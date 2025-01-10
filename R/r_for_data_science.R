@@ -98,28 +98,102 @@ ggplot(
   ) +
   scale_color_colorblind() # this is a function to pick colorblind safe colors
 
+
+ggplot(
+  data = penguins, 
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(mapping = aes(color = bill_depth_mm)) +
+  geom_smooth()
+
 ggplot(
   data = penguins,
-  mapping = aes(x = bill_length_mm, y = bill_depth_mm)
+  mapping = aes(x = flipper_length_mm, y = body_mass_g, color = island)
+) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+# There are easier ways to write out the plot to save typing so the following plot can be reduced
+# From this:
+ggplot(
+  data = penguins, 
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
 ) +
   geom_point()
+# To this:
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+
+# Eventually you can even use pipping to help with plots, like this:
+penguins |>
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+
+# Visualizing distribution: Categorical vs Numerical
+
+# For categorical variables:
+# a variable is categorical if it can only take one of a small set of values
+# Most of the time we will be using bar charts for this data 
+# the height of the bar shows how many observations there are for each x value
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+# by default the order of the categories will be alphabetical but you can reorder them for highest frequency first 
+ggplot(penguins, aes(x = fct_infreq(species))) +
+  geom_bar()
+
+# for numeric variables:
+# a variable is numerical (quantitative) if it can take on a wide range of numerical values, and it is sensible to add, subtract, or take averages with those values
+# a common visual for this is the histogram
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+# it is always worth playing around with the binwidth because if there are too many observations the lines are too narrow and it will be hard to read
+# the higher the number the less bars and the thicker and easier they are to read 
+
+# another way to visualize numeric data is with a density plot
+# this is basically a smoothed out version of a histogram 
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
 
 
+ggplot(penguins, aes(y = species)) + 
+  geom_bar()
+
+ggplot(penguins, aes(x = species)) +
+  geom_bar(color = "red")
+
+ggplot(penguins, aes(x = species)) +
+  geom_bar(fill = "red")
 
 
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 0.2)
 
+# visualizing relationships
+# to see numeric and categorical values side by side, we can use box-plots
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+# can also make density plots too
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density(linewidth = 0.75) # adjusting the linewidth can make the lines more readable 
+# to add to the visual, you can also fill in the space underneath the lines 
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(alpha = 0.5) # the transparency is between 0 (completely transparent) and 1 (completely opaque)
 
+# there are also options to see visuals of 2 categorical variables at once 
+# this is commonly done by stacked bar plots 
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
 
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill") # adding the fill position maxes each bar out to the top and the y essentially because what percentage of the whole
 
-
-
-
-
-
-
-
-
-
+# for three or more numeric variables: 
+# we can use the visual of the scatterplot but add other aesthetics for the other variables like color for one and shape for another variable
+# but this can make it difficult to read
+# another option is using the facet_wrap() argument where it splits the visual into multiple different facets (which are just subsets of the data)
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island)
 
 
 
