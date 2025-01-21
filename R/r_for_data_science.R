@@ -402,20 +402,181 @@ arrange(
 )
 
 
+# grouping data by a specific column means you can work with each group for other functions
+flights |> 
+  group_by(month)
+
+# summarize is similar to what it does in python but you can give it more specifications in R
+# if we want to see the average departure delay by month:
+flights |> 
+  group_by(month) |> 
+  summarize(
+    avg_delay = mean(dep_delay, na.rm = TRUE) # we need to include the na.rm = TRUE to ignore blanks in the data otherwise we just get 'NA' for each output
+  )
+
+# it is also possible to have multiple summaries into a single call of summarize()
+# n() used in the below is for returning the number of rows in each group
+flights |> 
+  group_by(month) |> 
+  summarize(
+    avg_delay = mean(dep_delay, na.rm = TRUE),
+    n = n()
+  )
+
+# there are multiple types of slice_ functions that let you extract specific rows within each group 
+# df |> slice_head(n = 1) takes the first row from each group.
+# df |> slice_tail(n = 1) takes the last row in each group.
+# df |> slice_min(x, n = 1) takes the row with the smallest value of column x.
+# df |> slice_max(x, n = 1) takes the row with the largest value of column x.
+# df |> slice_sample(n = 1) takes one random row.
+
+flights |> 
+  group_by(dest) |> # this will group the dataset by the destination location 
+  slice_max(arr_delay, n = 1) |> # this will take the top 1 max number row in the arrival delay column 
+  relocate(dest) # this then takes the dest column and moves it to the first column 
+
+# you can also group by more than one variable:
+daily <- flights |> 
+  group_by(year, month, day) # this will group the dataset by each day of the year 
+daily
+
+daily_flights <- daily |> 
+  summarize(n = n())
+# dplyr will send a message that the summarise() will only group the output by the first 2 groupings and will exclude the last one
+# it will say the way to include the last is by adding the `.groups` argument
+# you can also addendum this function to include different values by adding "drop" and "keep" 
+
+# to remove grouping you would use `ungroup()` 
+daily |> 
+  ungroup()
+
+# if you summarize without any type of grouping then you just get one output because the summary will just be of the entire dataset
+daily |> 
+  ungroup() |> 
+  summarize(
+    avg_delay = mean(dep_delay, na.rm = TRUE), 
+    flights = n()
+  )
+
+# there is another method of grouping that is newer by using the `.by`
+# the advantage of this is that it won't give back the message that it dropped the last row and you won't have to use `ungroup()` at the end 
+# you can also group multiple things together with .by
+flights |> 
+  summarize(
+    delay = mean(dep_delay, na.rm = TRUE),
+    n = n(),
+    .by = month 
+  )
+
+flights |> 
+  summarize(
+    delay = mean(dep_delay, na.rm = TRUE),
+    n = n(),
+    .by = c(origin, dest)
+  )
 
 
+# 1. 
+flights |> 
+  group_by(carrier, dest) |> # grouping the data by carrier and destination airport 
+  summarize(avg_delay = mean(dep_delay, na.rm = TRUE)) |> # take the average delay time and create a column for it
+  arrange(desc(avg_delay)) # sort the output by highest average delay time
+# the output will show that the top worst avg delay is UA to STL with an avg of 77.5
+
+# 2.
+flights |> 
+  filter(dep_delay > 0) |> # will filter to only include flights with a delayed departure time 
+  group_by(dest) |> # groups the data by the destination
+  slice_max(dep_delay, n = 1) |> # takes the top row for highest departure delay time
+  relocate(dest) # moves the destination column to the first column
+
+# 3. 
+flights |> 
+  ggplot(aes(x = dep_time, y = dep_delay, na.rm = TRUE)) +
+  geom_point()
+
+# 4.
+flights |> 
+  slice_min(dep_delay, n = -1)
+
+# 6.
+df <- tibble(
+  x = 1:5,
+  y = c("a", "b", "a", "a", "b"),
+  z = c("K", "K", "L", "L", "K")
+)
+
+df |>
+  group_by(y)
+
+df |>
+  arrange(y)
+
+df |>
+  group_by(y) |>
+  summarize(mean_x = mean(x))
+
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x), .groups = "drop")
+
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x))
+
+install.packages("styler")
 
 
+flights |>
+  filter(dest == "IAH") |> 
+  group_by(year, month, day) |> 
+  summarize(
+    n = n(),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) |> 
+  filter(n > 10)
+
+flights |> 
+  filter(
+    carrier == "UA",
+    dest  %in% c("IAH", "HOU"),
+    sched_dep_time > 0900,
+    sched_arr_time < 2000
+  ) |> 
+  group_by(flight) |> 
+  summarize(
+    delay = mean(arr_delay, na.rm = TRUE),
+    cancelled = sum(is.na(arr_delay)),
+    n = n()
+  ) |> 
+  filter(n > 10)
 
 
-
-
-
-
-
-
-
-
+# another way to handle large datasets and make them easier to read and work with is by pivoting the data
+# this is when you take a dataset and expand upon it based on the data that is already there
+# ex:
+df <- tribble(
+  ~id,  ~bp1, ~bp2,
+  "A",  100,  120,
+  "B",  140,  115,
+  "C",  120,  125
+)
+# if we want to take this tribble and see each measurement and value per id with the id and measurement in seperate rows:
+df |> 
+  pivot_longer(
+    cols = bp1:bp2,
+    names_to = "measurement",
+    values_to = "value"
+  )
+# this will now essentially let us see the different combinations of the data
 
 
 
