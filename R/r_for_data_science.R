@@ -12,7 +12,7 @@ install.packages(
     "repurrrsive", "tidymodels", "writexl")
 )
 
-# Chapter: Whole Game
+# Chapter: Whole Game ----------------------------------------------------------
 
 # for the first exercise we will need to install the palmerpenguins package which has a penguins dataset
 library(palmerpenguins)
@@ -223,7 +223,7 @@ ggplot(penguins, aes(x = island, fill = species)) +
 ggplot(penguins, aes(x = species, fill = island)) +
   geom_bar(position = "fill")
 
-################################################################
+
 # coding basics in R 
 # basic arithmetic in R
 1 / 200 * 30
@@ -533,6 +533,7 @@ df |>
   mutate(mean_x = mean(x))
 
 install.packages("styler")
+library(styler)
 
 
 flights |>
@@ -569,7 +570,7 @@ df <- tribble(
   "B",  140,  115,
   "C",  120,  125
 )
-# if we want to take this tribble and see each measurement and value per id with the id and measurement in seperate rows:
+# if we want to take this tribble and see each measurement and value per id with the id and measurement in separate rows:
 df |> 
   pivot_longer(
     cols = bp1:bp2,
@@ -577,6 +578,48 @@ df |>
     values_to = "value"
   )
 # this will now essentially let us see the different combinations of the data
+
+# to go from a tibble with the column names being ex: x_1, y_2, x_3, etc. you can use the underscore as a separator for elongating the dataset
+who2 |> 
+  pivot_longer(
+    cols = !(country:year),
+    names_to = c("diagnosis", "gender", "age"),
+    names_sep = "_",
+    values_to = "count"
+  )
+
+household |> 
+  pivot_longer(
+    cols = !family, 
+    names_to = c(".value", "child"),
+    
+  "B",        "bp2",    115
+)
+
+df |>
+  pivot_wider(
+    names_from = measurement,
+    values_from = value
+  )
+
+df |> 
+  group_by(id, measurement) |> 
+  summarize(n = n(), .groups = "drop") |> 
+  filter(n > 1)
+
+# Chapter: Visualize -----------------------------------------------------------
+library(tidyverse)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
