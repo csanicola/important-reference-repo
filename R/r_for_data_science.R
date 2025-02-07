@@ -773,19 +773,186 @@ ggplot(mpg) +
   facet_grid(. ~ cyl)
 # this makes 3 different vertical graphs
 
+# `.` is just a placeholder so that we can have a facet in only one dimension. 
+# This is necessary because sometimes one sided formulae can cause problems.
+
+# 4. Take the first faceted plot in this section:
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) + 
+  facet_wrap(~ cyl, nrow = 2)
+
+# What are the advantages to using faceting instead of the color aesthetic? What are the disadvantages? How might the balance change if you had a larger dataset?
+
+# its easier to see the data groupings for each category but its hard to compare the categories together 
+# It is difficult to resolve more than a dozen or so discrete colours, but we can have a larger number of facets than that. On the other hand, facets can be harder to read at a glance, or if the cells being compared aren't lined up in the required dimension. So in a situation like this, colours are probably better, but if we had more classes, or wanted to use colour for a different variable, facets would come into their own.
+
+# 5. Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? Why doesn’t facet_grid() have nrow and ncol arguments?
+?facet_wrap
+# nrow is number of rows
+# ncol is number of columns 
+# you can change the order of the panels
+?facet_grid
+# because there are only ever a set number of rows and cols depending on the two variables
+# In `facet_wrap`, `nrow` and `ncol` control the numbers of rows and columns, but in `facet_grid` these are implied by the faceting variables. `dir` also controls the placement of the individual panels, and so isn't an argument of `facet_grid`.
+
+# 6. Which of the following plots makes it easier to compare engine size (displ) across cars with different drive trains? What does this say about when to place a faceting variable across rows or columns?
+
+ggplot(mpg, aes(x = displ)) + 
+  geom_histogram() + 
+  facet_grid(drv ~ .)
+# this one is easier to compare the grouping/skewness of each type of drive trains for comparison between them
+
+ggplot(mpg, aes(x = displ)) + 
+  geom_histogram() +
+  facet_grid(. ~ drv)
+# this one is easier to compare counts but harder to see the skinnier lines
+
+# 7. Recreate the following plot using facet_wrap() instead of facet_grid(). How do the positions of the facet labels change?
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+
+ggplot(mpg) +
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_wrap(~ drv, nrow = 3)
+# it now shows the labels for drv on top of the graph instead of the right side 
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# there are a bunch of geoms that auto calculate stats for their displays like geom_bar using the count of variables # you are able to change the way it calculates these stats by specifying something different
+# if you want to use identity instead of count you would do:
+diamonds |>
+  count(cut) |> 
+  ggplot(aes(x = cut, y = n)) +
+  geom_bar(stat = "identity")
 
+# another option is displaying proportions instead of counts 
+ggplot(diamonds, aes(x = cut, y = after_stat(prop), group = 1)) + 
+  geom_bar()
 
+# another option is a stat summary which summarized the y values for each unique x value
+ggplot(diamonds) +
+  stat_summary(
+    aes(x = cut, y = depth),
+    fun.min = min,
+    fun.max = max, 
+    fun = median
+  )
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Exercises
+# 1. What is the default geom associated with stat_summary()? How could you rewrite the previous plot to use that geom function instead of the stat function?
+# geom_pointrange()
+ggplot(data = diamonds) +
+  geom_pointrange(
+    mapping = aes(x = cut, y = depth),
+    stat = "summary",
+    fun.min = min, 
+    fun.max = max,
+    fun = median
+    )
 
+# 2. What does geom_col() do? How is it different from geom_bar()?
+?geom_col
+# its like geom_bar but the heights of the bars represent values in the data 
 
+# 3. Most geoms and stats come in pairs that are almost always used in concert. Make a list of all the pairs. What do they have in common? (Hint: Read through the documentation.)
 
+# Complementary geoms and stats:
+# geom                  | stat
+# geom_bar()	            stat_count()
+# geom_bin2d()	          stat_bin_2d()
+# geom_boxplot()	        stat_boxplot()
+# geom_contour_filled()	  stat_contour_filled()
+# geom_contour()	        stat_contour()
+# geom_count()	          stat_sum()
+# geom_density_2d()	      stat_density_2d()
+# geom_density()	        stat_density()
+# geom_dotplot()	        stat_bindot()
+# geom_function()	        stat_function()
+# geom_sf()	              stat_sf()
+# geom_sf()	              stat_sf()
+# geom_smooth()	          stat_smooth()
+# geom_violin()	          stat_ydensity()
+# geom_hex()	            stat_bin_hex()
+# geom_qq_line()	        stat_qq_line()
+# geom_qq()	              stat_qq()
+# geom_quantile()	        stat_quantile()
 
+# 4.  What variables does stat_smooth() compute? What arguments control its behavior?
+?stat_smooth
+# Aids the eye in seeing patterns in the presence of overplotting
+# The function stat_smooth() calculates the following variables:
+# - y: predicted value
+# - ymin: lower value of the confidence interval
+# - ymax: upper value of the confidence interval
+# - se: standard error
 
+# 5. In our proportion bar chart, we needed to set group = 1. Why? In other words, what is the problem with these two graphs?
 
+ggplot(diamonds, aes(x = cut, y = after_stat(prop))) + 
+  geom_bar()
+ggplot(diamonds, aes(x = cut, fill = color, y = after_stat(prop))) + 
+  geom_bar()
 
+# with the group = 1 not included the bars will have the same height and it won't show anything valuable 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# bar charts ca be either outlined in color or filled with color 
+# if you map the fill to another variable that isnt the x or y, it stackes the colors on top of one another in the bars 
+# there is a position argument when you have stacked bars
+# they are: 
+# - identity
+# - dodge 
+# - fill 
+
+# identity keeps the bars exactly where they fall and additives like alpha (transparency) and fill = N/A (just an outline) can be used in combination to make the categories easier to see
+# fill is stacked bars but for % so the bars are fully set to 100 and the categories within are the percentages of 100 so its useful for seeing with the overall categories but not for comparing with one another 
+# dodge puts all the subcategories side by side instead of stacked so it makes a bunch of bars which is good to compare overall but not within the overarching categories 
+
+# if you have a dataset with a lot of data especially with points and there are many that have the same you run into issues of overplotting 
+# to help this you can add the position "jitter" that will not keep the points on such uniforms lines so its easier to see larger clumps compared to one or two by themselves 
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(position = "jitter")
+# this is better to use with larger data sets rather than smaller data sets 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Exercises 
+# 1. What is the problem with the following plot? How could you improve it?
+  
+  ggplot(mpg, aes(x = cty, y = hwy)) + 
+    geom_point()
+
+  ggplot(mpg, aes(x = cty, y = hwy)) +
+    geom_point(position = "jitter") # adding jitter will make it easier to read 
+  
+# 2. What, if anything, is the difference between the two plots? Why?
+  
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(position = "identity")
+# no difference?
+
+# 3. What parameters to geom_jitter() control the amount of jittering?
+# width and height 
+  
+# 4. Compare and contrast geom_jitter() with geom_count().
+# The geom geom_jitter() adds random variation to the locations points of the graph. In other words, it “jitters” the locations of points slightly. This method reduces overplotting since two points with the same location are unlikely to have the same random variation.
+# However, the reduction in overlapping comes at the cost of slightly changing the x and y values of the points.
+# The geom geom_count() sizes the points relative to the number of observations. Combinations of (x, y) values with more observations will be larger than those with fewer observations.
+
+# 5. What’s the default position adjustment for geom_boxplot()? Create a visualization of the mpg dataset that demonstrates it.
+# default position is dodge2 and this can be either horizontal or vertical 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# there is also the ability to use actual map coordinates to map locations on a graph 
 
 
 
