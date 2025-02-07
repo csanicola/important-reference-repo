@@ -610,6 +610,184 @@ df |>
 # Chapter: Visualize -----------------------------------------------------------
 library(tidyverse)
 
+# when using shapes, there are a max of 6 discrete (unique) values that can be used so if you have more than that, it's best to use something else like color 
+# size is also not the best idea if there are too many discrete values because then the whole plot will just look like a giant blob 
+
+# R has 26 built-in shapes that are identified by numbers. There are some seeming duplicates: for example, 0, 15, and 22 are all squares. The difference comes from the interaction of the color and fill aesthetics. The hollow shapes (0–14) have a border determined by color; the solid shapes (15–20) are filled with color; the filled shapes (21–25) have a border of color and are filled with fill. Shapes are arranged to keep similar shapes next to each other.
+
+# to see the different aesthetic options: https://ggplot2.tidyverse.org/articles/ggplot2-specs.html
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Exercises:
+# 1. Create a scatterplot of hwy vs. displ where the points are pink filled in triangles.
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(shape = 24, fill = "pink")
+# shapes are used by numbers instead of names 
+
+# 2. Why did the following code not result in a plot with blue points?
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy, color = "blue"))
+# Your code did not result in blue points because "blue" is placed inside aes(), treating it as a categorical variable rather than setting the actual color.
+# the fixed code is below:
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(color = "blue")
+
+# 3. What does the stroke aesthetic do? What shapes does it work with? (Hint: use ?geom_point)
+?geom_point
+# for shapes that have borders: Use the stroke aesthetic to modify the width of the border
+
+# 4. What happens if you map an aesthetic to something other than a variable name, like aes(color = displ < 5)? Note, you’ll also need to specify x and y.
+# it evaluates the expression for each row in the dataset and treats it as a categorical (logical) variable so:
+# displ < 5 returns TRUE or FALSE for each row 
+# ggplot2 treats these logical values as discrete categories 
+# the plot will use a different color for TRUE (displ < 5) and FALSE (displ >= 5)
+# a legend will be created showing the two groups (TRUE and FALSE)
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy, color = displ < 5))
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# the aesthetics can be used for geom_point() and geom_smooth() but not all aesthetics can be mapped to both like shape for _smooth 
+# for geom_smooth() you could use linetype:
+ggplot(mpg, aes(x = displ, y = hwy, linetype = drv)) +
+  geom_smooth()
+# another option to make it even more clear is to actually stack the two on top of each other:
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point() +
+  geom_smooth(aes(linetype = drv))
+# aesthetics for each geom is the mapping for that layer only which makes it possible to see multiple overlapping aesthetics per layer 
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth()
+
+# the local layer aesthetics override the global aesthetics too:
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_point(
+    data = mpg |> filter(class == "2seater"),
+    color = "red"
+  ) +
+  geom_point(
+    data = mpg |> filter(class == "2seater"),
+    shape = "circle open", size = 3, color = "red"
+  )
+
+# ggplot2 only has 40 geoms but there are more expansion packs for more visuals for whatever you need
+# one other example is the ggridges package that can make ridge lines which are useful for visualizing density of numeric variables based on categorical variables 
+install.packages("ggridges")
+library(ggridges)
+
+ggplot(mpg, aes(x = hwy, y = drv, fill = drv, color = drv)) +
+  geom_density_ridges(alpha = 0.5, show.legend = FALSE)
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Exercises
+# 1. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
+# line = geom_line()
+# boxplot = geom_boxplot()
+# histogram = geom_histogram()
+# area chart = geom_area()
+
+# 2. Earlier in this chapter we used show.legend without explaining it:
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(aes(color = drv), show.legend = FALSE)
+
+# What does show.legend = FALSE do here? What happens if you remove it? Why do you think we used it earlier?
+# it removes the legend in the visual which can be good to compare multiple visuals that have the same legend so it doesn't get in the way 
+
+# 3. What does the se argument to geom_smooth() do?
+?geom_smooth
+# Display confidence interval around smooth? (TRUE by default, see level to control.)
+
+# 4. Recreate the R code necessary to generate the following graphs. Note that wherever a categorical variable is used in the plot, it’s drv.
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(color = "blue", se = FALSE)
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(aes(group = drv), se = FALSE)
+
+ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point() +
+  geom_smooth(aes(group = drv), se = FALSE)
+
+ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point(aes(color = drv)) +
+  geom_smooth(se = FALSE)
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = drv)) +
+  geom_smooth(aes(group = drv, linetype = drv), se = FALSE)
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(fill = drv), shape = 21, color = "white", stroke = 1)
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# facet_wrap() is used to split a plot into subplots based on categorical variables:
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_wrap(~cyl)
+
+# but if you want to use two variables, you would use facet_grip() instead 
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() + 
+  facet_grid(drv ~ cyl)
+# it defaults to the same scale for the ranges of x and y but to have it autoscale then use "free_x", "free_y" or "free" for both
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(drv ~ cyl, scales = "free")
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Exercises 
+
+# 1. What happens if you facet on a continuous variable?
+# it will convert the continuous variable into bins 
+ggplot(mpg) +
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_wrap(~ cty)
+
+# 2. What do the empty cells in the plot above with facet_grid(drv ~ cyl) mean? Run the following code. How do they relate to the resulting plot?
+
+ggplot(mpg) + 
+  geom_point(aes(x = drv, y = cyl))
+
+# it means there are no data points for those categories
+
+# 3. What plots does the following code make? What does . do?
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+# this makes 3 different horizontal graphs
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+# this makes 3 different vertical graphs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
