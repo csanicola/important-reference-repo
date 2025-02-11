@@ -735,7 +735,7 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point() +
   facet_wrap(~cyl)
 
-# but if you want to use two variables, you would use facet_grip() instead 
+# but if you want to use two variables, you would use facet_grid() instead 
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point() + 
   facet_grid(drv ~ cyl)
@@ -953,13 +953,33 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # there is also the ability to use actual map coordinates to map locations on a graph 
+nz <- map_data("nz")
 
+ggplot(nz, aes(x = long, y =lat, group = group)) +
+  geom_polygon(fill = "white", color = "black") +
+  coord_quickmap()
 
+bar <- ggplot(data = diamonds) +
+  geom_bar(
+    mapping = aes(x = clarity, fill = clarity),
+    show.legend = FALSE,
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1)
 
+bar + coord_flip()
+bar + coord_polar()
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Exercise 
+ggplot(mpg, aes(x = factor(1), fill = drv)) +
+  geom_bar()
 
-
-
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() + 
+  geom_abline() +
+  coord_fixed()
+?geom_abline()
 
 
 
