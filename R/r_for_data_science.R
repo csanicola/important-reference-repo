@@ -981,6 +981,117 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
   coord_fixed()
 ?geom_abline()
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# EDA
+library("tidyverse")
+library("nycflights13")
+install.packages("ggbeeswarm")
+library("ggbeeswarm")
+install.packages("lvplot")
+library("lvplot")
+install.packages("ggstance")
+library("ggstance")
+
+ggplot(diamonds, aes(x = y)) +
+  geom_histogram(binwidth = 0.5)
+# this plot is too big to see any of the outliers so we need to zoom into the small values in the y-axis and we can do so with coord_cartesian()
+
+ggplot(diamonds, aes(x = y)) +
+  geom_histogram(binwidth = 0.5) +
+  coord_cartesian(ylim = c(0, 50))
+
+unusual <- diamonds |>
+  filter(y < 3 | y > 20) |>
+  select(price, x, y, z) |>
+  arrange(y)
+unusual
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Exercises
+# 1.
+summary(select(diamonds, x, y, z))
+
+ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = x), binwidth = 0.01)
+
+ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = y), binwidth = 0.01)
+
+ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = z), binwidth = 0.01)
+
+# to see the outliers more clearly 
+ggplot(diamonds, aes(x = x, y = y)) +
+  geom_point()
+
+ggplot(diamonds, aes(x = x, y = z)) +
+  geom_point()
+
+ggplot(diamonds, aes(x = y, y = z)) +
+  geom_point()
+
+# now lets look at the histograms with the outliers removed
+filter(diamonds, x > 0, x < 10) %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = x), binwidth = 0.01) +
+  scale_x_continuous(breaks = 1:10)
+
+filter(diamonds, y > 0, y < 10) %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = y), binwidth = 0.01) +
+  scale_x_continuous(breaks = 1:10)
+
+filter(diamonds, z > 0, z < 10) %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = z), binwidth = 0.01) +
+  scale_x_continuous(breaks = 1:10)
+
+# 2. 
+?diamonds
+ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = price), binwidth = 10)
+ggplot(diamonds) +
+  geom_histogram(mapping = aes(x = price), binwidth = 500)
+
+# 3. 
+diamonds %>%
+  filter(carat >= 0.99, carat <= 1) %>%
+  count(carat)
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+diamonds2 <- diamonds |> 
+  mutate(y = if_else(y < 3 | y > 20, NA, y))
+
+ggplot(diamonds2, aes(x = x, y = y)) + 
+  geom_point()
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# exercises
+mean(c(0, 1, 2, NA), na.rm = TRUE)
+sum(c(0, 1, 2, NA), na.rm = TRUE)
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+ggplot(diamonds, aes(x = price)) +
+  geom_freqpoly(aes(color = cut), binwidth = 500, linewidth = 0.75)
+
+ggplot(diamonds, aes(x = price, y = after_stat(density))) + 
+  geom_freqpoly(aes(color = cut), binwidth = 500, linewidth = 0.75)
+
+# or you can use side-by-side boxplots 
+ggplot(diamonds, aes(x = cut, y = price)) +
+  geom_boxplot()
+
+
+
+
+
+
+
+
 
 
 
