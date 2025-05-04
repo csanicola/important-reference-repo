@@ -2,6 +2,8 @@
 
 # Postgres Terminal commands
 
+> PostgreSQL login info for freecodecamp training: `psql --username=freecodecamp --dbname=postgres`
+
 - `\l` is to **list out** the databases that are available
 - to **create a database** you would use the command `CREATE DATABASE database_name;`
   - all commands need the semi-colon at the end of them
@@ -32,6 +34,23 @@
     - `ALTER TABLE table_name DROP CONSTAINT constraint_name;`
 - to set up a **foreign key** which is what can connect one table to another:
   - `ALTER TABLE table_name ADD COLUMN column_name DATATYPE REFERENCES referenced_table_name(referenced_column_name);`
+    - adding a **one-to-one relationship** you would use the below command:
+      - `ALTER TABLE table_name ADD UNIQUE(column_name);`
+  - to add an **existing column as a foreign key**: `ALTER TABLE table_name ADD FOREIGN KEY(column_name) REFERENCES referenced_table(referenced_column);`
+- for tables with keys or foreign keys, you should set up a `NOT NULL` rule: `ALTER TABLE table_name ALTER COLUMN column_name SET NOT NULL;`
+- you can also make tables that have data type restrains to it when creating the table: `CREATE TABLE table_name(column_name DATATYPE CONSTRAINTS);`
+- "many to many" relationships usually use a **junction** table to link the two tables together forming the "many to many" relationships
+- to create a primary key from two columns, its known as a **composite** primary key: `ALTER TABLE table_name ADD PRIMARY KEY(column1, column2);`
+  - this will create a table with multiple column1 values and multiple column2 values but you will never have the same combination of column1 and column2 in the same row
+- to **join** two tables together, you would use the `JOIN` command: `SELECT columns FROM table_1 FULL JOIN table_2 ON table_1.primary_key_column = table_2.foreign_key_column;`
+  - you can specify columns or use `*` to select all columns
+    - to join three tables:
+
+```sql
+SELECT columns FROM junction_table
+FULL JOIN table_1 ON junction_table.foreign_key_column = table_1.primary_key_column
+FULL JOIN table_2 ON junction_table.foreign_key_column = table_2.primary_key_column;
+```
 
 # Terminal Project Notes
 
@@ -58,3 +77,6 @@
 - you can rename filenames using `mv` ex: `mv <filename> <new_filename>` (mv stands for move)
 - use `find` to find things or view a file tree
 - `exit` is the command to exit the terminal
+- to save a postgresql database (for specifically the freecodecamp account/project)you can use the following command in the terminal `pg_dump -cC --inserts -U freecodecamp universe > universe.sql`
+  - it will save a `universe.sql` in the file where the command was located
+  - to rebuild the database you would enter the following command which will run all the scripts in the sql file: `psql -U postgres < universe.sql`
