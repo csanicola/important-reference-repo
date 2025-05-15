@@ -10,7 +10,7 @@
 | `No_Show_Rate`               | Percentage of scheduled appointments that patients missed       | Float     | 7.8              | National benchmark <10%                   |
 | `Followup_Adherence_Rate`    | Percentage of patients who completed recommended follow-ups     | Float     | 81.5             | Higher is better                          |
 | `Staff_to_Patient_Ratio`     | Ratio of support staff to unique patients seen                  | Float     | 0.18             | Example: 18 staff per 100 patients        |
-| `Provider_Productivity`      | Average number of visits per full-time equivalent (FTE) provide | Float     | 384,6            | Total visits divided by provider FTE      |
+| `Provider_Productivity`      | Average number of visits per full-time equivalent (FTE) provide | Float     | 384.6            | Total visits divided by provider FTE      |
 | `A1C_Screening_Compliance`   | Percentage of diabetic patients with documented A1C screening   | Float     | 92.3             | Proxy for quality measure compliance      |
 | `Total_Providers_FTE`        | Total number of full-time equivalent providers                  | Float     | 10.5             | Needed to calculate productivity          |
 | `Total_Staff_FTE`            | Total number of full-time equivalent support staff              | Float     | 19.0             | Used to calculate staff ratio             |
