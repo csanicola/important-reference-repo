@@ -1,0 +1,130 @@
+# R Notes 
+Sources:
+1. [Mastering Health Science Using R](https://alicepaul.github.io/health-data-science-using-r/book.html)
+
+*Keyboard shortcuts:*
+- `<-` (assignment operator)
+  - Windows: Alt + -
+  - Mac: Option + -
+- `%>%` (pipe operator)
+  - Windows: Ctrl+Shift+M 
+  - Mac: Cmd+Shift+M 
+- (Un)Comment Selection
+  - Windows: Ctrl+Shift+C 
+  - Mac: Cmd+Shift+C 
+___
+## Basics of R 
+### Basic Computations Objects
+- Addition: `+`
+- Subtraction: `-`
+- Multiplication: `*`
+- Division: `/`
+- Exponentiation: `^`
+- Modulo: `%%`
+___
+- **objects** are values used in R 
+  - a **variable** is an object
+  - an object is a named instance of a data structure
+  - data structures in R are **vectors**, **factors**, **matrices**, **arrays**, **lists**, and **data frames**
+- to store any computation or value as a variable you would use the assignment operator:
+  - `x <- 2+3`
+
+- calling a function is: `function_name()`
+  - examples of functions:
+    - `ceiling()` returns the ceiling (an upper usually prescribed limit) of your input
+    - `floor()` returns the floor (a lower usually prescribed limit) of your input 
+    - `round()` rounds your input to the closest integer - it rounds a number in 0.5 to the closest even integer:
+      - ex: 2.5 = 2; 3.5 = 4
+___
+- to see what the current working directory is you would use `getwd()`
+  - to change the working directory, you would use `setwd()`
+___
+- before you do anything else, you need to install packages that are used in R 
+  - the most important one is `tidyverse`
+    - `install.packages('tidyverse')`
+      - to call the package: `library(tidyverse)`
+___
+## Data Structures in R 
+- each individual value in R has a type: **logical**, **integer**, **double** or **character**
+  - you can use `typeof()` to find the type of vector 
+- **double** is a numeric value with a stored decimal
+- an **integer** is a whole number without a decimal
+  - to indicate we want the number to be an integer object, you need to use `L` after the number 
+- **characters** have letters
+- **logicals** or **booleans** are `TRUE` and `FALSE`
+  - **booleans** can actually be interpreted as `0`/`1` and can be used in logic: ex: `TRUE + FALSE + TRUE` = 2
+### Vectors 
+- Vectors are one-dimensional data structures that cna store multiple data types of the same type (ex: character, Boolean, numeric)
+- You can confirm if something is a vector by using: `is.vector()`
+- Creating a vector:
+  - combine multiple values using the `c()` function 
+    - vectors can only store the same type of value, so if you try and combine a string and a integer, it will convert the integer to a string 
+    - the `class()` function returns the data structure of an object 
+    - you can create an empty vectio by leaving the `c()` blank
+      - you can also set the type of the empty vector:
+        - `ex_empty <- vector(mode="numeric")`
+  - you can create a vector with `req()` or `seq()`
+    - `req(x, times)` takes the value (x) and a number of times and outputs x the number of times entered
+    - `seq(from, to step)` takes a numeric starting value (from) and an end value (to) and step size (step) which specifies the sequence to get from the **from** to the **to** value (or the maximum that can get close based on the step value)
+
+#### Indexing a vector 
+- when a vector is created, you can access certain values in it by indexing []
+  - `vector[1]`
+- not only can you access a single value, but a subset of the values using `c()`
+  - `vector[c(1,4)]`
+- another option is to associate a name with each value
+  - `names(rain) <- days`
+- another option is using `TRUE` and `FALSE` values to index the values in a vector (both vectors need to be the same length)
+  - so when you index the vector, it will only show the `TRUE` values
+
+#### Modifying a Vector and Calculations
+- exp() - exponential
+- log() - log
+- sqrt() - square root
+- abs() - absolute value
+- round() - round to nearest integer value
+- ceiling() - round up to the nearest integer value
+- floor() - round down to the nearest integer value
+- signif(, dig) - round to dig number of significant digits
+- the above logical functions can be used to combine vectors or as operators on vector values
+- you can also change values in a vector: `rain["Friday"] <- 0.5`
+- adding additional entries to a vector is possible too 
+  - `days <- c(days, "Saturday", "Sunday")`
+  - to check the current length of a vector, you can use the `length()` function 
+- you can also get the sum, max, and min of a vector using the functions:
+  - `sum()`
+  - `max()`
+  - `min()`
+
+#### Common Vector Functions
+- below are some of the most common vector functions available in R 
+- sum() - summation
+- median() - median value
+- mean() - mean
+- sd() - standard deviation
+- var() - variance
+- max() - maximum value
+- which.max() - index of the first element with the maximum value
+- min() - minimum value
+- which.min() - index of the first element with the minimum value
+
+- you can also use the `sort()` function to sort the values
+- and the `order()` function to see the order of the values which have the smallest and highest values
+- for both `order()` and `sort()`, they have the extra argument of `decreasing` which can be set to either `TRUE` or `FALSE`
+
+### Factors 
+- a special kind of vector that behaves like a regular vector, except that it represents values from a category
+- it keeps track of all possible values of that category in what are called levels of the factor 
+- the function `as.factor()` converts a vector to a factor
+  - using the `factor()` function instead of `as.factor()` will let you specify the levels of the factor even if there are more levels that current values of the factor 
+  ```r 
+  days_fct <- factor(days, 
+                    levels = c("Monday", "Tuesday", "Wednesday", 
+                                "Thursday", "Friday", "Saturday", "Sunday"))
+  ```
+- you may not have all the values in the factor as what you are specifying in the levels but thats just telling when a new value is inserted, what level the new value will take
+- factors can also be used for numeric vectors 
+- if we want to have 0/1 to represent whether a day is a weekend or not, this is something we can do with factor levels
+
+### Matrices 
+- 
