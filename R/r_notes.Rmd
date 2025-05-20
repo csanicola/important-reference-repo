@@ -127,4 +127,100 @@ ___
 - if we want to have 0/1 to represent whether a day is a weekend or not, this is something we can do with factor levels
 
 ### Matrices 
-- 
+- similar to vectors in that they store data of the same type but matrices are two-dimensional and consist of rows and columns 
+- matrices can be created using the matric() function
+  - `matrix(data, nrow, ncol, byrow)`
+    - **data** are the values (and are often used with the `c()` function)
+    - **nrow** is the number of rows
+    - **ncol** is the number of columns
+    - **byrow** is either `TRUE` if you want the data values to be filled in by row or `FALSE` if its by columns
+- to find the dimensions of the matrix, you can use `nrow()`, `ncol()`, or `dim()`
+  - `nrow()` returns how many rows there are 
+  - `ncol()` returns how many columns there are 
+  - `dim()` returns how many rows and columns there are
+
+#### Indexing a Matrix 
+- as opposed to vectors, since there are rows and columns, you need to know both when trying to index a value in a matrix
+  - `rainfall[1, 4]`
+- you can provide multiple indexes to return multiple values
+  - `rainfall[1, c(4, 5, 7)]`
+- you can also index by boolean
+  - `rainfall[c(FALSE, TRUE), ]`
+- we can also specify row and column names in the indices
+- `colnames()` and `rownames()` returns the names of the rows and columns
+
+#### Modifying a Matrix
+- to change the values in a matrix, you need to index the values first and then assign new values
+- the functions `rbind()` and `cbind()` can add rows and columns 
+  - `rainfall <- rbind(rainfall, "Week3" = c(0.4, 0.0, 0.0, 0.0, 1.2, 2.2, 0.0))` this will add a new row with values 
+  - `rainfall <- cbind(rainfall, "Total" = c(7.1, 2.4, 3.8))` this will add a new column with values
+- you can bind matrices together using `cbind()`, but you need to make sure they are the same size
+- you can also use mathematical operators to combine too: `A+B` or perform mathematics on the matrix: `exp(C)`
+
+### Data Frames
+- like matrices, they store data in rows and columns, but you can use different data types
+- you can create a data frame from data using the `data.frame()` function
+  - the `head()` function prints the first six rows of a data frame
+  - the `tail()` function prints the last six rows of a data frame
+- you can use the same `dim()`, `nrow()`, `ncol()` as you would with a matrix 
+- the same with `colnames()` or you can even just use `names()`
+
+#### Indexing a Data Frame
+- done the same way as with a matrix 
+- you can also use `$` for accessing the column names: `weather_data$day_of_week`
+
+#### Modifying a Data Frame
+- can also modify the data the same as with a matrix 
+- can also combine data frames using the `rbind()` or `cbind()` but can also use `$`
+
+### Lists 
+- a data frame is actually a special type of another data structure called a list
+- a list is a collection of objects under the same name
+- these objects can be vectors, matrices, data frames, or even other lists
+- they don't have to be the same size, type, or any other matching attribute
+- when printing indexes, it will return the sublist of values you are indexing
+- you can specify to return just the values themselves by using double brackets: `ex_list[[2]]`
+- you can also just name of the elements of a list to make indexing and manipulating easier:
+```r 
+ex_list <- list(name="John",
+                medication=c("ibuprofen", "metformin"),
+                past_weights=c(136, 142, 159))
+```
+___
+## Working with Data Files in R 
+
+- Tab-Delimited Files: You can read in a tab-separated .txt file using the read.delim() function in base R.
+- Excel Files: You can read in a .xls or .xlsx file using readxl::read_excel(), which allows you to specify a sheet and/or cell range within a file (e.g., read_excel('test.xlsx', sheet="Sheet1")).
+- SAS: haven::read_sas() reads in .sas7bdat or .sas7bcat files, haven::read_xpt() reads in SAS transport files.
+- Stata: haven::read_dta() reads in .dta files.
+- SPSS: haven::read_spss() reads in .spss files.
+
+- to explore the distribution and ranges of the values in certain columns, you can use the `summary()` function
+  - if there are any NA values in the column, you can use the argument `na.rm=TRUE` to remove the NAs or else some of the results will just be NA
+- `min(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the minimum value for a numeric vector
+- `max(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the maximum value for a numeric vector
+- `mean(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the mean for a numeric vector
+- `median(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the median for a numeric vector
+- `range(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the minimum and maximum values for a numeric vector x
+- `quantile(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the sample quantiles for a numeric vector
+- `IQR(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE)` returns the interquartile range for a numeric vector
+- by default the quantile() function returns the sample quantiles but you can specify which quantiles you want to use
+  - `quantile(pain$PAIN_INTENSITY_AVERAGE, probs = c(0.1, 0.9), na.rm=TRUE)`
+
+- you can also see the distribution of values in a numeric column by using the `hist()` function
+
+- the `summary()` function works with categorical columns too but will just return the counts for each level
+  - it is easier to see the output by using the `table()` function: `table(pain$PAT_SEX, use="always")`
+    - the `useNA` argument will show if there are any NA values in the table because by default it ignores NA's in the output
+- using the `prob.table()` function will convert the counts to proportions (what percentage of the total values is the categorical value)
+- you can also take a subset of the data and store it into a new dataframe
+
+- the `pmax()` function is to find the maximum value between two columns
+
+- another useful function that allows us to perform computations over the rows or columns of a matrix or data frame is the `apply(X, MARGIN, FUN)` function
+  - the `X` is the data frame or matrix
+  - the `MARGIN` indicates whether to compute over the rows (1) or columns(2)
+  - the `FUN` argument is the function to apply across that MARGIN
+- you can also use `colSums()` to find the sum of the columns
+
+### Missing Infinite and NaN Values
