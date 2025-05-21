@@ -293,7 +293,7 @@ the below are more logic operators that can be used in R
 
 - the function `ifelse()` is a logic operator that we can use to create a new vector with conditions
 - to create a histogram (numeric values) and bar graphs (categorical values) and customize the plots
-```r 
+```r
 hist(log(df$column), breaks=20, col="blue", # breaks is basically how many bars you want aka how do you want the data to be broken up
   main="This is the Title",
   xlab="This is the label for the X-axis")
@@ -306,4 +306,13 @@ barplot(height=cat_counts, names=names(cat_counts),
 barplot(height = smoke_counts, names = names(smoke_counts),
         col = c("orange","violetred", "blue"),
         xlab="Smoking Status", ylab="Frequency")
+
+# you can also use multiple continuous variables in a single scatterplot and then use another variable as the color option instead of specifying
+plot(nhanes_df$SBP1, nhanes_df$DBP1, col=as.factor(nhanes_df$HYP),
+    xlab="Systolic Blood Pressure",
+    ylab="Diastolic Blood Pressure")
+abline(v=120, col="blue") # abline() function is used to create a line on the plot; in this case to show the blood pressure cutoff (120/80)
+abline(h=80, col="blue")
 ```
+- to combine two plots in the same output, you would use the `par()` function that takes the arguments: `mfrow = c(nrow, ncol)`
+  - this is asking to specify the number of columns and rows we want to use for the figure

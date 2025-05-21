@@ -1,11 +1,9 @@
 # From the Textbook Mastering Health Science Using R
 # https://alicepaul.github.io/health-data-science-using-r/book.html
 
-###################################################################################################
-# 1. Getting Started with R
-###################################################################################################
+#  ----- 1. Getting Started with R ----- 
 
-# 1.2.1 Basic Computations Objects
+# ----- 1.2.1 Basic Computations Objects ----- 
 # Addition
 5+6
 # Subtraction
@@ -59,16 +57,15 @@ installed.packages()
 install.packages('tidyverse')
 library(tidyverse)
 
-###################################################################################################
-# 2. Data Structures in R
-###################################################################################################
+
+# ----- 2. Data Structures in R ----- 
 
 # an object is a named instance of a data structure
 ex_num <- 4
 
 # data structures in R are vectors, factors, matrices, arrays, lists, and data frames
 
-# 2.1 Data Types
+# ----- 2.1 Data Types ----- 
 # each individual value in R has a type: logical, integer, double or character
 # you can use typeof() function to find the type of vector
 typeof(ex_num) # double
@@ -86,7 +83,7 @@ typeof(ex_bool)
 # booleans can actually be interpreted as 0/1 and can be used in logic
 TRUE + FALSE + TRUE
 
-# 2.2 Vectors
+# ----- 2.2 Vectors ----- 
 # vectors are one-dimensional data structures that can store multiple data types of the same type (ex: character, Boolean, numeric)
 # you can confirm if something is a vector by using:
 is.vector(ex_bool)
@@ -115,7 +112,7 @@ rep("Monday", 4)
 seq(1,5,1)
 seq(0,-10,-2)
 
-# 2.2.1 Indexing a Vector
+# ----- 2.2.1 Indexing a Vector ----- 
 # when a vector is created, you can access certain values in it by indexing []
 days[1]
 days[4]
@@ -132,7 +129,7 @@ rain["Friday"]
 ind_bools <- c(TRUE, FALSE, FALSE, TRUE, FALSE)
 days[ind_bools] # this is now going to return only the TRUE values in the vector
 
-# 2.2.2 Modifying a Vector and Calculations
+# ----- 2.2.2 Modifying a Vector and Calculations ----- 
 # exp() - exponential
 # log() - log
 # sqrt() - square root
@@ -166,7 +163,7 @@ min(rain)
 practice_one <- seq(1, 11, 2)
 practice_one[3]
 
-# 2.2.4 Common Vector Functions
+# ----- 2.2.4 Common Vector Functions ----- 
 # sum() - summation
 # median() - median value
 # mean() - mean
@@ -186,7 +183,7 @@ days[order(rain)] # this is returning the days of the week in the order of the s
 # for both order() and sort() they have the extra argument of `decreasing` which can either be `TRUE` or `FALSE`
 days[order(rain, decreasing=TRUE)] # now it will show the days in order of highest rain to lowest rain values
 
-# 2.3 Factors 
+# ----- 2.3 Factors ----- 
 # a special kind of vector that behaves like a regular vector, except that it represents values from a category
 # it keeps tracks of all possible values of that category in what are called levels of the factor
 # the function `as.factor()` converts a vector to a factor
@@ -208,7 +205,7 @@ days_fct
 weekend <- as.factor(c(1, 0, 0, 0, 1, 1))
 levels(weekend)
 
-# Matrices
+# ----- 2.4 Matrices ----- 
 # similar to vectors in that they store data of the same type but matrices are two-dimensional and consist of rows and columns
 # matricies can be created using the matrix() function
 # matrix(data, nrow, ncol, byrow) = data is the values, nrow is number of rows, ncol is number of columns, byrow is either TRUE if you want the data values to be filled in by row or FALSE if its by column
@@ -224,7 +221,7 @@ nrow(rainfall)
 ncol(rainfall)
 dim(rainfall)
 
-# 2.4.1 Indexing a Matrix 
+# ----- 2.4.1 Indexing a Matrix ----- 
 # as opposed to vectors, since there are rows and columns, you need to know both when trying to index a value in a matrix
 rainfall[1, 4]
 # you can provide multiple indexes to return multiple values
@@ -239,7 +236,7 @@ colnames(rainfall) <- c("Monday", "Tuesday", "Wednesday", "Thursday",
 rownames(rainfall) <- c("Week1", "Week2")
 rainfall["Week1", c("Friday", "Saturday")]
 
-# 2.4.2 Modifying a Matrix
+# ----- 2.4.2 Modifying a Matrix ----- 
 # to change the values in a matrix, you need to index the values first and then assign new values
 rainfall["Week1", "Friday"] <- 3
 rainfall["Week1", c("Monday", "Tuesday")] <- 0
@@ -263,7 +260,7 @@ practice_two <- matrix(rep(1,12), ncol=3, nrow=4, byrow=TRUE)
 print(practice_two)
 practice_two[ ,c(1,3)]
 
-# Data Frames
+# ----- 2.5 Data Frames ----- 
 # like matrices, they store data in rows and columns, but you can use different data types 
 # you can create a data frame from data using the data.frame() function
 weather_data <- data.frame(day_of_week = c("Monday", "Tuesday", "Wednesday", "Monday"),
@@ -284,7 +281,7 @@ rownames(weather_data) <- c("6/1", "6/2", "6/3", "6/8")
 head(weather_data)
 rownames(weather_data)
 
-# Indexing a Data Frame
+# ----- 2.5.1 Indexing a Data Frame ----- 
 # done the same way as with a matrix
 weather_data[1, 2]
 weather_data[1, c("day_of_week", "temp")]
@@ -295,7 +292,7 @@ weather_data$temp
 weather_data$day_of_week <- factor(weather_data$day_of_week)
 levels(weather_data$day_of_week)
 
-# Modifying a Data Frame
+# ----- 2.5.2 Modifying a Data Frame ----- 
 # can also modify the data the same as with a matrix
 weather_data[1, "rain"] <- 2.2
 weather_data
@@ -310,7 +307,7 @@ weather_data
 weather_data["6/2", "air_quality_index"] <- 57
 weather_data
 
-# Lists
+# ----- 2.6 Lists ----- 
 # a data frame is actually a special type of another data structure called a list
 # a list is a collection of objects under the same name
 # these objects can be vectors, matrices, data frames, or even other lists
@@ -333,9 +330,9 @@ ex_list$supplements <- c("vitamin D", "biotin")
 ex_list$supplements[2] <- "collagen"
 ex_list
 
-###################################################################################################
-# 3. Working with Data Files in R
-###################################################################################################
+
+# ----- 3. Working with Data Files in R ----- 
+
 # the library to load in for this is HDSinRdata which contains a sample dataset
 install.packages("HDSinRdata")
 library(HDSinRdata)
@@ -434,7 +431,7 @@ perc_patients <- apply(pain_body_map, 2, sum, na.rm=TRUE) /
   nrow(pain_body_map)
 summary(perc_patients)
 
-# 3.2.5 Missing Infinite and NaN Values
+# ----- 3.2.5 Missing Infinite and NaN Values ----- 
 # missing values in R are represented by NA
 # to confirm is there is a missing value, you can use the function `is.na()`
 sum(is.na(pain$PATIENT_NUM))
@@ -468,7 +465,7 @@ pain_sub1 <- na.omit(pain)
 pain_sub2 <- pain[complete.cases(pain), ]
 dim(pain_sub1)
 dim(pain_sub2)
-# 3.2.6 Dates in R
+# ----- 3.2.6 Dates in R ----- 
 # Symbol	Description
 # %Y	Four-digit year.
 # %y	Two-digit year.
@@ -508,7 +505,7 @@ difftime(date_example$x[2], date_example$x[1], units = "days")
 seq(date_example$x[1], by = "month", length=3)
 # the lubridate package does more date manipulation
 
-# 3.3 Using Logic to Subset, Summarize, and Transform
+# ----- 3.3 Using Logic to Subset, Summarize, and Transform ----- 
 # the below are more logic operators that can be used in R
 # < less than
 # <= less than or equal to
@@ -581,47 +578,147 @@ subset(pain, pain$PAT_RACE == "OTHER")
 pain$PAT_RACE[pain$PATIENT_NUM==3588] <- "NOT SPECIFIED"
 table(pain$PAT_RACE)
 
-###################################################################################################
-# 4. Intro to Exploratory Data Analysis 
-###################################################################################################
+
+# ----- 4. Intro to Exploratory Data Analysis -----
 
 install.packages('GGally')
+install.packages('gt')
+install.packages('gtsummary')
 
 library(HDSinRdata)
 library(GGally)
 library(gt)
 library(gtsummary)
 
+# ----- 4.1 Univariate Distributions -----
+
+# the database we are working with is a sample of the National Health and Nutrition Examination Survey (Centers for Disease Control and Prevention (CDC) 1999-2018) containing lead, blood pressure, BMI, smoking status, alcohol use, and demographic variables from NHANES 1999-2018.
+# if you ever need to see the column descriptions, you can use:
+?NHANESsample
+
+# first we want to see if there are any missing values
+sum(complete.cases(NHANESsample)) # see if there are any complete rows
+apply(NHANESsample, 2, function(x) sum(is.na(x)))/nrow(NHANESsample) # see which columns have the most missing values
+nhanes_df <- na.omit(subset(NHANESsample,
+                            select = -c(SBP2, SBP3, SBP4, DBP2, DBP3, DBP4))) # here we are asking to create a subset of the df where it will only keep the columns besides the ones selected that have full data 
+
+# we can now look at some of the columns more in depth
+table(nhanes_df$SMOKE)
+summary(nhanes_df$YEAR)
+
+# if we want to look at the most recent observations from the data, we would again use the subset() function
+nhanes_df <- subset(nhanes_df, nhanes_df$YEAR == 2017)
+
+# now we want to create a new column for if a person has ever smoked (combining the QuitSmoke and StillSmoke variables)
+nhanes_df$EVER_SMOKE <- ifelse(nhanes_df$SMOKE %in% c("QuitSmoke",
+                                                      "StillSmoke"),
+                               "Yes", "No")
+table(nhanes_df$EVER_SMOKE)
+# if we wanted to just see the output and not store it in a column, we could use the pipe operator `|>`
+ifelse(nhanes_df$SMOKE %in% c("QuitSmoke", "StillSmoke"),
+       "Yes", "No") |>
+  table()
+
+# now we want to look at the lead column
+hist(log(nhanes_df$LEAD))
+
+# we can add to this visual by customizing the plot
+hist(log(nhanes_df$LEAD), breaks=30, col="blue",
+     main="Histogram of Log Blood Lead Level",
+     xlab="Log Blood Lead Level")
+
+# for categorical columns we can use count of each variable
+smoke_counts <- table(nhanes_df$SMOKE)
+barplot(height=smoke_counts, names=names(smoke_counts),
+        col="violetred", xlab="Smoking Status", ylab="Frequency")
+
+# you can even use multiple colors for each bar
+barplot(height = smoke_counts, names = names(smoke_counts),
+        col = c("orange","violetred", "blue"),
+        xlab="Smoking Status", ylab="Frequency")
+
+# PRACTICE QUESTION
+lead_quantile_counts <- table(nhanes_df$LEAD_QUANTILE) / sum(table(nhanes_df$LEAD_QUANTILE))
+barplot(height=lead_quantile_counts, names=names(lead_quantile_counts),
+        col="red",xlab="Lead Quantile", ylab="Percentage")
+
+# ----- 4.2 Bivariate Distributions -----
+
+# now if we want to look at the distribution of the categorical columns of smoking status by sex
+table(nhanes_df$SMOKE, nhanes_df$SEX)
+# and if we want to look at the numeric breakdown of lead by sex
+summary(nhanes_df$LEAD[nhanes_df$SEX=="Female"])
+summary(nhanes_df$LEAD[nhanes_df$SEX=="Male"])
+
+# we can also visually view a categorical column and continuous column by using boxplots with the plot() function
+# the first argument for the function is the x-axis and the second is the y-axis
+plot(nhanes_df$SEX, log(nhanes_df$LEAD), ylab="Log Blood Lead Level",
+     xlab="Sex")
+
+# we can also combine categorical values in a more advanced boxplot
+boxplot(log(LEAD) ~ SEX + EVER_SMOKE, data = nhanes_df,
+        col=c("orange", "blue", "orange", "blue"),
+        xlab="Sex: Ever Smoked", ylab="Log BLood Lead Level")
+
+# to see the distribution of two continuous columns, its best to use scatterplots
+plot(nhanes_df$SBP1, nhanes_df$DBP1, col="blue",
+     xlab="Systolic Blood Pressure",
+     ylab="Diastolic Blood Pressure")
+# since these two look highly correlated from the scatterplot, we can calculate the Pearson and Spearman correlation using the cor() function
+# the default is Pearson but you can specify which correlation to use
+cor(nhanes_df$SBP1, nhanes_df$DBP1)
+cor(nhanes_df$SBP1, nhanes_df$DBP1, method="spearman")
+
+# we can further customize the scatterplots by using another variable as the color gradient instead of specifying a color
+plot(nhanes_df$SBP1, nhanes_df$DBP1, col=as.factor(nhanes_df$HYP),
+     xlab="Systolic Blood Pressure",
+     ylab="Diastolic Blood Pressure")
+abline(v=120, col="blue") # these lines are to show the cutoff for the hypertension variable
+abline(h=80, col="blue") # aka 120/80 is the cutoff for blood pressure
+
+# we can also combine plots to display next to one another
+par(mfrow=c(1, 2))
+# boxplot
+boxplot(log(LEAD) ~ HYP, data=nhanes_df, xlab="Hypertension",
+        ylab="Log Blood Lead Level")
+# Scatterplot
+plot(nhanes_df$SBP1, nhanes_df$DBP1, col=as.factor(nhanes_df$HYP),
+     xlab="Systolic Blood Pressure",
+     ylab="Diastolic Blood Pressure")
+abline(v=120,col="blue")
+abline(h=80,col="blue")
+# this is done with the par() function which stands for parameters and using the arguments mfrow = c(nrow, ncol)
+# we do have to reset the par() for the rest of the displays
+par(mfrow=c(1,1))
+
+# PRACTICE QUESTION
+table(nhanes_df$EDUCATION)
+# need to plot 3 boxplots next to each other
+par(mfrow=c(1,3))
+# boxplot 1
+less_than_hs <- subset(nhanes_df, nhanes_df$EDUCATION == "LessThanHS")
+boxplot(INCOME ~ BMI_CAT, data=less_than_hs, 
+        main="Less than High School",
+        xlab="BMI Category",
+        ylab="Income")
+# boxplot 2
+hs <- subset(nhanes_df, nhanes_df$EDUCATION == "HS")
+boxplot(INCOME ~ BMI_CAT, data=hs,
+        main="High School", 
+        xlab="BMI Category",
+        ylab="Income")
+#boxplot 3
+more_than_hs <- subset(nhanes_df, nhanes_df$EDUCATION == "MoreThanHS")
+boxplot(INCOME ~ BMI_CAT, data=more_than_hs,
+        main="More than High School",
+        xlab="BMI Category",
+        ylab="Income")
 
 
+# then reset the par() again
+par(mfrow=c(1,1))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ----- 4.3 Autogenerating Plots -----
 
 
 

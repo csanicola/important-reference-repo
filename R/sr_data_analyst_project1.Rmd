@@ -1,0 +1,35 @@
+---
+title: "Sr Data Analysis Project1"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+
+```{r}
+install.packages('tidyverse')
+install.packages('GGally')
+install.packages('gt')
+install.packages('gtsummary')
+
+library(tidyverse)
+library(HDSinRdata)
+library(GGally)
+library(gt)
+library(gtsummary)
+```
+
+First we need to load in the data
+This data is from the [Sr_Data_Analyst_Project1 Notebook]('https://github.com/csanicola/important-reference-repo/blob/822febba0fca0a5ba7bc20c3fe333594ffe51ce6/Practice/sr_data_analyst_project1.ipynb') that created fake healthcare data for analysis purposes
+
+We then want to look at the head of the data to see what it looks like and if the correct csv was loaded in.
+```{r}
+df <- read.csv('D:/GitHub/important-reference-repo/Data/fake_healthcare_data_v2.csv')
+head(df)
+```
+To get a bit more detailed overview of what type of data is in this dataframe, we can use the `summary()` function
+```{r}
+summary(df)
+```
+
