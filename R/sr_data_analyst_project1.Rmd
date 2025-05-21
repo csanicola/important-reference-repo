@@ -5,19 +5,23 @@ editor_options:
   chunk_output_type: inline
 ---
 
+# Analyzing Healthcare Data to see about Practice Trends over a Period of Time
 
+# Loading in Packages and Data
 
 ```{r}
 install.packages('tidyverse')
 install.packages('GGally')
 install.packages('gt')
 install.packages('gtsummary')
+install.packages('ggplot2')
 
 library(tidyverse)
 library(HDSinRdata)
 library(GGally)
 library(gt)
 library(gtsummary)
+library(ggplot2)
 ```
 
 First we need to load in the data
@@ -25,11 +29,87 @@ This data is from the [Sr_Data_Analyst_Project1 Notebook]('https://github.com/cs
 
 We then want to look at the head of the data to see what it looks like and if the correct csv was loaded in.
 ```{r}
-df <- read.csv('D:/GitHub/important-reference-repo/Data/fake_healthcare_data_v2.csv')
+df <- read.csv('D:/GitHub/important-reference-repo/Data/fake_healthcare_data_v3.csv')
 head(df)
 ```
+
+
+# Handle NA/Missing Data
+```{r}
+sum(is.na(df))
+```
+
+
+# Overview of the Data
+
 To get a bit more detailed overview of what type of data is in this dataframe, we can use the `summary()` function
 ```{r}
 summary(df)
 ```
+First need to convert the categorical values as factors, to make everything easier, especially plotting.
+```{r}
+df$Practice_ID <- as.factor(df$Practice_ID)
+df$Quarter <- as.factor(df$Quarter)
+df$Year <- as.factor(df$Year)
+```
+
+
+```{r}
+# basic boxplot
+plot(df$Practice_ID, df$Visit_Volume, ylab="Visit Volume", xlab="Practice")
+```
+```{r}
+ggplot(df, aes(x = Year, y = Visit_Volume)) +
+  geom_bar(stat="summary", fun="mean") +
+  labs(y="Visit Volume", x="Practice")
+```
+We can see two categorical values like the year and quarter in a boxplot
+```{r}
+boxplot(Avg_Wait_Time_Min ~ Year + Quarter, data=df,
+        col=c("orange", "blue", "red", "yellow", "pink"),
+        xlab="Year + Quarter", ylab="Average Wait Time")
+```
+
+If we now want to see the correlation of two continuous variables (Avg_Wait_Time_Min and Patient_Satisfaction_Score), we would use a scatterplot
+```{r}
+plot(df$Avg_Wait_Time_Min, df$Provider_Productivity, col="blue",
+     xlab="Average Wait Time (min)",
+     ylab="Patient Satisfaction Score")
+```
+There doesn't look to be any correlation, but we can check by running a Pearsons and Spearman correlation calculation
+```{r}
+cor(df$Avg_Wait_Time_Min, df$Provider_Productivity)
+cor(df$Avg_Wait_Time_Min, df$Provider_Productivity, method="spearman")
+```
+
+If we want to see all of the univariate and bivariate plot combinations, we can use the `ggpairs()` function from the GGally package
+```{r}
+ggpairs(df)
+```
+```{r}
+ggcorr(df, label=TRUE)
+```
+```{r}
+tbl_summary(df)
+```
+
+We can also summarize the data by a specific variable, so if we use Year, it would look like this:
+```{r}
+tbl_summary(df, by="Year",
+            statistic=list(all_continuous() ~ "{mean} ({sd})")) |> 
+  as_gt()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
