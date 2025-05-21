@@ -1,6 +1,6 @@
 # Analyzing Hospital Patient Data in R
-# based on https://www.geeksforgeeks.org/analyzing-hospital-patient-data-in-r/
-
+based on [Analyzing Hospital Patient Data in R](https://www.geeksforgeeks.org/analyzing-hospital-patient-data-in-r/)
+```{r}
 install.packages("tidyverse")
 library(tidyverse)
 
@@ -11,19 +11,24 @@ library(ggthemes)
 library(dplyr)
 library(ggplot2)
 library(ggcorrplot)
-
+```
+## Step 1: Import Data
+```{r}
 data <- read.csv("D:/GitHub/important-reference-repo/Data/fake_healthcare_data_v2.csv") # on Windows
-
+# view the head of the data to verify
 head(data)
-
-# Summary statistics for numerical variables
+```
+## Summary statistics for numerical variables
+```{r}
 summary(data)
-
-# Summary statistics for categorical variables
+```
+## Summary statistics for categorical variables
+```{r}
 table(data$Practice_ID)
 table(data$Quarter)
+```
 
-# Analyzing Visit Volume Over Time
+## Analyzing Visit Volume Over Time
 ggplot(data, aes(x = Quarter, y = Visit_Volume)) +
     geom_boxplot() +
     labs(title = "Visit Volume by Quarter", x = "Quarter", y = "Visit Volume")

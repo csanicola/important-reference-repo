@@ -1,4 +1,4 @@
-# R Notes 
+# ----- R Notes -----
 Sources:
 1. [Mastering Health Science Using R](https://alicepaul.github.io/health-data-science-using-r/book.html)
 
@@ -13,8 +13,8 @@ Sources:
   - Windows: Ctrl+Shift+C 
   - Mac: Cmd+Shift+C 
 ___
-## Basics of R 
-### Basic Computations Objects
+## ----- Basics of R -----
+### ----- Basic Computations Objects -----
 - Addition: `+`
 - Subtraction: `-`
 - Multiplication: `*`
@@ -44,7 +44,7 @@ ___
     - `install.packages('tidyverse')`
       - to call the package: `library(tidyverse)`
 ___
-## Data Structures in R 
+## ----- Data Structures in R -----
 - each individual value in R has a type: **logical**, **integer**, **double** or **character**
   - you can use `typeof()` to find the type of vector 
 - **double** is a numeric value with a stored decimal
@@ -53,7 +53,7 @@ ___
 - **characters** have letters
 - **logicals** or **booleans** are `TRUE` and `FALSE`
   - **booleans** can actually be interpreted as `0`/`1` and can be used in logic: ex: `TRUE + FALSE + TRUE` = 2
-### Vectors 
+### ----- Vectors -----
 - Vectors are one-dimensional data structures that cna store multiple data types of the same type (ex: character, Boolean, numeric)
 - You can confirm if something is a vector by using: `is.vector()`
 - Creating a vector:
@@ -67,7 +67,7 @@ ___
     - `req(x, times)` takes the value (x) and a number of times and outputs x the number of times entered
     - `seq(from, to step)` takes a numeric starting value (from) and an end value (to) and step size (step) which specifies the sequence to get from the **from** to the **to** value (or the maximum that can get close based on the step value)
 
-#### Indexing a vector 
+#### ----- Indexing a vector -----
 - when a vector is created, you can access certain values in it by indexing []
   - `vector[1]`
 - not only can you access a single value, but a subset of the values using `c()`
@@ -77,7 +77,7 @@ ___
 - another option is using `TRUE` and `FALSE` values to index the values in a vector (both vectors need to be the same length)
   - so when you index the vector, it will only show the `TRUE` values
 
-#### Modifying a Vector and Calculations
+#### ----- Modifying a Vector and Calculations -----
 - exp() - exponential
 - log() - log
 - sqrt() - square root
@@ -96,7 +96,7 @@ ___
   - `max()`
   - `min()`
 
-#### Common Vector Functions
+#### ----- Common Vector Functions -----
 - below are some of the most common vector functions available in R 
 - sum() - summation
 - median() - median value
@@ -112,7 +112,7 @@ ___
 - and the `order()` function to see the order of the values which have the smallest and highest values
 - for both `order()` and `sort()`, they have the extra argument of `decreasing` which can be set to either `TRUE` or `FALSE`
 
-### Factors 
+### ----- Factors -----
 - a special kind of vector that behaves like a regular vector, except that it represents values from a category
 - it keeps track of all possible values of that category in what are called levels of the factor 
 - the function `as.factor()` converts a vector to a factor
@@ -126,7 +126,7 @@ ___
 - factors can also be used for numeric vectors 
 - if we want to have 0/1 to represent whether a day is a weekend or not, this is something we can do with factor levels
 
-### Matrices 
+### ----- Matrices -----
 - similar to vectors in that they store data of the same type but matrices are two-dimensional and consist of rows and columns 
 - matrices can be created using the matric() function
   - `matrix(data, nrow, ncol, byrow)`
@@ -139,7 +139,7 @@ ___
   - `ncol()` returns how many columns there are 
   - `dim()` returns how many rows and columns there are
 
-#### Indexing a Matrix 
+#### ----- Indexing a Matrix -----
 - as opposed to vectors, since there are rows and columns, you need to know both when trying to index a value in a matrix
   - `rainfall[1, 4]`
 - you can provide multiple indexes to return multiple values
@@ -149,7 +149,7 @@ ___
 - we can also specify row and column names in the indices
 - `colnames()` and `rownames()` returns the names of the rows and columns
 
-#### Modifying a Matrix
+#### ----- Modifying a Matrix -----
 - to change the values in a matrix, you need to index the values first and then assign new values
 - the functions `rbind()` and `cbind()` can add rows and columns 
   - `rainfall <- rbind(rainfall, "Week3" = c(0.4, 0.0, 0.0, 0.0, 1.2, 2.2, 0.0))` this will add a new row with values 
@@ -157,7 +157,7 @@ ___
 - you can bind matrices together using `cbind()`, but you need to make sure they are the same size
 - you can also use mathematical operators to combine too: `A+B` or perform mathematics on the matrix: `exp(C)`
 
-### Data Frames
+### ----- Data Frames -----
 - like matrices, they store data in rows and columns, but you can use different data types
 - you can create a data frame from data using the `data.frame()` function
   - the `head()` function prints the first six rows of a data frame
@@ -165,15 +165,15 @@ ___
 - you can use the same `dim()`, `nrow()`, `ncol()` as you would with a matrix 
 - the same with `colnames()` or you can even just use `names()`
 
-#### Indexing a Data Frame
+#### ----- Indexing a Data Frame -----
 - done the same way as with a matrix 
 - you can also use `$` for accessing the column names: `weather_data$day_of_week`
 
-#### Modifying a Data Frame
+#### ----- Modifying a Data Frame -----
 - can also modify the data the same as with a matrix 
 - can also combine data frames using the `rbind()` or `cbind()` but can also use `$`
 
-### Lists 
+### ----- Lists -----
 - a data frame is actually a special type of another data structure called a list
 - a list is a collection of objects under the same name
 - these objects can be vectors, matrices, data frames, or even other lists
@@ -187,7 +187,7 @@ ex_list <- list(name="John",
                 past_weights=c(136, 142, 159))
 ```
 ___
-## Working with Data Files in R 
+## ----- Working with Data Files in R -----
 
 - Tab-Delimited Files: You can read in a tab-separated .txt file using the read.delim() function in base R.
 - Excel Files: You can read in a .xls or .xlsx file using readxl::read_excel(), which allows you to specify a sheet and/or cell range within a file (e.g., read_excel('test.xlsx', sheet="Sheet1")).
@@ -223,7 +223,7 @@ ___
   - the `FUN` argument is the function to apply across that MARGIN
 - you can also use `colSums()` to find the sum of the columns
 
-### Missing Infinite and NaN Values
+### ----- Missing Infinite and NaN Values -----
 - missing values in R are `NA`
 - to determine if there is a missing value, you can use the function `is.na()`
   - if you combine the `is.na()` function with `sum()`, you can see how many columns/rows have NA values:
@@ -234,7 +234,7 @@ ___
 - if you want to remove all the na values in a dataframe, you can use the function `na.omit()` 
   - if you want to see how many rows have full values (aka there are no na/nan values in the row), you can use the function `complete.cases()`
     - this returns `TRUE`/`FALSE` for if the row has na values or not
-#### Dates in R 
+#### ----- Dates in R -----
 **Symbol | Description**
 %Y | Four-digit year
 %y | Two-digit year
@@ -258,7 +258,7 @@ ___
   - `seq(time1, by = "months", length = 3)`
 - another helpful package for manipulating time is the `lubridate` package
 
-#### Using Logic to Subset, Summarize, and Transform
+#### ----- Using Logic to Subset, Summarize, and Transform -----
 the below are more logic operators that can be used in R
 - `<` less than
 - `<=` less than or equal to
@@ -285,12 +285,13 @@ the below are more logic operators that can be used in R
 - the function `subset()` takes two arguments (the data (aka the vector, matrix, or dataframe), and a vector of TRUE/FALSE values to use for row selection)
   - ex: `subset(pain, pain$PAT_RACE == "OTHER")`
 
-## Intro to Exploratory Data Analysis
+## ----- Intro to Exploratory Data Analysis -----
 - more packages to help with summary plots and tables are:
   - library(GGally)
   - library(gt)
   - library(gtsummary)
 
+#### ----- Univariate & Bivariate Distributions -----
 - the function `ifelse()` is a logic operator that we can use to create a new vector with conditions
 - to create a histogram (numeric values) and bar graphs (categorical values) and customize the plots
 ```r
@@ -316,3 +317,30 @@ abline(h=80, col="blue")
 ```
 - to combine two plots in the same output, you would use the `par()` function that takes the arguments: `mfrow = c(nrow, ncol)`
   - this is asking to specify the number of columns and rows we want to use for the figure
+
+#### ----- Autogenerated Plots ----- 
+- the GGally package has useful functions for looking at multiple univariate and bivariate relationships at the same time
+  - such as the `ggpairs()` function
+    - this takes the data as the first argument and by default it plots the pairwise distributions for all columns but can be specified for only specific columns 
+      - this is done using the `columns=` argument
+- another useful package is the `ggcorr()` function which takes the arguments `label=TRUE`
+  - this is essentially a correlation matrix for numeric values only so you can specify or just run on the entire df and it will only display the num correlations
+
+#### ----- Tables ----- 
+- another way to view information is through a table
+- the **gt** package and **gtsummary** package are used for that
+- the **tbl_summary()** function is from the gtsummary package and is used to summarize all the columns in the data 
+  - it uses the argument `include` to specify which columns to include
+  - the output can be piped into the `as_gt()` function
+```r
+tbl_summary(df, include=c("NUM1", "NUM2", "NUM3")) |>
+  as_gt()
+```
+- if we want to change the type of data reported in the summary table, we would do so with the `statistic` argument
+```r 
+tbl_summary(df, include=c("NUM1", "NUM2", "NUM3"),
+            by="NUM2", # we can also break apart the table by a specific variable
+            statistic=list(all_continuous() ~ "{mean} ({sd})")) |> # this is specifing it will only be for the continuous variables
+  as_gt()
+```
+## -----  Data Transformations and Summaries ----- 
