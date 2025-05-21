@@ -224,3 +224,63 @@ ___
 - you can also use `colSums()` to find the sum of the columns
 
 ### Missing Infinite and NaN Values
+- missing values in R are `NA`
+- to determine if there is a missing value, you can use the function `is.na()`
+  - if you combine the `is.na()` function with `sum()`, you can see how many columns/rows have NA values:
+    - `sum(is.na(x))`
+- to see if something is infinite or not, use the `is.infinite()` or `is.finite()` functions 
+- R also uses `NaN` (aka Not a Number) to show if there is a NaN value such as 0/0
+  - you can use the function `is.nan()` to check
+- if you want to remove all the na values in a dataframe, you can use the function `na.omit()` 
+  - if you want to see how many rows have full values (aka there are no na/nan values in the row), you can use the function `complete.cases()`
+    - this returns `TRUE`/`FALSE` for if the row has na values or not
+#### Dates in R 
+**Symbol | Description**
+%Y | Four-digit year
+%y | Two-digit year
+%m | Numeric month
+%b% | Abbreviated name of month
+%B | Full name of month
+%d | Numeric day of the month
+%H | Military time hour (24 hours)
+%I | Imperial time hour (12 hours)
+%M | Minute
+%S | Seconds
+%p | AM/PM
+
+- to change a column to a date column, you would use the function `as.Date()` 
+  - for columns with dates and times, you would use the function `as.POSIXct()`
+  - you also need a `format` and `tz` argument for both
+- once a column is made into a date column, you can use the function `difftime()` to find the time difference
+  - you need `time1` and `time2` to find the difference (as `time1 - time2`) and then include the given `units`
+    - ex: `difftime(time1, time2, units = "days")`
+- you can also use the `seq()` function to add or subtract time by a specific unit:
+  - `seq(time1, by = "months", length = 3)`
+- another helpful package for manipulating time is the `lubridate` package
+
+#### Using Logic to Subset, Summarize, and Transform
+the below are more logic operators that can be used in R
+- `<` less than
+- `<=` less than or equal to
+- `>` greater than
+- `>=` greater than or equal to
+- `==` equal to
+- `!=` not equal to
+- `a %in% b` a’s value is in a vector of values b
+
+- there is a natural order between comparisons
+  - `TRUE < FALSE` is actually asking if `1 < 0`
+
+- the `%in%` operator checks whether a value is in a set of possible values
+- Additionally, we can use the following operators, which allow us to negate or combine logical operators.
+  - `!x` - the NOT operator ! reverses TRUE/FALSE values
+  - `x | y` - the OR operator | checks whether either x or y is equal to TRUE
+  - `x & y` - the AND operator & checks whether both x and y are equal to TRUE
+  - `xor(x,y)` - the xor function checks whether exactly one of x or y is equal to TRUE (called exclusive or)
+  - `any(x)` - the any function checks whether any value in x is TRUE (equivalent to using an OR operator | between all values)
+  - `all(x)` - the all function checks whether all values in x are TRUE (equivalent to using an AND operator & between all values)
+
+- the function `unique()` returns all the unique values in a column (which is especially useful for categorical columns)
+- the function `which()` is used to return the index values for all `TRUE` values
+- the function `subset()` takes two arguments (the data (aka the vector, matrix, or dataframe), and a vector of TRUE/FALSE values to use for row selection)
+  - ex: `subset(pain, pain$PAT_RACE == "OTHER")`

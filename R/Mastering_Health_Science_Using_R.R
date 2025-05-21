@@ -435,3 +435,148 @@ perc_patients <- apply(pain_body_map, 2, sum, na.rm=TRUE) /
 summary(perc_patients)
 
 # 3.2.5 Missing Infinite and NaN Values
+# missing values in R are represented by NA
+# to confirm is there is a missing value, you can use the function `is.na()`
+sum(is.na(pain$PATIENT_NUM))
+# to see if there are NAs accross multiple columns and not just one, we can use apply() function too
+num_missing_col <- apply(pain, 2, function(x) sum(is.na(x)))
+min(num_missing_col)
+# the above will tell us that there is at least one missing value in each column
+# since that is just seeing minimally how many missing, we may want to see if there is an entire column of missing values; to do so, we need to see how many columns there are total and if there is a row that matches that number indicating that there are all missing values for every column for an entire row
+num_missing_row <- apply(pain, 1, function(x) sum(is.na(x)))
+max(num_missing_row)
+which.max(num_missing_row) # this is asking which row has lal the missing values in it
+pain <- pain[-11749, ] # this is going to remove that row from the dataset
+# once we remove that row, if we find the percentage of missing values per column we can see which has the most NAs
+num_missing_col <- apply(pain, 2, function(x) sum(is.na(x))/nrow(pain))
+num_missing_col
+# you will see that for PAIN_INTESITY_AVERAGE.FOLLOW_UP it is 0.670422015 which is saying there is only about 33% of responses/valid data for this column
+# from this we can create new columns of data
+# first is a column for the change in pain at follow-up
+pain$PAIN_CHANGE <- pain$PAIN_INTENSITY_AVERAGE.FOLLOW_UP - pain$PAIN_INTENSITY_AVERAGE
+hist(pain$PAIN_CHANGE)
+# second is a column for the percent change in pain at follow-up
+pain$PERC_PAIN_CHANGE <- pain$PAIN_CHANGE / pain$PAIN_INTENSITY_AVERAGE
+summary(pain$PERC_PAIN_CHANGE)
+# the Max will say 'Inf' which means infinity
+# to test whether something is infinity or not you can use the functions is.infinite() or is.finite()
+sum(is.infinite(pain$PERC_PAIN_CHANGE)) # this will test how many rows return infinite values for this column
+# NaN is also an option in R which stands for "Not a Number"; ex: 0/0
+# there is also the function to use `na.omit()` which will remove all incomplete cases in a dataframe
+# complete.cases() returns TRUE/FALSE values for each row to indicate whether each row has full values or not
+pain_sub1 <- na.omit(pain)
+pain_sub2 <- pain[complete.cases(pain), ]
+dim(pain_sub1)
+dim(pain_sub2)
+# 3.2.6 Dates in R
+# Symbol	Description
+# %Y	Four-digit year.
+# %y	Two-digit year.
+# %m	Numeric month.
+# %b%	Abbreviated name of month.
+# %B	Full name of month.
+# %d	Numeric day of the month.
+# %H	Military time hour (24 hours).
+# %I	Imperial time hour (12 hours).
+# %M	Minute.
+# %S	Seconds.
+# %p	AM/PM
+
+# to convert an object to a dat object, you would use the `as.Date()` function
+# for date/time columns, you would use `as.POSIXct()`
+date_example <- data.frame(x = c("2020-01-15", "2021-11-16",
+                                  "2019-08-01"),
+                            y = c("2020-01-15 3:14 PM",
+                                  "2021-11-16 5:00 AM",
+                                  "2019-08-01 3:00 PM"),
+                            z = c("04:10:00", "11:35:11", "18:00:45"))
+# convert date and date times using formats
+date_example$x <- as.Date(date_example$x, format = "%Y-%m-%d",
+                           tz = "EST")
+date_example$y <- as.POSIXct(date_example$y,
+                              format = "%Y-%m-%d %I:%M %p")
+
+# add date to z and convert
+date_example$z <- paste("2024-06-24", date_example$z)
+date_example$z <- as.POSIXct(date_example$z,
+                             format = "%Y-%m-%d %H:%M:%S")
+date_example
+
+# having date specified columns, you are now able to find the time between dates using the difftime() function
+difftime(date_example$x[2], date_example$x[1], units = "days")
+# you can also use the function `seq()` to add or subtract time from a date using `by`
+seq(date_example$x[1], by = "month", length=3)
+# the lubridate package does more date manipulation
+
+# 3.3 Using Logic to Subset, Summarize, and Transform
+# the below are more logic operators that can be used in R
+# < less than
+# <= less than or equal to
+# > greater than
+# >= greater than or equal to
+# == equal to
+# != not equal to
+# a %in% b a’s value is in a vector of values b
+
+2 < 2
+2 <= 2
+3 > 2
+3 >= 2
+"A" == "B"
+"A" != "B"
+
+# there is also a natural order between comparisons
+TRUE < FALSE # aka this will ask is 1 < 0
+
+# the %in% operator checks whether a value is in a set of possible values
+1 %in% c(4, 1, 2)
+c(0, 1, 5) %in% c(4, 1, 2)
+
+# Additionally, we can use the following operators, which allow us to negate or combine logical operators.
+# !x - the NOT operator ! reverses TRUE/FALSE values
+# x | y - the OR operator | checks whether either x or y is equal to TRUE
+# x & y - the AND operator & checks whether both x and y are equal to TRUE
+# xor(x,y) - the xor function checks whether exactly one of x or y is equal to TRUE (called exclusive or)
+# any(x) - the any function checks whether any value in x is TRUE (equivalent to using an OR operator | between all values)
+# all(x) - the all function checks whether all values in x are TRUE (equivalent to using an AND operator & between all values)
+!(2 < 3)
+("Alice" < "Bob") | ("Alice" < "Aaron")
+("Alice" < "Bob") & ("Alice" < "Aaron")
+xor(TRUE, FALSE)
+any(c(FALSE, TRUE, TRUE))
+all(c(FALSE, TRUE, TRUE))
+
+# the below example is checking those who do or do not have Medicaid and assigns a new value in that column
+pain$MEDICAID_BIN[pain$MEDICAID_BIN == "no"] <- "No Medicaid"
+pain$MEDICAID_BIN[pain$MEDICAID_BIN == "yes"] <- "Medicaid"
+table(pain$MEDICAID_BIN)
+# now if we want to include only those who have a follow-up, we would combine functions
+pain_follow_up <- pain[!is.na(pain$PAIN_INTENSITY_AVERAGE.FOLLOW_UP), ] # this is asking for the data of the rows that don't have missing(na) values for the PAIN_INTENSITY_AVERAGE.FOLLOW_UP column
+# we can now also use the any() function in combination with our previous column we created for lower back pain to see if there are any patients with general back pain (it will see if any of the columns comes back TRUE but we can use all() if we need all of the columns to come back TRUE)
+pain$BACK <- any(pain$X208==1, pain$X209==1, pain$X212==1,
+                 pain$X213==1, pain$X218==1, pain$X219==1)
+
+# PRACTICE QUESTION
+pain_subset <- pain[pain$PAIN_INTENSITY_AVERAGE >= 5, ]
+head(pain_subset)
+
+# if we want to now look at the patient race columns...
+table(pain$PAT_RACE)
+# most patients are either black or white
+# you can also use the unique() function to see how many unique variables are in a column
+unique(pain$PAT_RACE)
+# we can combine some of the levels in this column using the %in% operator
+aapi_values <- c("CHINESE", "HAWAIIAN", "INDIAN (ASIAN)", "FILIPINO",
+                 "VIETNAMESE", "JAPANESE", "KOREAN", "GUAM/CHAMORRO",
+                 "OTHER ASIAN", "OTHER PACIFIC ISLANDER")
+pain$PAT_RACE[pain$PAT_RACE %in% aapi_values] <- "AAPI"
+pain$PAT_RACE[pain$PAT_RACE %in%
+                c("ALASKA NATIVE", "AMERICAN INDIAN")] <- "AI/AN"
+table(pain$PAT_RACE)
+
+# there is another function `which()` that can be used to return the index value for all the TRUE values
+# we can use this with the race 'DECLINED' as not specified
+pain$PAT_RACE[which (pain$PAT_RACE == "DECLINED")] <- "NOT SPECIFIED"
+subset(pain, pain$PAT_RACE == "OTHER")
+pain$PAT_RACE[pain$PATIENT_NUM==3588] <- "NOT SPECIFIED"
+table(pain$PAT_RACE)
