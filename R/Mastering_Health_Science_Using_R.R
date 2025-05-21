@@ -719,6 +719,113 @@ boxplot(INCOME ~ BMI_CAT, data=more_than_hs,
 par(mfrow=c(1,1))
 
 # ----- 4.3 Autogenerating Plots -----
+# the ggpairs() function plots univariate and bivariate relationships at the same time
+ggpairs(nhanes_df, columns=c("SEX", "AGE", "LEAD", "SBP1", "DBP1"))
+# another function is the ggcorr() which takes in all the dataframe but only the numeric columns and displays the relationships between them (aka a correlation graph) and the positional argument option is `label=TRUE`
+nhanes_df[, c("AGE", "LEAD", "SBP1", "DBP1")] |>
+  ggcorr(label=TRUE)
+
+# ----- 4.4 Tables -----
+# another way to view information is through a table
+# the gt package and gtsummary package are used for this
+gt(head(nhanes_df[,c("ID", "AGE", "SEX", "RACE")]))
+
+# the tbl_summary() function is from the gtsummary package and is used to summarize all the columns in the data # it uses the argument `include` to specify which columns to include
+# the output can be piped into the `as_gt()` function
+tbl_summary(nhanes_df,
+            include=c("SEX", "RACE", "AGE", "EDUCATION", "SMOKE",
+                      "BMI_CAT", "LEAD", "SBP1", "DBP1", "HYP")) |> 
+  as_gt()
+
+# if we want to change the type of data reported in the summary table, we would do so with the `statistic` argument
+tbl_summary(nhanes_df,
+            include=c("SEX", "RACE", "AGE", "EDUCATION", "SMOKE",
+                      "BMI_CAT", "LEAD", "SBP1", "DBP1", "HYP"),
+            by="HYP",
+            statistic=list(all_continuous() ~ "{mean} ({sd})")) |> 
+  as_gt()
+
+# ----- 5. Data Transformations and Summaries -----
+# here will be using the dplyr package which is used for more extensive data exploration and transformation
+library(HDSinRdata)
+library(tidyverse)
+data(NHANESsample)
+
+class(NHANESsample)
+
+# a tibble has all the properties of data frames but its a more modern version of a data frame
+# the function as_tibble()
+nhanes_df <- as_tibble(NHANESsample)
+print(head(nhanes_df))
+nhanes_df <- as.data.frame(nhanes_df)
+print(head(nhanes_df))
+
+# ----- 5.2 Subsetting Data -----
+# we can only see the head of certain columns that we select
+select(nhanes_df, c(RACE, LEAD)) %>% head()
+# we can remove columns with -c() 
+nhanes_df <- nhanes_df %>% select(-c(ID, LEAD_QUANTILE))
+names(nhanes_df)
+
+# if you want to filter the data to only observations after 2008
+nhanes_df_recent <- nhanes_df %>% filter(YEAR >= 2008)
+
+# Example 1: multiple filter calls
+nhanes_df_males1 <- nhanes_df %>%
+  filter(YEAR <= 2012) %>%
+  filter(YEAR >= 2008) %>%
+  filter(SEX == "Male")
+
+# Example 2: combine with & operator
+nhanes_df_males2 <- nhanes_df %>%
+  filter((YEAR <= 2012) & (YEAR >= 2008) & (SEX == "Male"))
+
+# Example 3: combine into one filter call with commas
+nhanes_df_males3 <- nhanes_df %>%
+  filter(between(YEAR, 2008, 2012), SEX == "Male")
+
+# the slice() function to select a slice of rows by their index
+slice(nhanes_df, c(1, nrow(nhanes_df)))
+
+# slice_sample() is a function takes in an argument `n` which specifies the number of random rows to sample from the data 
+
+
+# slice_max() and slice_min() are functions to specify a column through the argument `order_by` and return the `n` rows with either the highest or lowest values in that column
+# three male observations with highest blood lead level in 2007
+nhanes_df %>%
+  filter(YEAR == 2007, SEX == "Male") %>%
+  select(c(RACE, EDUCATION, SMOKE, LEAD, SBP1, DBP1)) %>%
+  slice_max(order_by=LEAD, n=3)
+
+# three male observations with lowest blood lead level in 2007
+nhanes_df %>%
+  filter(YEAR == 2007, SEX == "Male") %>%
+  select(c(RACE, EDUCATION, SMOKE, LEAD, SBP1, DBP1)) %>%
+  slice_min(order_by=LEAD, n=3)
+
+# ----- 5.3 Updating Rows and Columns -----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
