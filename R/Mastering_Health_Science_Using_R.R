@@ -804,19 +804,221 @@ nhanes_df %>%
   slice_min(order_by=LEAD, n=3)
 
 # ----- 5.3 Updating Rows and Columns -----
+# these next functions are to update the rows and columns of the data itself 
+# the function `rename()` is to change the names of columns
+nhanes_df <- nhanes_df %>% rename(PIR = INCOME, SMOKE_STATUS = SMOKE) # PIR is for poverty income ratio
+names(nhanes_df)
 
+ifelse(nhanes_df$SMOKE_STATUS == "NeverSmoke", "No", "Yes") %>%
+  table()
 
+# the function `case_when()` is an extension of `ifelse()` but allows to specify more than two cases
+case_when(nhanes_df$SMOKE_STATUS == "NeverSmoke" ~ "Never Smoked",
+          nhanes_df$SMOKE_STATUS == "QuitSmoke" ~ "Quit Smoking",
+          nhanes_df$SMOKE_STATUS == "StillSmoke" ~ "Current Smoker") %>%
+  table()
 
+# the function `mutate()` takes a data frame and a set of columns with associated names to add to the data or update
+# the below we both create the new column and update the current column at the same time
+nhanes_df <- nhanes_df %>% 
+  mutate(EVER_SMOKE = ifelse(SMOKE_STATUS == "NeverSmoke", 
+                             "No", "Yes"), 
+         SMOKE_STATUS = 
+           case_when(SMOKE_STATUS == "NeverSmoke" ~ "Never Smoked",
+                     SMOKE_STATUS == "QuitSmoke" ~ "Quit Smoking",
+                     SMOKE_STATUS == "StillSmoke" ~ "Current Smoker")) 
 
+# the function `arrange()` takes in a data frame and a vector of columns used to sort the data
+nhanes_df %>% 
+  select(c(YEAR, SEX, SMOKE_STATUS, SBP1, DBP1, LEAD)) %>%
+  filter(SEX == "Male", SMOKE_STATUS == "Current Smoker") %>%
+  arrange(desc(SBP1), desc(DBP1)) %>%
+  head(8)
+# the above is sorted by SBP1 and then by DBP1
+# the below is sorting just by SBP1
+nhanes_df %>% 
+  select(c(YEAR, SEX, SMOKE_STATUS, SBP1, DBP1, LEAD)) %>%
+  filter(SEX == "Male", SMOKE_STATUS == "Current Smoker") %>%
+  arrange(desc(SBP1)) %>%
+  head(8)
 
+# PRACTICE QUESTION
+nhanes_df %>%
+  mutate(DBP_CHANGE = DBP4 - DBP1) %>%
+  select(c(DBP1, DBP4, DBP_CHANGE)) %>%
+  arrange(DBP_CHANGE) %>%
+  head(4)
 
+# ----- 5.4 Summarizing and Grouping -----
+# the `count()` function takes a data frame and one or more columns and counts the number of rows for each combination of unique values in these columns
+count(nhanes_df)
+count(nhanes_df, RACE, YEAR)
 
+# if we want to find the total number of observations as well as the mean and median systolic blood pressure for Non-Hispanic Blacks
+nhanes_df %>%
+  filter(RACE == "Non-Hispanic Black") %>%
+  summarize(TOT = n(), MEAN_SBP = mean(SBP1, na.rm=TRUE),
+            MEAN_DBP = mean(DBP1, na.rm=TRUE))
 
+# the `group_by()` function takes a data frame and one or more columns with which to group the data
+nhanes_df %>%
+  group_by(RACE) %>%
+  slice(1)
+# we can then combine functions and find the total number of observations as well as the mean systolic and diastolic blood pressure valuers for each racial groups
+nhanes_df %>%
+  group_by(RACE) %>%
+  summarize(TOT = n(), MEAN_SBP = mean(SBP1, na.rm=TRUE),
+            MEAN_DBP=mean(DBP1, na.rm=TRUE))
 
+# we can also then ungroup the data using the ungroup() function which restores the data to a single data frame
+nhanes_df %>%
+  select(SEX, RACE, SBP1, DBP1) %>%
+  group_by(RACE) %>%
+  ungroup() %>%
+  arrange(desc(SBP1)) %>%
+  slice(1)
 
+# ----- 6. CASE STUDY: Cleaning Tuberculosis Screening Data -----
+# the data we will be using is the tb_diagnosis_raw in the HDSinRdata package
+# this data represents 1634 patients in rural South Africa who tested for TB
+library(HDSinRdata)
+library(tidyverse)
+library(gt)
+library(gtsummary)
 
+# Read in data 
+data("tb_diagnosis_raw")
 
+# Inspect variable descriptions
+?tb_diagnosis_raw
 
+# the first thing we want to do is drop columns related to the participation in the survery and about seeking care
+# there are also variables containing long or vague names so we will rename most of the variables
+# Select variables and rename
+tb_df <- tb_diagnosis_raw %>% 
+  select(c(xpert_status_fac, age_group, sex, hiv_status_fac,
+           other_conditions_fac___1, other_conditions_fac___3,
+           other_conditions_fac___88, other_conditions_fac___99,
+           symp_fac___1, symp_fac___2, symp_fac___3, symp_fac___4, 
+           symp_fac___99, length_symp_unit_fac, length_symp_days_fac,
+           length_symp_wk_fac, length_symp_mnt_fac, length_symp_yr_fac,
+           smk_fac, dx_tb_past_fac, educ_fac)) %>%
+  rename(tb = xpert_status_fac, hiv_pos = hiv_status_fac,
+         cough = symp_fac___1, fever = symp_fac___2, 
+         weight_loss = symp_fac___3, night_sweats = symp_fac___4, 
+         symptoms_missing = symp_fac___99,
+         ever_smoke = smk_fac, 
+         past_tb = dx_tb_past_fac, education = educ_fac)
+
+tbl_summary(tb_df) %>%
+  as_gt()
+
+# sometimes we also want to standard the variables used in each column
+# for this example, there are some columns using 0/1 and others using 1/2 for boolean values
+# re-code binary variables to 0/1 instead of 1/2
+tb_df$tb <- case_when(tb_df$tb == 1 ~ "TB Positive",
+                      tb_df$tb == 2 ~ "TB Negative")
+tb_df$male <- case_when(tb_df$sex == 1 ~ 1,
+                        tb_df$sex == 2 ~ 0)
+tb_df <- tb_df %>% select(-c(sex))
+
+# Re-code diabetes to check if missing
+tb_df$diabetes <- case_when(tb_df$other_conditions_fac___3 == 1 ~ 1,
+                            tb_df$other_conditions_fac___1 == 1 ~ 0,
+                            tb_df$other_conditions_fac___88 == 1 ~ NA,
+                            tb_df$other_conditions_fac___99 == 1 ~ NA,
+                            TRUE ~ 0)
+tb_df <- tb_df %>% select(-c(other_conditions_fac___1,
+                             other_conditions_fac___3,
+                             other_conditions_fac___88,
+                             other_conditions_fac___99))
+table(tb_df$diabetes)
+
+# Re-code variables with missing or refused values
+tb_df$hiv_pos <- case_when((tb_df$hiv_pos == 1) ~ 1,
+                           tb_df$hiv_pos %in% c(2, 77) ~ 0,
+                           tb_df$hiv_pos == 88 ~ NA)
+
+tb_df$ever_smoke <- case_when(tb_df$ever_smoke %in% c(1,2) ~ 1,
+                              tb_df$ever_smoke == 3 ~ 0,
+                              tb_df$ever_smoke == 99 ~ NA)
+
+tb_df$past_tb <- case_when(tb_df$past_tb == 1 ~ 1,
+                           tb_df$past_tb %in% c(2, 77) ~ 0)
+
+# Code NA values and look at education distribution
+tb_df$education[tb_df$education == 99] <- NA
+hist(tb_df$education, xlab = "Years of Education",
+     main = "Histograph of Education Years")
+
+# Categorize education to HS and above
+tb_df$hs_less <- case_when(tb_df$education <= 12 ~ 1,
+                           tb_df$education > 12 ~ 0,
+                           TRUE ~ NA)
+# now we don't need the education column anymore so we will remove it
+tb_df <- tb_df %>% select(-c(education))
+
+# we now want to see how long someone has entered symptoms so we can look at the different units of time there are
+tb_df %>%
+  group_by(length_symp_unit_fac) %>%
+  summarize(missing_days = sum(is.na(length_symp_days_fac))/n(),
+            missing_wks = sum(is.na(length_symp_wk_fac))/n(),
+            missing_mnt = sum(is.na(length_symp_mnt_fac))/n(),
+            missing_yr = sum(is.na(length_symp_yr_fac))/n())
+
+# we can also check to see if all the integers are positive or not
+min(tb_df$length_symp_days_fac, na.rm = TRUE)
+is.integer(tb_df$length_symp_days_fac)
+
+# we now want to create a new variable for whether or not a person has experienced symptoms for more than two weeks
+# Categorize number of weeks experiencing symptoms
+tb_df <- tb_df %>%
+  mutate(two_weeks = case_when((length_symp_unit_fac == 77 |
+                                  is.na(length_symp_unit_fac)) ~ NA,
+                               (length_symp_unit_fac == 1 &
+                                  length_symp_days_fac <= 14) ~ 0,
+                               (length_symp_unit_fac == 2 &
+                                  length_symp_wk_fac <= 2) ~ 0,
+                               TRUE ~ 1))
+tb_df <- tb_df %>%
+  select(-c(length_symp_wk_fac, length_symp_days_fac,
+            length_symp_mnt_fac, length_symp_yr_fac,
+            length_symp_unit_fac))
+
+# we next want to create a new summary column that represents the total number of classic TB symptoms rather than keeping track of individual symptoms
+# Count total number of symptoms
+tb_df$num_symptoms <- tb_df$fever + tb_df$weight_loss + tb_df$cough +
+  tb_df$night_sweats
+tb_df$num_symptoms[tb_df$symptoms_missing == 1] <- NA
+tb_df <- tb_df %>% select(-c(night_sweats, weight_loss, cough, fever,
+                             symptoms_missing))
+
+# Exclude observations with no TB symptoms
+tb_df <- tb_df %>%
+  filter(num_symptoms != 0)
+
+table(tb_df$num_symptoms)
+
+# Convert all variables to factors
+tb_df[] <- lapply(tb_df, function(x){return(as.factor(x))})
+
+# we are now going to create a final summary table that includes all the summary statistics
+tbl_summary(tb_df, by = "tb",
+            label = list(
+              tb ="Tuberculosis",
+              age_group = "Age Group",
+              hiv_pos = "HIV Positive",
+              ever_smoke = "Ever Smoked",
+              past_tb = "Past TB",
+              male = "Male",
+              hs_less = "High School or Less Educ.",
+              two_weeks = "Two Weeks Symptoms",
+              diabetes = "Diabetes",
+              num_symptoms = "Number of Symptoms"
+            )) %>%
+  add_overall() %>%
+  as_gt() %>%
+  cols_width(everything() ~ "55pt")
 
 
 

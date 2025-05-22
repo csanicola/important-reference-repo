@@ -1,8 +1,8 @@
-<!-- PROJECT LOGO -->
+ <!-- PROJECT LOGO -->
 
 <br />
 <div align="center">
-  <a href="https://github.com/csanicola74/Important_Reference_Repo">
+  <a href="https://github.com/csanicola/important-reference-repo">
     <img src="Images/IMPORTANT REFERENCES REPOSITORY.png" alt="Logo">
   </a>
 
@@ -13,14 +13,14 @@
     <br />
     Created and Maintained by Caroline Sanicola, M.S.
     <br />
-    <a href="https://github.com/csanicola74/Important_Reference_Repo"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/csanicola/important-reference-repo"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/csanicola74/Important_Reference_Repo">View Scripts</a>
+    <a href="https://github.com/csanicola/important-reference-repo">View Scripts</a>
     ·
-    <a href="https://github.com/csanicola74/Important_Reference_Repo/issues">Report Issues</a>
+    <a href="https://github.com/csanicola/important-reference-repo/issues">Report Issues</a>
     ·
-    <a href="https://github.com/csanicola74/Important_Reference_Repo/issues">Request Feature</a>
+    <a href="https://github.com/csanicola/important-reference-repo/issues">Request Feature</a>
   </p>
 </div>
 
@@ -32,7 +32,9 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#purpose">Purpose</a></li>
+        <li><a href="#key-features">Key Features</a></li>
+        <li><a href="#disclaimer">Disclaimer</a></li>
       </ul>
     </li>
     <li>
@@ -42,8 +44,14 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#repository-structure">Repository Structure</a></li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#script-categories">Script Categories</a></li>
+        <li><a href="#how-to-navigate">How to Navigate</a></li>
+      </ul>
+    </li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -55,24 +63,33 @@
 
 ## About The Project
 
-Welcome to the "Important Reference Repository"! This repository serves as a comprehensive resource hub aimed at empowering healthcare professionals, data analysts, and researchers with the necessary tools and knowledge to execute data analysis tasks in healthcare projects. Through a well-curated collection of guides, scripts, and instructional materials, we endeavor to demystify the process of analyzing healthcare data, ensuring that insights derived are accurate, actionable, and meaningful.
+<!-- PURPOSE -->
 
-Here, you will find a rich array of resources including:
+### Purpose
 
--   **Script Collections**: A variety of scripts tailored for healthcare data analysis, ranging from basic descriptive statistics to advanced machine learning models.
--   **Guides**: Step-by-step guides on how to execute these scripts, understand the output, and apply the results in a healthcare context.
--   **Use-case Examples**: Real-world examples demonstrating when, why, and how to use different analysis techniques in healthcare projects.
--   **Best Practices**: Recommendations on data handling, analysis, and reporting to ensure the integrity and reliability of your analysis.
+This repository serves as a **centralized reference hub** for healthcare data science, providing:
 
-This repository is an open invitation for collaboration and knowledge-sharing, with the goal of advancing the field of healthcare analytics, and ultimately contributing to better healthcare outcomes.
+- **Reusable scripts** for common analytical tasks (data cleaning, statistical modeling, visualization).
+- **Tutorials** for healthcare-specific challenges (HIPAA compliance, EHR data wrangling).
+- **Best practices** for reproducible research and publication-ready outputs.
+<!-- KEY FEATURES -->
 
-### DISCLAIMER:
+### Key Features
 
-***The "Important Reference Repository" is provided as an educational resource to assist professionals in the healthcare and data analysis fields. While we strive to provide accurate and up-to-date information, the scripts, guides, and other materials contained herein are offered on an "as-is" basis and users should exercise their own professional judgment when utilizing these resources.***
+- 🏥 **Healthcare-Focused** : Examples tailored to clinical/epidemiological data.
+- 📚 **Modular Design** : Scripts are organized by use case (e.g., "ICD-10 Coding", "Survival Analysis").
+- 🔍 **Documented Workflows** : Jupyter/RMarkdown notebooks with step-by-step explanations.
+- 🛡️ **Compliance-Aware** : Guidance on de-identification and HIPAA considerations.
+<!-- DISCLAIMER -->
 
-***We do not claim that the use of these resources will ensure success or prevent errors in your data analysis endeavors. The contributors of this repository are not responsible for any errors, omissions, or for the results obtained from the use of this information. Moreover, the materials within this repository are not a substitute for professional advice or services, and users are encouraged to seek the consultation of qualified professionals as needed.***
+### Disclaimer
 
-***We welcome contributions, suggestions, and feedback to improve the quality and breadth of the materials in this repository, and we encourage a collaborative approach to advancing knowledge and skills in healthcare data analysis.***
+❗ **Important** :
+
+- This repository contains **educational material only** .
+- Scripts are provided **"as-is"** —users must validate outputs for clinical/research use.
+- No PHI (Protected Health Information) is included; all examples use synthetic/dummy data.
+- Consult your institution’s IRB and compliance office before applying to real-world data.
 
 Use the `Readme.md` to get started.
 
@@ -80,40 +97,147 @@ Use the `Readme.md` to get started.
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+## Getting Started
 
-- ![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)
-- ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
-- ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-- ![Keras](https://img.shields.io/badge/Keras-%23D00000.svg?style=for-the-badge&logo=Keras&logoColor=white)
-- ![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)
-- ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
-- ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
-- ![Plotly](https://img.shields.io/badge/Plotly-%233F4F75.svg?style=for-the-badge&logo=plotly&logoColor=white)
-- ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
-- ![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
-- ![SciPy](https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white)
-- ![TensorFlow](https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white)
+### Prerequisites
+
+| Tool/Language | Recommended Version | Installation Guide                                |
+| ------------- | ------------------- | ------------------------------------------------- |
+| Python        | 3.8+                | [python.org](https://www.python.org/downloads/)   |
+| R             | 4.0+                | [cran.r-project.org](https://cran.r-project.org/) |
+| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                          |
+| Git           | Latest              | [git-scm.com](https://git-scm.com/downloads)      |
+
+### Installation
+
+1. Clone the repo:
+
+```bash
+git clone https://github.com/csanicola/important-reference-repo.git
+```
+
+2. Install Python dependencies:
+
+```bash
+pip install -r requirements.txt # For Python users
+```
+
+3. For R users, install packages from install.packages.R:
+
+```r
+source("install_pacakges.R")
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Repository Structure
+
+├── 📂 Data/ # Open sources and Fake Generated Healthcare Data for practice
+│ ├── diabetes*012_health_indicators_BRFSS2015.csv
+│ ├── fake_healthcare_data.csv # Generated from fake_healthcare_data_practice.ipynb
+│ └── sample_patient_data.csv
+├── 📂 Data_Engineer_Pathway/
+│ ├── 📂 1. Deepen Python Skills/
+│ │ ├── I.Concepts.md
+| │ └── II. Comprehension_Level.md
+├── 📂 Guides/
+│ ├── Data_Cleaning.md
+│ ├── Data_Modeling_for_Scientific_Papers.md
+│ ├── Exploratory_Data_Analysis*(EDA).md
+│ ├── Feature_Engineering.md
+│ ├── Modeling.md
+│ └── SQL.md
+├── 📂 Healthcare_Data_Analysist_Learning_Path/
+│ ├── 📂 01-Beginner/
+│ │ ├── 📂 01-intro-to-programming/
+│ │ │ ├── 📂 exercises/
+│ │ │ │ ├── 📂 solutions/
+│ │ │ │ │ ├── arithmetic_solution.py
+│ │ │ │ │ ├── hello_world_solution.py
+│ │ │ │ │ └── variables_solution.py
+│ │ │ │ ├── exercise_1_hello_world.md
+│ │ │ │ ├── exercise_2_variables.md
+│ │ │ │ └── exercise_3_arithmetic.md
+│ │ │ ├── basic_syntax.py
+│ │ │ └── README.md
+│ │ ├──📂 02-data-types-and-structures/
+│ │ │ ├──📂 exercises/
+│ │ │ ├── data_types.py
+│ │ │ └── README.md
+│ ├── 📂 02-Intermediate/
+│ │ ├── 📂 01-oop/
+│ │ │ ├── oop_basics.py
+│ │ │ └── README.md
+│ │ ├── 📂 02-intro-to-data-analysis/
+│ │ │ ├── data_cleaning.py
+│ │ │ └── README.md
+│ ├── 📂 03-Advanced/
+│ │ ├── 📂 01-machine-learning/
+│ │ │ ├── ml_basics.py
+│ │ │ └── README.md
+│ │ ├── 📂 02-healthcare-specific-data-analysis/
+│ │ │ ├── ehr_data_analysis.py
+│ │ │ └── README.md
+│ ├── 📂 Reference
+│ │ │ ├── data_analysis_best_practices.md
+│ │ │ ├── healthcare_data_standards.md
+│ │ │ ├── python_cheatsheet.md
+│ │ │ ├── reference_template.md
+│ │ │ └── resources.md
+│ │ └── README.md
+├── 📂 Images
+│ │ │ ├── boxplot.png
+│ │ │ ├── correlation_matrix.png
+│ │ │ ├── IMPORTANT REFERENCES REPOSITORY.png
+│ │ │ ├── linear_regression.png
+│ │ │ └── logistic_regression.png
+├── 📂 Online_Courses
+
+├── 📂 Practice
+
+├── 📂 Projects
+
+├── 📂 Python
+
+├── 📂 R
+
+├── 📂 SAS
+
+├── 📂 SQL
+
+├── 📂 Statistics
+├── 🖼️ Data_Engineer_Pathway.png
+├── 📜 requirements.txt # Python dependencies
+├── 📜 install_packages.R # R dependencies
+├── 📜 web_resources.md
+└── 📜 LICENSE
 
 <!-- USAGE -->
 
 ## Usage
 
-1.  
+1. Full guides for multiple courses covering various data science topics including college courses.
 
 ### Prerequisites
 
+**Applications:**
 
+- Visual Studio Code
+- RStudio
+
+**Languages:**
+
+- Python
+- R
 
 ### Installation
 
 To install pandas, you can use the following command in your terminal:
 
-```
+```python
 # !pip install pandas
 ```
+
 Please note that you need to have Python and pip installed on your machine to run this command. The Python code provided in this project was developed with Python 3.8, but it should work with other versions of Python 3 as well.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -121,10 +245,6 @@ Please note that you need to have Python and pip installed on your machine to ru
 <!-- DIRECTORY -->
 
 ## Directory
--
--
--
--
 
 <!-- LICENSE -->
 
@@ -138,12 +258,10 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-Project Link: [https://github.com/csanicola74/Important_Reference_Repo](https://github.com/csanicola74/Important_Reference_Repo)
+Project Link: [https://github.com/csanicola/important-reference-repo](https://github.com/csanicola/important-reference-repo)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ACKNOWLEDGMENTS -->
 
 <!-- MARKDOWN LINKS & IMAGES -->
-
-
