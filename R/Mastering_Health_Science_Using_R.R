@@ -1021,6 +1021,394 @@ tbl_summary(tb_df, by = "tb",
   cols_width(everything() ~ "55pt")
 
 
+# ----- 7. Merging and Reshaping Data -----
+
+library(tidyverse)
+library(HDSinRdata)
+
+data(covidcases) # data set about weekly COVID-19 case and death counts by county in the US for 2020
+data(lockdowndates) # data set contains the start and end dates for statewide stay-at-home orders
+data(mobility) # data set contains daily mobility estimates by state in 2020
+
+head(covidcases)
+head(mobility)
+head(lockdowndates)
+
+# the function `as.Date()` tells R to treat these columns as dates instead of characters
+mobility$date <- as.Date(mobility$date, formula="%Y-%M-%D")
+lockdowndates$Lockdown_Start <- as.Date(lockdowndates$Lockdown_Start,
+                                        formula="%Y-%M-%D")
+lockdowndates$Lockdown_End <- as.Date(lockdowndates$Lockdown_End,
+                                      formula="%Y-%M-%D")
+class(mobility$date)
+class(lockdowndates$Lockdown_Start)
+class(lockdowndates$Lockdown_End)
+
+month(mobility$date[1])
+week(mobility$date[1])
+
+# this is a test to show what the as.Date() and adding time calculations looks like
+as.Date("2019-12-29") + weeks(1)
+
+covidcases$date <- as.Date("2019-12-29") + weeks(covidcases$week - 1) # this is now adding one week to this specific date
+head(covidcases)
+
+# ----- 7.1 Tidy Data -----
+# data is considered a tidy if:
+# - each variable is associated with a single column
+# - each observation is associated with a single row
+# - each value has its own cell
+mat_mort1 <- data.frame(country=c("Turkey", "United States",
+                                  "Sweden", "Japan"),
+                        y2002 = c(64, 9.9, 4.17, 7.8),
+                        y2007 = c(21.9, 12.7, 1.86, 3.6),
+                        y2012 = c(15.2, 16, 5.4, 4.8))
+head(mat_mort1)
+# the above isn't a tidy because the variable for maternity mortality rate is associated with multiple columns
+# to make it a tidy, we can create separate columns for country, year, and maternity mortality rate
+mat_mort2 <- data.frame(
+  country = rep(c("Turkey", "United States", "Sweden", "Japan"), 3),
+  year = c(rep(2002, 4), rep(2007, 4), rep(2012, 4)),
+  mat_mort_rate = c(64.0, 9.9, 4.17, 7.8, 21.9, 12.7, 1.86, 3.6, 15.2, 16, 5.4, 4.8))
+head(mat_mort2)
+
+# ----- 7.2 Reshaping Data -----
+# another function is `pivot_longer()` to change the data from what is called **wide form** to what is called **long form**
+# an example of this is if we want to take the lockdown data:
+lockdown_long <- lockdowndates %>%
+  pivot_longer(cols = c("Lockdown_Start", "Lockdown_End"),
+               names_to = "Lockdown_Event", values_to = "Date") %>%
+  mutate(Date = as.Date(Date, formula="%Y-%M-%D"),
+         Lockdown_Event = ifelse(Lockdown_Event == "Lockdown_Start",
+                                 "Start", "End")) %>%
+  na.omit()
+head(lockdown_long)
+# we can then take this data and transform it back to wider by using the `pivot_wider()` function
+lockdown_wide <- pivot_wider(lockdown_long,
+                             names_from = Lockdown_Event,
+                             values_from = Date)
+head(lockdown_wide)
+
+# now suppose that we want to create a data frame where the columns correspond to the number of cases for each state in New England
+ne_cases <- covidcases %>%
+  filter(state %in% c("Maine", "Vermont", "New Hampshire",
+                      "Connecticut", "Rhode Island",
+                      "Massachusetts")) %>%
+  mutate(month = month(date)) %>%
+  group_by(state, month) %>%
+  summarize(total_cases = sum(weekly_cases)) %>%
+  ungroup()
+head(ne_cases)
+# the above will give a warning message stating that the data is still grouped by state
+
+# we now want to convert this data to wider format with a column for each state
+pivot_wider(ne_cases, names_from = state, values_from = total_cases)
+
+
+# ----- 7.3 Merging Data with Joins -----
+# merging two data frames is called joining
+table1 <- data.frame(age = c(14, 26, 32),
+                     name = c("Alice", "Bob", "Alice"))
+table2 <- data.frame(name = c("Carol", "Bob"),
+                     statins = c(TRUE, FALSE))
+full_join(table1, table2, by = "name")
+
+# Types of Joins:
+# - left_join(table1, table2, by): Joins each row of table1 with all matches in table2.
+# - right_join(table1, table2, by): Joins each row of table2 with all matches in table1 (the opposite of a left join)
+# - inner_join(table1, table2, by): Looks for all matches between rows in table1 and table2. Rows that do not find a match are dropped.
+# - full_join(table1, table2, by): Keeps all rows from both tables and joins those that match. Rows that do not find a match have NA values filled in.
+# - semi_join(table1, table2, by): Keeps all rows in table1 that have a match in table2 but does not join to any information from table2.
+# - anti_join(table1, table2, by): Keeps all rows in table1 that do not have a match in table2 but does not join to any information from table2. The opposite of a semi-join.
+
+covidcases_full <- left_join(covidcases, lockdowndates,
+                             by = c("state" = "State")) # sometimes we need to specify the joining column if its slightly worded differently
+head(covidcases_full)
+
+# the `between()` function creates a new column
+covidcases_full <- covidcases_full %>%
+  mutate(lockdown = between(date, Lockdown_Start, Lockdown_End)) %>% # the new column 'lockdown' we created based on the two date columns
+  select(-c(Lockdown_Start, Lockdown_End)) # now we don't need them, we drop these columns
+
+covidcases_full %>%
+  filter(state == "Alabama", county == "Jefferson",
+         date <= as.Date("2020-05-10"))
+
+covidcases_full <- inner_join(covidcases_full, mobility,
+                              by = c("state", "date")) %>%
+  select(-c(samples, m50_index))
+head(covidcases_full)
+
+# PRACTICE QUESTION
+df_A <- data.frame(patient_id = c(12, 9, 12, 8, 14, 8), 
+                   visit_num = c(1, 1, 2, 1, 1, 2), 
+                   temp = c(97.5, 96, 98, 99, 102, 98.6), 
+                   systolic_bp = c(120, 138, 113, 182, 132, 146))
+df_A
+df_B <- data.frame(patient_id = c(12, 12, 12, 8, 8, 8, 14, 14), 
+                   visit_num = c(1, 2, 3, 1, 2, 3, 1, 2),
+                   digit_span = c(3, 5, 7, 7, 9, 5, 8, 7))
+df_B
+
+df_AB <- inner_join(df_A, df_B,
+                    by = c("patient_id", "visit_num"))
+head(df_AB)
+
+# ----- 8. Visualization with ggplot2 -----
+library(tidyverse)
+library(HDSinRdata)
+library(patchwork)
+data(pain)
+
+# sampling data
+set.seed(5)
+pain_df_sub <- subset(pain,
+                      select = -c(PAIN_INTENSITY_AVERAGE.FOLLOW_UP))
+
+pain_df <- pain[complete.cases(pain_df_sub), ]
+pain_df <- pain_df[sample(1:nrow(pain_df), 5000, replace = FALSE),]
+
+# ----- 8.1 Intro to ggplot -----
+# the function `ggplot()` is to create a graph but using just the ggplot() will bring up an empty gray box that you build up with the code you put in it
+ggplot()
+
+# the function `aes()` is to create aesthetics for the graph that you are making
+# geom_point() is for scatterplots
+ggplot(pain_df) + geom_point(aes(x=PROMIS_ANXIETY,
+                                 y=PROMIS_DEPRESSION))
+# Alternative 1:
+ggplot(pain_df, aes(x = PROMIS_ANXIETY, y = PROMIS_DEPRESSION)) +
+  geom_point()
+# Alternative 2:
+ggplot() +
+  geom_point(data = pain_df, aes(x = PROMIS_ANXIETY,
+                                 y = PROMIS_DEPRESSION))
+
+# now the `labs()` function adds layers to the graph
+ggplot(pain_df) +
+  geom_point(aes(x = PROMIS_ANXIETY, y = PROMIS_DEPRESSION),
+             color = "blue", size = 2, shape = 5) +
+  labs(x = "PROMIS Anxiety Score", y = "PROMIS Depression Score",
+       title = "Depression vs Anxiety Scores")
+
+# other plotting options include `geom_histogram()` which has the options: `binwidth`, `y`, `alpha`, `color`, `fill`, `linetype`, `size`, and `weight`
+# by default: `y` in a histogram is the count for each bin
+# `theme_minimal()` function is used to change the background colors
+# `theme_bw()` function is the classic dark on light theme
+
+ggplot(pain_df) +
+  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE), color = "violetred",
+                 fill = "lightblue", alpha = 0.5, bins = 11) +
+  labs(x = "Patient Reported Pain Intensity", y = "Count") +
+  theme_minimal()
+
+# PRACTICE QUESTION
+ggplot(pain_df, aes(x = GH_MENTAL_SCORE, y = PROMIS_SLEEP_DISTURB_V1_0)) +
+  geom_smooth(color="navy", se=TRUE, fill = "lightblue")
+
+# ----- 8.2 Adjusting the Axes and Aesthetics -----
+# the function `scale_x_continuous()` allows to specify the `limits`, `breaks`, and `labels`
+
+ggplot(pain_df) +
+  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE), color = "violetred",
+                 fill = "lightblue", alpha = 0.5, bins = 11) +
+  labs(x = "Patient Reported Pain Intensity", y = "Count") +
+  scale_x_continuous(breaks = 0:10) +
+  theme_minimal()
+
+# the `position="jitter"` added the to `geom_point()` function jitters the points making them not exactly line up to the lines making it easier to see trends
+ggplot(pain_df) +
+  geom_point(aes(x = PROMIS_PHYSICAL_FUNCTION,
+                 y = PROMIS_SLEEP_DISTURB_V1_0,
+                 color = PAIN_INTENSITY_AVERAGE), position="jitter")
+
+# the `scale_color_gradient()` function allows us to specify the low and high end colors
+# you can also combo this and use `scale_color_grandient2()` and `scale_color_grandientn()` to specify more color points
+# the function `coord_cartesian()` is used to specify the limits which clips the values rather than removing points outside the limits
+ggplot(pain_df) +
+  geom_point(aes(x = PROMIS_PHYSICAL_FUNCTION,
+                 y = PROMIS_SLEEP_DISTURB_V1_0,
+                 color = PAIN_INTENSITY_AVERAGE),
+             position = "jitter", alpha = 0.5) +
+  scale_x_continuous(limits = c(15, 50), breaks = c(20, 30, 40, 50),
+                     labels = c("-3 SD", "-2 SD", "-1 SD",
+                                "Pop Mean")) +
+  scale_y_continuous(breaks = c(40, 50, 60, 70, 80),
+                     labels = c("-1 SD", "Pop Mean", "+1 SD", "+2 SD",
+                                "+3 SD")) +
+  scale_color_gradient(breaks = seq(0, 10, 2), low = "green",
+                       high = "red", "Reported Pain") +
+  labs(x = "PROMIS Physical Function T-Score",
+       y = "PROMIS Sleep Distrubance T-Score") +
+  theme_minimal()
+
+# now we want to create boxplots of the race categories
+pain_df$PAT_RACE_CAT <- ifelse(pain_df$PAT_RACE %in% c("BLACK", "WHITE"),
+                               pain_df$PAT_RACE, "OTHER")
+pain_df$PAT_RACE_CAT <- as.factor(pain_df$PAT_RACE_CAT)
+
+ggplot(pain_df) +
+  geom_boxplot(aes(y = PAT_RACE_CAT, x = PAIN_INTENSITY_AVERAGE,
+                   fill = PAT_RACE_CAT), alpha = 0.5) +
+  theme_minimal()
+
+# the function `scale_y_discrete()` is a scale function that corresponds to a discrete y-asix
+# we can also specify color using the color `palette` option
+ggplot(pain_df)+
+  geom_boxplot(aes(y = PAT_RACE_CAT, x = PAIN_INTENSITY_AVERAGE,
+                   fill = PAT_RACE_CAT), alpha = 0.5) +
+  scale_x_continuous(breaks = c(0:10)) +
+  scale_y_discrete(limits = c("OTHER", "WHITE", "BLACK"),
+                   labels = c("Other", "White", "Black")) +
+  scale_fill_brewer(palette = "Dark2", guide = "none") +
+  labs(x = "Reported Pain Intensity", y = "Reported Race") +
+  theme_minimal()
+
+# the RColorBrewer package contained other palette options
+# you can use any of the palettes using `brewer.pal()`
+library(RColorBrewer)
+display.brewer.all()
+
+# the `scale_fill_manual()` function is used to specify the colors we want to use for the two categories using the `values` argument
+ggplot(pain_df) +
+  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE, fill = "Baseline")) +
+  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE.FOLLOW_UP,
+                     fill = "Follow-Up")) +
+  scale_x_continuous(breaks = c(0:10)) +
+  scale_fill_manual(values = c("violetred", "pink"),
+                    name = "Measurement") +
+  labs(x = "Reported Pain Intensity", y = "Count") +
+  theme_minimal()
+
+# ----- 8.3 Adding Groups -----
+# there are other ways of adding multiple layers on one visual
+pain_df$HAS_FOLLOW_UP <- 
+  !is.na(pain_df$PAIN_INTENSITY_AVERAGE.FOLLOW_UP)
+ggplot(pain_df) +
+  geom_density(aes(x = PROMIS_PHYSICAL_FUNCTION,
+                   group = HAS_FOLLOW_UP,
+                   color = HAS_FOLLOW_UP)) +
+  scale_x_continuous(breaks = c(0:10)) +
+  scale_color_discrete(name = "Follow-Up", labels = c("No", "Yes")) +
+  labs(x = "PROMIS Physical Function T-Score",
+       y = "Estimated Density") +
+  theme_minimal()
+
+
+# to do another distribution, sometimes its helpful to look at the data to find the proportions
+pain_df_grp <- pain_df %>%
+  group_by(HAS_FOLLOW_UP, PAIN_INTENSITY_AVERAGE) %>%
+  summarize(tot = n()) %>%
+  mutate(prop = tot/sum(tot)) %>%
+  ungroup()
+head(pain_df_grp)
+
+# the function `geom_col()` creates barplots
+# to not have stack bars be default, you would use the argument `position=dodge` and thatll put the bars side-by-side
+ggplot(pain_df_grp) +
+  geom_col(aes(x = PAIN_INTENSITY_AVERAGE, y = prop,
+               fill = HAS_FOLLOW_UP)) +
+  scale_x_continuous(breaks=c(0:10)) +
+  scale_fill_discrete(name = "Seen at Follow Up",
+                      labels = c("No", "Yes")) +
+  labs(x = "Reported Pain Intensity", y = "Proportion") +
+  theme_minimal()
+
+# another way to add visual is to add a facet wrap to your ggplot object
+# facets divide a plot into subplots based on one or more discrete variable values
+# grouping the rows/columns we arrange uses the function `facet_grid()`
+# or you can wrap the plots into a rectangular format using `facet_wrap()`
+ggplot(pain_df) +
+  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE, fill = "Baseline")) +
+  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE.FOLLOW_UP, 
+                     fill = "Follow-Up")) +
+  scale_x_continuous(breaks = c(0:10)) +
+  scale_fill_manual(values = c("violetred", "pink"),
+                    name = "Measurement") +
+  labs(x = "Reported Pain Intensity", y = "Count") +
+  facet_grid(row = vars(PAT_RACE_CAT)) +
+  theme_minimal()
+
+# now we want to create another plot but first need to find the number of participants who selected each body region as well as the average pain intensity for those patients
+# we also classify each body part region into larger groups 
+pain_body_map <- data.frame(part = names(pain_df)[2:75])
+pain_body_map$num_patients <- colSums(pain_df[, 2:75])
+pain_body_map$perc_patients <- pain_body_map$num_patients / 
+  nrow(pain_df)
+pain_body_map$avg_pain <- colSums(pain_df[, 2:75] * 
+                                    pain_df$PAIN_INTENSITY_AVERAGE) /
+  pain_body_map$num_patients
+pain_body_map <- pain_body_map %>% 
+  mutate(region = case_when(
+    part %in% c("X208", "X209", "X218", "X219", "X212",
+                "X213") ~ "Back",
+    part %in% c("X105", "X106", "X205", "X206") ~ "Neck",
+    part %in% c("X107", "X110", "X207", "X210") ~ "Shoulders",
+    part %in% c("X108", "X109", "X112", "X113") ~ "Chest/Abs",
+    part %in% c("X126", "X127", "X228", "X229",
+                "X131", "X132", "X233", "X234") ~ "Legs",
+    part %in% c("X111", "X114", "X211", "X214", "X115", "X116",
+                "X117", "X118", "X217", "X220") ~ "Arms",
+    part %in% c("X119", "X124", "X221", "X226", "X125", "X128",
+                "X227", "X230") ~ "Wrists/Hands",
+    part %in% c("X215", "X216") ~ "Elbows",
+    part %in% c("X135", "X136", "X237", "X238", "X133", "X134",
+                "X235", "X236") ~ "Feet/Ankles",
+    part %in% c("X129", "X130", "X231", "X232") ~ "Knees",
+    part %in% c("X101", "X102", "X103", "X104", "X201", "X203",
+                "X202", "X204") ~ "Head",
+    part %in% c("X120", "X121", "X122", "X123", "X222", "X223",
+                "X224", "X225") ~ "Hips"))
+
+head(pain_body_map)
+
+# now we are plotting the average pain value for each body part as well as the proportion of patients who categorize it as painful
+ggplot(pain_body_map) +
+  geom_label(aes(x = perc_patients, y = avg_pain, label = part, 
+                 color = region)) + 
+  geom_hline(yintercept = mean(pain_body_map$avg_pain)) +
+  annotate(geom = "text", label = "Average Pain Value", 
+           x = 0.35, y = 7.0) + 
+  labs(x = "Proportion Patients Selected Region", 
+       y = "Average Pain of Patients") +
+  theme_minimal()+
+  theme(legend.position="bottom", 
+        panel.grid.major = element_line(color = "lightpink"))
+
+# after making all these plots, it is useful to save them
+# the main function to do this is `ggsave()`
+# the **patchwork** package is to incorporate multiple plots together
+# the function `plot_layout()` function allows us to specify the grid used to arrange our figures
+# another function `guide_area()` creates a placeholder for the legends
+# and the argument `guide = "collect"` in the `plot_layout()` function specify that all guides should be put together
+p1 <- ggplot(pain_body_map) +
+  geom_label(aes(x = perc_patients, y = avg_pain, label = part, 
+                 color = region)) + 
+  geom_hline(yintercept = mean(pain_body_map$avg_pain)) +
+  annotate(geom = "text", label = "Average Pain Value", 
+           x = 0.35, y = 7.0) + 
+  labs(x = "Proportion of Patients Selecting Region", 
+       y = "Average Pain of Patients") +
+  scale_color_discrete(name="Body Part")+
+  theme_minimal()+
+  theme(legend.position = "bottom", 
+        panel.grid.major = element_line(color = "lightpink"))
+
+p2 <- ggplot(pain_body_map) +
+  geom_histogram(aes(x = perc_patients), color = "violetred", 
+                 fill = "lightpink") + 
+  labs(x = "Proportion of Patients Selecting Region", y = "Count") +
+  theme_minimal()+
+  theme(panel.grid.major = element_line(color = "lightpink"))
+
+p1 + p2 + guide_area() + plot_layout(ncol=1, guides = "collect",
+                                     axes = "collect")
+
+# ggsave("images/visualization_ggplot/myplot.png", height=10) 
+
+
+
+# ----- 9. CASE STUDY: Exploring Early COVID-19 Data -----
 
 
 
