@@ -1763,6 +1763,209 @@ p1 + p2 + guide_area() + plot_layout(ncol=1, guides = "collect",
 
 
 ## ----- CASE STUDY: Exploring Early COVID-19 Data -----
+```{r}
+install.packages('usmap')
+library(HDSinRdata)
+library(tidyverse)
+library(patchwork)
+library(gt)
+library(gtsummary)
+library(usmap)
+```
+
+### ----- Pre-processing -----
+- we are going to be looking at COVID-19 cases and daily mobility statistics by state
+```{r}
+# Read in data
+data(covidcases)
+data(mobility)
+```
+- the first thing is to look at the columns in our data and correct date columns
+```{r}
+# Convert to date format and find week
+mobility$date <- as.Date(mobility$date, formula = "%Y-%M-%D")
+mobility$week <- week(mobility$date)
+```
+- now that we converted those to dates, we can summarize the mobility for a state across each week
+```{r}
+# Find average mobility for week
+mobility_week <- mobility %>%
+  group_by(state, week) %>%
+  summarize(m50 = mean(m50, na.rm=TRUE), .groups = "drop") # the .groups argument is a grouping structure of the results where "drop" means all levels of grouping are dropped
+head(mobility_week)
+```
+- for both datasets, we want to check whether each state was observed across all dates and how the state's name is represented
+```{r}
+# Find number of dates recorded for each state
+table(mobility_week$state)
+```
+- for the `covidcases` data, the data is at the county level; we want to summarize this data instead
+```{r}
+# Find state names and number of weeks recorded for each state
+unique(covidcases$state)
+
+num_wks <- covidcases %>%
+  group_by(state) %>%
+  summarize(num_weeks = n_distinct(week), .groups = "drop")
+summary(num_wks)
+```
+- we also need to update D.C. to be standard acrodd the data
+```{r}
+mobility_week$state[mobility_week$state == "Washington, D.C."] <- "District of Columbia"
+```
+
+- after checking the format of the state and week columns, we can now merge the data together using `left_join()`
+```{r}
+# Join cases and mobility data
+covid <- left_join(covidcases, mobility_week, by = c("state", "week"))
+```
+- now we want to get some simple info about the continuous variables in the data 
+- the main points we want to see if there are negative values or missing data
+```{r}
+summary(covid[, c("weekly_cases", "weekly_deaths", "m50")])
+```
+- there are negative numbers and are clear discrepancies in the data so we can either recode as 0 or NA depending on what we are trying to look for; for this instance, we will recode the negatives as NA
+```{r}
+# Set negative counts to NA
+covid$weekly_cases <- replace(covid$weekly_cases,
+                              which(covid$weekly_cases < 0),
+                              NA)
+covid$weekly_deaths <- replace(covid$weekly_deaths,
+                               which(covid$weekly_deaths < 0),
+                               NA)
+```
+
+- lastly, we want to add state abbreviations and region for each state using `state.name` and `state.region` vectors
+```{r}
+# Add region and abbreviation and remove county
+region_key <- data.frame(state = c(state.name,
+                                   "District of Columbia"),
+                         state_abb = c(state.abb, "DC"),
+                         region = c(as.character(state.region),
+                                    "South"))
+
+covid <- covid %>%
+  left_join(region_key, by = c("state"))
+
+head(covid)
+```
+
+### ----- Mobility and Cases Over Time -----
+- now that the data is cleaned, we can start exploring the data
+- we can create a summary table that'll show the measures differing by region
+```{r}
+covid %>%
+  select(c("region", "m50", "weekly_cases", "weekly_deaths")) %>%
+  tbl_summary(by = "region", missing = "no") %>%
+  as_gt() %>%
+  cols_width(everything() ~ "55pt")
+```
+- we can then plot this data
+```{r}
+# Average mobility in the US over time - overall 
+pmob1 <- covid %>%
+  select(c(region, state, week, m50)) %>%
+  distinct() %>%
+  group_by(week) %>%
+  summarize(avg_m50 = mean(m50, na.rm=TRUE), .groups="drop") %>%
+  ggplot() + 
+  geom_line(aes(x = week, y = avg_m50)) +
+  labs(x = "Week in 2020", y = "Average Mobility", 
+       title = "Average Mobility in the US") + 
+  theme_bw()
+
+# Average mobility in the US over time - by region
+pmob2 <- covid %>%
+  select(c(region, state, week, m50)) %>%
+  distinct() %>%
+  group_by(region, week) %>%
+  summarize(avg_m50 = mean(m50, na.rm=TRUE), .groups="drop") %>%
+  ggplot() + 
+  geom_line(aes(x = week, y = avg_m50, color = region)) +
+  labs(x = "Week in 2020", y = "Average Mobility", 
+       title = "Average Mobility by Region in the US",
+       color = "Region") + 
+  theme_bw() +
+  theme(legend.position = "bottom") 
+
+pmob1+pmob2
+```
+
+- so with these two graphs, we can see overall mobility and then by region
+- the issue with this is we do not have population counts which would help standardize these numbers
+- we can use a secondary y-axis using the `sec_axis()` function within the `scale_y_continuous()` allows us to plot deaths and cases together 
+- for this case, the secondary axis is scaled by 1/10th of the primary axis
+```{r}
+# Change in number cases over time, per region
+covid %>%
+  filter(!is.na(region)) %>% 
+  group_by(region, week) %>%
+  summarize(weekly_cases = sum(weekly_cases, na.rm = TRUE),
+            weekly_deaths = sum(weekly_deaths, na.rm = TRUE),
+            .groups = "drop") %>%
+ggplot() +
+  geom_line(aes(x = week, y = weekly_cases, color = region, 
+                linetype = "Cases")) + 
+  geom_line(aes(x = week, y = weekly_deaths*10, color = region, 
+                linetype = "Deaths")) +
+  scale_y_continuous(name = "Average Weekly Cases",
+                     sec.axis = sec_axis(~./10, 
+                          name = "Average Weekly Deaths"))+
+  scale_linetype(name = "Measure") +
+  labs(x = "Week in 2020", color = "Region", 
+       title = "Weekly Cases Over Time by Region") +
+  theme_bw()
+```
+
+- now if we want to see how mobility and cases are related, we can look at scatter plots of mobility and cases in California
+```{r}
+covid_ca <- covid %>% filter(state == "California")
+ggplot(covid_ca) +
+  geom_point(aes(x = weekly_cases, y = m50), na.rm = TRUE) +
+  labs(x = "Weekly Cases", y = "Average Mobility")
+```
+
+- there is a function `plot_usmap()` that is used to plot correlations by state
+```{r}
+# Calculate and plot correlation between cases and mobility, y state
+covid_cor <- covid %>%
+  group_by(state) %>%
+  summarize(correlation = cor(weekly_cases, m50,
+                              use = "complete.obs"))
+
+plot_usmap(regions = "states", data = covid_cor, 
+           values = "correlation") +
+  scale_fill_gradient2(low = "darkblue", high = "darkred",
+                       mid = "white", name = "Correlation") +
+  labs(title = "Correlation Between Cases and Mobility") +
+  theme(legend.position = "right")
+```
+
+- lastly, we will look at how the total cases and deaths are related to each other
+  - this shows that the Northeast suffered more deaths per case overall
+    - which may be related to the lower mobility and negative correlation between mobility and cases observed earlier
+
+```{r}
+# Relationship between cases and deaths summarized
+covid %>%
+  group_by(region, state_abb) %>%
+  summarize(total_cases = sum(weekly_cases, na.rm = TRUE),
+            total_deaths = sum(weekly_deaths, na.rm = TRUE),
+            .groups = "drop") %>%
+ggplot() + 
+  geom_label(aes(x = total_cases, y = total_deaths, color = region,
+                 label = state_abb), size = 1.5) + 
+  labs(x = "Total Cases", y = "Total Deaths", color = "Region") +
+  theme_bw()
+```
+
+# ----- Probability Distributions in R -----
+
+
+
+
+
+
 
 
 
