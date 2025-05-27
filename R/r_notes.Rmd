@@ -1960,8 +1960,48 @@ ggplot() +
 ```
 
 # ----- Probability Distributions in R -----
+- we are now going to practice probability distribution which is done by generating random samples and calculating the corresponding density, quantile, and cumulative functions that correspond to that distribution
+```{r}
+library(tidyverse)
+library(HDSinRdata)
+```
 
+- now to draw random samples, we need to generate a code that changes the results everytime the code is run. 
+- to replicade the code, we need to have a _random seed_ which makes the results the same everytime 
+  - the `set.seed()` function takes a numeric seed value
+```{r}
+sample(1:10, 1) # the will change each time you run this chunk
+set.seed(5)
+sample(1:10, 1) # this will stay the same each time you run it
+```
 
+## ----- Probability Distribution Functions -----
+- all of the common discrete (e.g., Bernoulli, binomial) and continuous (e.g. normal, uniform, exponential, Poisson) probability distributions have corresponding functions in R
+- `r[dist]()`: random sample function for the given distribution (e.g., `rnorm()`, `runif()`)
+- `d[dist]()`: density function for the distribution (e.g., `dnorm()`, `dunif()`)
+- `p[dist]()`: cumulative distribution function for the distribution (e.g., `pnorm()`, `punif()`)
+- `q[dist]()`: quantile function for the distribution (e.g., `qnorm()`, `qunif()`)
+
+### ----- Random Samples -----
+- the below generates a sample of 100 random numbers following a normal distribution with mean 5 and standard deviation 1
+  - the arguments for this function take in `n` (number of observations), `mean` (the mean with default value 0), and `sd` (the standard deviation with default value 1)
+
+```{r}
+x <- rnorm(n = 100, mean = 5, sd = 1)
+hist(x)
+```
+- if we input a vector instead of a single value for the mean or sd if we want each sample to come from its own normal distribution
+
+```{r}
+x <- rnorm(n = 100, mean = rep(c(0,5), 50))
+hist(x)
+```
+- for binomial distribution, the difference is that we need to specify a probability `p` and number of trials `size` (rather than `mean` and `sd` in the normal case)
+- in the below, we generate 100 random numbers following a binomial distribution with 10 trials and a probability 0.5
+```{r}
+x <- rbinom(n = 100, p = 0.5, size = 10)
+hist(x)
+```
 
 
 
