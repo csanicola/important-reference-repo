@@ -2161,7 +2161,7 @@ library(gtsummary)
 data(tex_itop)
 ```
 
-### ----- Univariate Distributions and One-Sample Tests -----
+#### ----- Univariate Distributions and One-Sample Tests -----
 
 ```{r}
 # we first want to look at the number of induced terminations of pregnancy (ITOPs) in 2021 per 1000 females ages 15-49 in each country
@@ -2242,7 +2242,7 @@ wilcox_res$p.value
 # the p-value is very small which means since it is less than 0.05, we reject the null hypothesis meaning that we have strong evidence that the true median of county_rates_2021 is less than 5.14
 ```
 
-### ----- Correlation and Covariance -----
+#### ----- Correlation and Covariance -----
 - we now look at two-sample tests
 ```{r}
 # looking at 2020 and 2021 rates by county
@@ -2287,7 +2287,7 @@ cor_test_res
 cor_test_res$conf.int
 ```
 
-### ----- Two-Sample Tests for Continuous Variables -----
+#### ----- Two-Sample Tests for Continuous Variables -----
 - to directly compare the difference between 2020 and 2021 using a two-sample test
 ```{r}
 t_test_two_res <- t.test(x = county_rates$y2020,
@@ -2296,6 +2296,504 @@ t_test_two_res
 # these results indicate that we reject the null hypothesis that the two county rates are equal to the 0.05 level
 
 t_test_two_res$conf.int
+```
+
+- now if we want to compare the change in abortion rates from 2020 to 2021 between rural and urban counties
+```{r}
+# first we need to create a variable describing the rate change between these years
+# we are going to use change in rate rather than percentage change to avoid infinite or undefined values
+county_rates_type <- tex_itop %>%
+  dplyr::select(c(county, urban, county_type, total_rate, year)) %>%
+  filter(total_rate < 15, year %in% c(2020, 2021)) %>%
+  pivot_wider(names_from = year, values_from = total_rate) %>%
+  na.omit() %>%
+  rename("y2020" = "2020", "y2021" = "2021") %>%
+  mutate(rate_change = (y2021 - y2020))
+```
+- for this we are once again going to use a two-sample two-sided t-test, but this time the data are not paired
+- below, we are going to use an alternative way to specify a t-test using a formula `lhs ~ rhs`   - `lhs` is a numeric column
+  - `rhs` is a factor column with two levels
+  - we also need to specify the data being used in this formula
+```{r}
+t_test_unpaired <- t.test(rate_change ~ urban, 
+                          data = county_rates_type)
+t_test_unpaired
+# from these results we see we can reject the null hypothesis
+# the rate changes for urban and rural counties are not significantly different
+
+t_test_unpaired$estimate
+# this is showing the estimated mean in both groups where we can confirm they aren't that different
+```
+```{r}
+x <- county_rates_type$rate_change[county_rates_type$urban == 'Urban']
+y <- county_rates_type$rate_change[county_rates_type$urban == 'Rural']
+t.test(x = x, y = y, paired = FALSE) 
+# these are the same results as above (just the other way of showing them)
+```
+
+- besides a t-test, we can run a two-sample Wilcoxon non-parametric test using the `wilcox.test()` function which can only compare two groups
+  - if we want to compare two or more independent samples, we can use a Kruskal-Wallis rank sum test using the `kruskal.test()` functionor a one-way analysis of variance (ANOVA) using the `aov()` function
+
+- for this test, we use `county_type` as an indicator for whether the county is urban, surburban, or rural
+  - for the `kruskal.test()` we can either specify the arguemnts formula (`rate_change ~ county_type`) and data (`county_rates_type`)
+    - or we can specify two vectors:
+      - `x` as a numeric vector
+      - `g` as a factor representing the group
+```{r}
+kruskal.test(county_rates_type$rate_change,
+             county_rates_type$county_type)
+
+aov_res <- aov(rate_change ~ county_type,
+               data = county_rates_type)
+
+# we need to run summary to get the p-value
+summary(aov_res)
+
+# both results are showing that we fail to reject the null hypothesis at the 0.05 level
+```
+
+#### ----- Two-Sample Variance Tests -----
+- we can also test whether the variance of a continuous variable is equal between groups
+  - we start to do this by comparing the variance in abortion rates in 2021 between urban and rural counties using an F-test
+  - our null hypothesis for this test is that the variance in both groups is equal
+  - the function `var.test()` implements the F-test
+    - the arguements are the same for a `t.test()`; either using vectors `x` and `y` OR a `formula` and `data`
+```{r}
+f_test <- var.test(y2021 ~ urban, county_rates_type)
+f_test
+# we fail to reject the null hypothesis that the variances in rates are equal at the 0.05 level
+# the estimate of the ratio of variance is around 1.11
+
+f_test$estimate
+```
+
+- the last part of this is using the Levene's test to test whether group variances are equal when there are more than two groups
+```{r}
+levene_test <- leveneTest(y2021 ~ as.factor(county_type), 
+                              county_rates_type)
+print(levene_test)
+# from these results, we reject the null hypothesis because the p-value is less than 0.05 (0.034)
+
+levene_test[['Pr(>F)']] # access the p-value (here it has a different name)
+```
+
+#### ----- Two-Sample Tests for Categorical Variables -----
+- now we are looking to compare the distributions of categorical variables
+  - we will be comparing the ctounies by their abortion rates if it is above or below 11.2 (the national average that year)
+
+```{r}
+county_rates_type$below_nat_avg <- 
+  ifelse(county_rates_type$y2020 > 11.2, "Above Nat Avg",
+         "Below Nat Avg")
+table(county_rates_type$below_nat_avg, county_rates_type$urban)
+```
+- now we can use a Fisher's exact test to test whether the classification of being above or below the national average and being rural and urban are associated with each other
+  - for this, the null hypothesis is that the odds of being below the national average is equal between rural and urban counties
+```{r}
+fisher_test <- fisher.test(county_rates_type$urban,
+                           county_rates_type$below_nat_avg)
+fisher_test
+# here we can cannot reject the null hypothesis and see that there is not a statistically significant difference between urban and rural counties at the 0.05 level (the odds ration is around 0.23)
+
+fisher_test$estimate
+```
+- another test is a Pearson's Chi-Squared test, which can be used for large sample sizes
+- since the counts for rural and urban counties are very small, we re-categorize our outcome to be at or above Texas' average to avoid this complication
+- the `chisq.test()` function is to run this
+  - it takes the arguments as a matrix or two factor vextors
+  - another argument is `correct` (which the default is TRUE) which indicates whether to apply a continuity correction
+```{r}
+tex_mean <- mean(county_rates_type$y2020)
+county_rates_type$below_tex_avg <- 
+  ifelse(county_rates_type$y2020 > tex_mean, "Above Texas Ave",
+         "Below Texas Ave")
+table(county_rates_type$below_tex_avg, county_rates_type$urban)
+```
+```{r}
+chi_sq <- chisq.test(county_rates_type$below_tex_avg,
+                     county_rates_type$urban)
+chi_sq
+# from here we see a statistically significant difference in the proportion of counties above the national average between rural and urban counties and reject the null hypothesis at the 0.05 leve (our p-value is 0.009)
+```
+
+### ----- Adding Hypothesis Tests to Summary Tables -----
+- when creating a stratified table, we can automatically add p-values for hypothesis tests comparing across populations using the `add_p()` function
+  - by default, the function uses a Kruskal-Wallis rank sum test for continuous variables (or a Wilcoxon rank sum test when the `by` variable has two levels) and uses a Chi-Squared Contingency Table Test for categorical varaibles (or a Fisher's Exact Test for categorical variables with any expected cell count less than five)
+    - the chosen tests are displayed as footnotes on the table
+```{r}
+tbl_summary(tex_itop, 
+            by = "year",
+            include = c(total_rate, white_rate, asian_rate, 
+                        hispanic_rate, black_rate, native_american_rate),
+            label = list(
+              total_rate = "Overall",
+              white_rate = "White",
+              asian_rate = "Asian",
+              hispanic_rate = "Hispanic",
+              black_rate = "Black",
+              native_american_rate = "Native American"),
+            statistic = list(all_continuous() ~ "{mean} ({sd})")) %>%
+  add_p() %>%
+  modify_header(label = "**Variable**") %>%
+  as_gt() %>%
+  cols_width(label ~ "50pt",
+             everything() ~ "30pt")
+```
+
+- from the table, we can see there wasn't any too statistically significant changes across years in the abortion rates for racial groups
+
+## ----- CASE STUDY: Analyzing Blood Lead Level and Hypertension
+
+```{r}
+library(HDSinRdata)
+library(tidyverse)
+library(gt)
+library(gtsummary)
+
+data("NHANESsample")
+```
+
+- our analysis focuses on using hypothesis testing to look at the association between hypertension and blood lead levels by sex
+
+- first we select demographic and clinical variables that we think will be significant
+```{r}
+NHANESsample <- NHANESsample %>%
+  select("AGE", "SEX", "RACE", "SMOKE", "LEAD", "BMI_CAT",
+         "HYP", "ALC") %>%
+  na.omit()
+```
+
+- next, we want to look at a summary table by hypertension status
+- we are expecting to see statistically significant differences between the two groups across all included variables
+```{r}
+tbl_summary(NHANESsample, by = c("HYP"),
+            label = list(SMOKE ~ "SMOKING STATUS",
+                         BMI_CAT ~ "BMI",
+                         ALC ~ "ALCOHOL USE")) %>%
+  add_p() %>%
+  add_overall() %>%
+  modify_spanning_header(c("stat_1", "stat_2") ~
+                           "**Hypertension Status**") %>%
+  as_gt() %>%
+  cols_width(everything() ~ "55pt")
+```
+
+- we can also plot the distribution of blood lead leves (on a log scale) by sex and hypertension status
+```{r}
+ggplot(NHANESsample) +
+  geom_boxplot(aes(x=LEAD,
+                   y = interaction(HYP,SEX),
+                   color = interaction(HYP,SEX))) +
+  scale_x_continuous(trans = "log", breaks = c(0.1, 1, 10, 50)) +
+  scale_y_discrete(labels = c("Male : 0", "Male : 1",
+                              "Female : 0", "Female : 1")) +
+  guides(color = "none") +
+  labs(x="Blood Lead Level",
+       y = "Sex : Hypertension Status")
+```
+
+- we hypothesize that log blood lead levels could be approximated by a normal distribution 
+  - to test this hypothesis that there is a difference in mean log blood lead level between those with and without hypertension, we use a two-sample unpaired t-test
+```{r}
+t.test(log(LEAD) ~ HYP, data = NHANESsample)
+# from these results, we can see that there is a statistical significants as the p-value is less than 0.05
+```
+
+- now we repeat this test for a stratified analysis and present the results in a concise table
+
+```{r}
+# stratify the data
+nhanes_male <- NHANESsample[NHANESsample$SEX == "Male",]
+nhanes_female <- NHANESsample[NHANESsample$SEX == "Female",]
+
+# t-test for each
+test_male <- t.test(log(LEAD) ~ HYP, data = nhanes_male)
+test_female <- t.test(log(LEAD) ~ HYP, data = nhanes_female)
+
+# create data frame
+res_df <- data.frame(group = c("Male", "Female"),
+                     statistic = signif(c(test_male$statistic,
+                                          test_female$statistic), 3),
+                     p.value = signif(c(test_male$p.value,
+                                        test_female$p.value), 3))
+
+res_df
+```
+
+## ----- Linear Regression -----
+```{r}
+library(HDSinRdata)
+library(tidyverse)
+library(broom)
+library(car)
+
+data(NHANESsample)
+```
+
+### ----- Simple Linear Regression -----
+- with the sample data, we use linear regression to understand the association between blood lead levels and systolic blood pressure, adjusting for possible confounders
+  - we first create summary columns for systolic and dystolic blood pressure 
+    - if an observation has one blood pressure reading, than we use that value
+      - if there is more than one blood pressure reading, then we drop the first observatin and average the rest
+      - we do a complete case analysis by dropping any observation with NA values
+```{r}
+NHANESsample$SBP <- apply(NHANESsample[, c("SBP1", "SBP2", "SBP3",
+                                          "SBP4")], 1,
+                          function(x) case_when(sum(!is.na(x)) == 0 ~ NA,
+                                                sum(!is.na(x)) == 1 ~ sum(x, na.rm = TRUE),
+                                                sum(!is.na(x)) > 1 ~ mean(x[-1],
+                                                                          na.rm = TRUE)))
+NHANESsample$DBP <- apply(NHANESsample[,c("DBP1", "DBP2", "DBP3",
+                                          "DBP4")], 1,
+                          function(x) case_when(sum(!is.na(x)) == 0 ~ NA,
+                                                sum(!is.na(x)) == 1 ~ sum(x, na.rm = TRUE),
+                                                sum(!is.na(x)) > 1 ~ mean(x[-1],
+                                                                          na.rm = TRUE)))
+nhanes_df <- na.omit(subset(NHANESsample,
+                            select = -c(SBP1, SBP2, SBP3, SBP4, DBP1,
+                                        DBP2, DBP3, DBP4)))
+dim(nhanes_df)
+```
+
+- now we make sure all the categorical variables are coded as factors
+```{r}
+nhanes_df$SEX <- as.factor(nhanes_df$SEX)
+nhanes_df$RACE <- as.factor(nhanes_df$RACE)
+nhanes_df$EDUCATION <- as.factor(nhanes_df$EDUCATION)
+nhanes_df$BMI_CAT <- as.factor(nhanes_df$BMI_CAT)
+nhanes_df$LEAD_QUANTILE <- as.factor(nhanes_df$LEAD_QUANTILE)
+```
+
+- to create our simple linear regression, we plot the relationship between blood lead level and systolic blood pressure
+  - since we have a single continuous independent variable, a scatter plot allows us to easily visualize whether we meet the assumptions underlying linear regression
+```{r}
+plot(nhanes_df$LEAD, nhanes_df$SBP,
+     xlab = "Blood Lead Level", ylab = "Systolic Blood Pressure",
+     pch = 16)
+```
+
+- from the above plot, we don't see a linear relationship between the two variables
+
+- even though there is no linear relationship, we can continue by fitting a simple linear regression model to explain the association
+  - the function `lm(formula = y ~ x, data)` fits a linear model in R
+```{r}
+simp_model <- lm(formula = SBP ~ LEAD, data = nhanes_df)
+summary(simp_model)
+```
+- we can visualize this estimated regression line and add it to the current scatter plot
+```{r}
+plot(nhanes_df$LEAD, nhanes_df$SBP,
+     ylab = c("Systolic Blood Pressure"),
+     xlab = c("Blood Lead Level"), pch = 16)
+abline(simp_model, col = 2, lwd = 2) # this is where we can add our new line from above
+```
+
+### ----- Multiple Linear Regression -----
+- we will create another model but add additional variables 
+```{r}
+adj_model <- lm(SBP ~ LEAD + AGE + SEX, data = nhanes_df)
+summary(adj_model)
+```
+
+- we can also extract the estimated regression coefficients from the model using the `coef()` function or by using the `tidy()` function from the **broom** package
+  - this function puts the coefficient estimates, standard errors, statistics, and p-values in a data frame
+    - can also add a confidence interval by specifying `conf.int = TRUE` 
+```{r}
+coef(adj_model)
+```
+
+```{r}
+tidy(adj_model, conf.int = TRUE, conf.level = 0.95)
+```
+- other useful summary functions are: 
+  - `resid()` which returns the residual values for the model 
+  - `fitted()` which returns the fitted values or estimated y values
+  - `predict()` is what we can use to predict on new data
+```{r}
+summary(resid(adj_model))
+```
+
+```{r}
+plot(nhanes_df$SBP, fitted(adj_model),
+     xlab = "True Systolic Blood Pressure",
+     ylab = "Predicted Systolic Blood Pressure", pch = 16)
+abline(a = 0, b = 1, col = "red", lwd = 2)
+```
+
+- we can then perform a nested hypothesis test between our sample linear regression model and our adjusted model using the `anova()` function
+  - we pass both models along with the arguemnt `test="F"` to indicate that we are performing an F-test.
+```{r}
+print(anova(simp_model, adj_model, test="F"))
+```
+- the model summary for the adjusted model displays the estimated coefficient for sex as 'SEXFemale' which indicates that the reference level for sex is male. 
+  - we can change the reference level by reordering the factor variable either by using the `factor()` function and specifying 'Female' as the first level or by using the `relevel()` function
+```{r}
+nhanes_df$SEX <- relevel(nhanes_df$SEX, ref = "Female") # we are releveling the SEX column with Female as the new reference level
+adj_model2 <- lm(SBP ~ LEAD + AGE + SEX, data = nhanes_df)
+tidy(adj_model2)
+```
+- the `lm()` function also allows to use `.` to indicate that we would like to include all remaining columns as independent variables or the `-` to exclude variables
+```{r}
+lm(SBP ~ . - ID - RACE - EDUCATION - INCOME - SMOKE - YEAR - BMI_CAT - 
+     LEAD_QUANTILE - DBP - ALC - HYP - RACE, data = nhanes_df)
+```
+
+### ----- Diagnostic Plots and Measures -----
+- in the previous plot, our model doesn't have a great fit
+- there are several build in plots to help further diagnostic plots
+```{r}
+par(mfrow = c(2, 2)) # plot all four plots together
+plot(adj_model)
+
+# the last plot summarizes the outliers, leverage, and influential points
+```
+
+#### ----- Normality -----
+
+- the `qqnorm()` and `qqline()` functions can take in the residuals from our model as an argument
+```{r}
+par(mfrow = c(1, 2)) # plot next to each other
+hist(resid(adj_model), xlab = "Residuals",
+     main = "Histogram of Residuals")
+qqnorm(resid(adj_model))
+qqline(resid(adj_model), col = "red")
+
+# both the histogram and qq-plot show the residuals are positively skewed, and thus the assumption of normality is not satisfied for our residuals
+```
+
+- instead of direct residuals, we can also find standardized residuals with the function `rstandard()`
+  - the standard residuals are the raw residuals divided by an estimate of the standard deviation for the residual which is different for each observation
+```{r}
+par(mfrow = c(1, 2))
+hist(rstandard(adj_model), xlab = "Standardized Residuals",
+     main = "Histogram of Standardized Residuals",
+     cex.main = 0.65)
+qqnorm(rstandard(adj_model), cex.main = 0.65)
+qqline(rstandard(adj_model), col = "red")
+```
+
+#### ----- Homoscedasticity, Linearity, and Collinearity -----
+- we can also create a residual vs fitted plot or plot the residuals against included covariates
+  - both plots, we are looking for the points to be spread roughly evenly around 0 with no discerning pattern
+```{r}
+par(mfrow = c(1, 2))
+plot(fitted(adj_model), resid(adj_model),
+     xlab = "Fitted Values", ylab = "Residuals")
+plot(nhanes_df$LEAD, resid(adj_model),
+     xlab = "Blood Lead Level", ylab = "Residuals")
+
+# however, both of these plots show a funnel shape, indicating a growing and shrinking variance of residuals by level
+# this indicates that we are violating the homoscedasticity assumption
+```
+- to quantify any collinearity between the included covariates, we can calculate the variance inflation factors 
+- the `vif()` function allows us to calculate the variance inflation factors or generalized variance inflation factors for all covariates
+```{r}
+vif(adj_model)
+# the output shows that all VIF values are around 1, indicating low levels of collinearity
+```
+
+#### ----- Leverage and Influence -----
+- leverage values measure how much an individual observation's y value influences its own predicted value and indicate whether observations have extreme predictor values compared to the rest of the data 
+  - leverage values range from 0 to 1 and sum to the number of estimated coefficients
+  - observations with high leverage have the potential to significantly impact the estimated regression coefficients and the overall fit of the model
+    - therefore, examining leverage values helps identify observations that may be influenced or outliers
+```{r}
+sort(hatvalues(adj_model), decreasing = TRUE)[1:10]
+# this is going to show us the ten highest leverage values
+```
+```{r}
+nhanes_df[order(hatvalues(adj_model), decreasing = TRUE),] %>%
+  select(c(SBP, LEAD, AGE, SEX)) %>%
+  head(10)
+```
+
+- some other measures of influence are the DFBETAs and Cook's distance, which measure how much each observation influences the estimated coefficients and the estimated y values
+  - the `influence.measures()` functino provides a set of measures that quantify the influence of each observation on a linear regression model
+    - the output returns the values in a matrix called `infmat`
+```{r}
+inf_mat <- influence.measures(adj_model)[['infmat']]
+as.data.frame(inf_mat) %>% head()
+```
+
+### ----- Interactions and Transformations -----
+- to improve the models, we can make transformations
+  - if we first can consider log transformations
+```{r}
+par(mfrow=c(2,2))
+hist(nhanes_df$SBP, xlab = "Systolic Blood Pressure",
+     main = "")
+hist(log(nhanes_df$SBP), xlab = "Log Systolic Blood Pressure",
+     main = "")
+hist(nhanes_df$LEAD, xlab = "Blood Lead Level",
+     main = "")
+hist(log(nhanes_df$LEAD), xlab = "Log Blood Lead level",
+     main = "")
+```
+
+- now the above output graphs have a more symmetrical distribution
+
+- to add a transformation to a model, you can simply apply `lm()` to the formula
+```{r}
+model_nlog_nlog <- lm(SBP ~ LEAD + AGE + SEX, data = nhanes_df)
+model_log_nlog <- lm(log(SBP) ~ LEAD + AGE + SEX, data = nhanes_df)
+model_nlog_log <- lm(SBP ~ log(LEAD) + AGE + SEX, data = nhanes_df)
+model_log_log <- lm(log(SBP) ~ log(LEAD) + AGE + SEX, data = nhanes_df)
+
+summary(model_nlog_nlog)$adj.r.squared
+summary(model_log_nlog)$adj.r.squared
+summary(model_nlog_log)$adj.r.squared
+summary(model_log_log)$adj.r.squared
+```
+```{r}
+par(mfrow=c(2,2))
+qqnorm(rstandard(model_nlog_nlog), main = "Original Model") 
+qqline(rstandard(model_nlog_nlog), col = "red")
+qqnorm(rstandard(model_log_nlog), main = "Log SBP") 
+qqline(rstandard(model_log_nlog), col = "red")
+qqnorm(rstandard(model_nlog_log), main = "Log Lead") 
+qqline(rstandard(model_nlog_log), col = "red")
+qqnorm(rstandard(model_log_log), main = "Log SBP, Log Lead") 
+qqline(rstandard(model_log_log), col = "red")
+```
+- both indicate that the model with the log-log transformation is the best fit, though the model with just a log transformation for `SBP` has a similar qq-plot
+
+- another consideration we can try is polynomial transformations
+  - the `poly(x, degree=1)` function allows us to specify a polynomial transformation where we might have higher degree terms
+```{r}
+model_poly <- lm(SBP ~ poly(LEAD, 3) + AGE + SEX, data = nhanes_df)
+model_poly
+```
+
+- we can summarize the outcome for our log-log model using the `tidy()` function
+```{r}
+tidy(model_log_log)
+# we can see small p-values for each estimated coefficient
+```
+- another component to add is an interaction term
+  - for this data we can consider an interaction between sex and blood lead level
+    - you can add an interaction tot he formula using a `:` between the two variables
+```{r}
+model_interaction <- lm(log(SBP) ~ log(LEAD) + AGE + SEX +
+                          SEX:log(LEAD), data = nhanes_df)
+summary(model_interaction)
+# our output shows that the coefficient for this interaction is indeed significant
+```
+
+### ----- Evaluation Metrics -----
+- there are a few other metrics that can help us understand how well our model fits the data and can also help with model selection
+  - the `AIC()` function finds the Akaike information criterion (AIC)
+    - takes into account both the goodness of fit (captured by the likelihood of the model) and the complexity of the model (captured by the number of parameters used)
+      - lower AIC values are preferable
+  - the `BIC()` function finds the Bayesian information criterion (BIC)
+    - similar to AIC but has a stronger penalty for model complexity compared to AIC
+  - both balance the trade-off between model complexity and goodness of fit
+```{r}
+AIC(model_log_log)
+AIC(model_interaction)
+```
+```{r}
+BIC(model_log_log)
+BIC(model_interaction)
 ```
 
 
