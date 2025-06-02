@@ -2796,6 +2796,97 @@ BIC(model_log_log)
 BIC(model_interaction)
 ```
 
+- the `predict()` function allows us to calculate the predicted y values
+  - when used on a model with no data specified, it returns the predicted values for the training data
+    - we can also specify new data using the `newdata` argument
+      - the `newdata` must contain the columns given in the model formula
+  - the `predict()` finds the predicted values, calculates the mean absolute error (MAE), and mean squared error (MSE)
+    - the MAE is less sensitive to outliers compared to MSE
+```{r}
+pred_y <- predict(model_interaction)
+
+mae <- mean(abs(nhanes_df$SBP - pred_y))
+mae
+```
+
+```{r}
+mse <- mean((nhanes_df$SBP - pred_y)^2)
+mse
+```
+
+### ----- Stepwise Selection -----
+- when performing variable selection, there are multiple methods, one being the **stepwise selection**
+- the `step()` function takes in an initial model along with a `direction`("forward", "backward", or "both"), and a `scope`
+  - the **scope** specifies the lower and upper model formulas to consider
+  - by default, the `step()` function prints each step in the process and uses AIC to guide its decision 
+    - by setting the `trace=0`, we avoid the print behavior
+  - updating the argument `k` to `log(n)` to use BIC where `n` is the number of observations
+```{r}
+lower_formula <- "log(SBP) ~ log(LEAD) + AGE + SEX:log(LEAD)"
+upper_formula <- "log(SBP) ~ log(LEAD) + AGE + SEX:log(LEAD) + SEX + RACE + EDUCATION + SMOKE + INCOME + BMI_CAT"
+mod_step <- step(model_interaction, direction = 'forward',
+                 scope = list(lower = lower_formula,
+                              upper = upper_formula))
+# the final output is an lm object
+```
+```{r}
+summary(mod_step)
+# this summary of the final model shows that the adjusted R-squared has improved to 0.2479
+```
+
+## ----- Logistic Regression -----
+- we will now look at the binary logistic regression using the `glm()` function
+```{r}
+# install.packages('pROC')
+# install.packages('lmtest')
+library(broom)
+library(tidyverse)
+library(pROC)
+library(lmtest)
+library(HDSinRdata)
+
+data(nyts)
+```
+
+### ----- Generalized Linear Models in R -----
+- the `glm(formula, fata, family)` function is used to fit generalized linear models
+  - `formula` - the relationship between the independent variables and the outcome of interest
+  - `data` - the dataset used to train the model
+  - `family` - a description of the error distribution and link function to be used in the model
+
+- in binary logistic regression, we assume a binomial outcome and use the logit link function
+  - we can specify this by setting `family = binomial`
+    - by default this assumes the link function is the logit function
+  - we can implement linear regression by setting `family = gaussian`
+
+- we are now interested is current e-cig use
+```{r}
+nyts$e_cig_use <- as.factor(ifelse(nyts$num_e_cigs == 0, "0", "1")) # if the number of e-cigs is 0, then e-cig use is 0 but anything else is e-cig-use is 1 (positive)
+table(nyts$e_cig_use)
+```
+
+- for the survey data, we are interested in the impact of taking the survey at school compared to other settings so we will simplify this variable
+```{r}
+table(nyts$location)
+
+nyts$location <- ifelse(nyts$location == "In a school building/classroom",
+                        "school", "home/other")
+nyts$location <- as.factor(nyts$location)
+table(nyts$location)
+```
+
+```{r}
+mod_start <- glm(e_cig_use ~ grade + sex + race_and_ethnicity + location, family = binomial, data = nyts)
+
+summary(mod_start)
+```
+
+- this time, we add the `exponentiate = TRUE` arguement to exponentiate our coefficients to we can interpret them as estimated change in odds, rather than log odds
+  - doing this we can see from the below that those who answered the survey at school have double the estimated odds of reporting e-cigarette use compared to those who took the survey at home/other, adjusting for grade, sex, race, and ethnicity
+```{r}
+tidy(mod_start, exponentiate = TRUE)
+```
+  
 
 
 
