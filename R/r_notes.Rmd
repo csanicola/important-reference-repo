@@ -2881,12 +2881,212 @@ mod_start <- glm(e_cig_use ~ grade + sex + race_and_ethnicity + location, family
 summary(mod_start)
 ```
 
-- this time, we add the `exponentiate = TRUE` arguement to exponentiate our coefficients to we can interpret them as estimated change in odds, rather than log odds
+- this time, we add the `exponentiate = TRUE` argument to exponentiate our coefficients to we can interpret them as estimated change in odds, rather than log odds
   - doing this we can see from the below that those who answered the survey at school have double the estimated odds of reporting e-cigarette use compared to those who took the survey at home/other, adjusting for grade, sex, race, and ethnicity
 ```{r}
 tidy(mod_start, exponentiate = TRUE)
 ```
   
+### ----- Residuals, Discrimination, and Calibration -----
+- the `resid()` function finds the residuals of the distribution
+  - you can specify by the Pearson and deviance residuals by changing the `type` argument
+```{r}
+par(mfrow=c(1,2))
+hist(resid(mod_start, type = "pearson"), main = "Pearson Residuals")
+hist(resid(mod_start, type = "deviance"), main = "Deviance Residuals")
+# both of these plots, we can observe a multi-modal distribution, which reflects the binary nature of our outcomes
+```
+
+- now, we want to look at the predicted probabilities
+  - by default, the `predict()` function returns the predicted value on the scale of the linear predictors
+    - in this case, that is the predicted log odds
+    - if we want to find the predicted probabilities, we update the argument by specifying `type="response"`
+      - we can also predict on data not used to train the model by using the argument `newdata`
+```{r}
+pred_probs <- predict(mod_start, type = "response")
+length(pred_probs)
+```
+- If we want to find the class for each observation used in fitting the model, we can use the model's output which stores the model matrix x and the outcome vector y
+```{r}
+# we can now plot the distribution of estimated probabilities for each class
+ggplot() +
+  geom_histogram(aes(x = pred_probs, fill = as.factor(mod_start$y)),
+                 bins = 30) +
+  scale_fill_discrete(name = "E-Cig Use") +
+  labs(x = "Predicted Probabilities", y = "Count")
+```
+
+#### ----- Receiver Operating Characteristic Curve -----
+- we can now also plot the receiver operating characteristic (ROC) and compute the area under the curve (AUC)
+  - the `roc()` function builds a ROC curve
+    - you can specify the response vector `response` and predictor vector `predictor`
+    - by default, with a 0/1 outcome, the `roc()` function assumes class 0 is controls and class 1 is cases
+      - can also specify this in `levels` argument to set the value of the response for controls and cases
+  - adding the `print.auc = TRUE` will add the AUC
+```{r}
+roc_mod <- roc(predictor = pred_probs, 
+               response = as.factor(mod_start$y), 
+               levels = c(0,1), direction = "<")
+plot(roc_mod, print.auc = TRUE, print.thres = TRUE)
+```
+- to understand more about the curve, we can use the `coords()` function to find the coordinates for each threshold used to create the curve
+  - the argument `x="all"` specifies that we want to find all threshold
+    - can specify only to return the local maxima
+```{r}
+roc_vals <- coords(roc = roc_mod, x = "all")
+head(roc_vals)
+```
+- with the above information, we can use this to find the highest threshold with a corresponding sensitivity above 0.75
+  - this means that if we were to predict class 1 for all observations with a predicted probability above 0.062, then we would achieve a sensitivity of 0.77 and specificity of 0.56 on the training data
+```{r}
+roc_vals[roc_vals$sensitivity > 0.75, ] %>% tail(n=1)
+```
+
+- we can use the threshold of 0.080 indicated on our ROC curve to create predicted classes for the response
+```{r}
+pred_ys <- ifelse(pred_probs > 0.08, 1, 0)
+tab_outcome <- table(mod_start$y, pred_ys)
+tab_outcome
+```
+```{r}
+sens <- tab_outcome[2, 2]/(tab_outcome[2, 1]+tab_outcome[2, 2])
+spec <- tab_outcome[1, 1]/(tab_outcome[1, 1]+tab_outcome[1, 2])
+ppv <- tab_outcome[2, 2]/(tab_outcome[1, 2]+tab_outcome[2, 2])
+npv <- tab_outcome[1, 1]/(tab_outcome[1, 1]+tab_outcome[2, 1])
+acc <- (tab_outcome[1, 1]+tab_outcome[2, 2])/sum(tab_outcome)
+```
+
+```{r}
+data.frame(Measures = c("Sens", "Spec", "PPV", "NPV", "Acc"),
+           Values = round(c(sens, spec, ppv, npv, acc), 3))
+```
+
+#### ----- Calibration Plot -----
+- another type of plot is a calibration plot
+  - this type of plot groups the data by the estimated probabilities and compares the mean probability with the observed proportion of observations in class 1
+
+- first we create a data frame with the predicted probabilities and the outcome variable
+- then we group this data into `num_cuts` groups based on the predicted probabilities using the `cut()` function
+- within each group, we find the model's predicted mean along with the observed proportion and estimated standard errors
+
+```{r}
+num_cuts <- 10
+calib_data <-  data.frame(prob = pred_probs,
+                          bin = cut(pred_probs, breaks = num_cuts),
+                          class = mod_start$y)
+calib_data <- calib_data %>% 
+             group_by(bin) %>% 
+             summarize(observed = sum(class)/n(), 
+                       expected = sum(prob)/n(), 
+                       se = sqrt(observed * (1-observed) / n()))
+calib_data
+```
+
+- now we can plot the observed vs. expected proportions
+- we also use the estimated standard error to create corresponding 95% confidence intervals
+```{r}
+ggplot(calib_data) +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  geom_errorbar(aes(x = expected, ymin = observed - 1.96 * se,
+                    ymax = observed + 1.96 * se),
+                colour = "black", width = .01) +
+  geom_point(aes(x = expected, y = observed)) +
+  labs(x = "Expected Proportion", y = "Observed Proportion") +
+  theme_minimal()
+```
+
+### ----- Variable Selection and Likelihood Ratio Tests -----
+- we are going to use the `step()` function to implement backward selection from a larger set of covariates
+  - we first remove any observations with NA values to ensure that our training data does not change size as the formula changes
+```{r}
+nyts_sub <- nyts %>%
+  dplyr::select(location, sex, grade, otherlang, grades_in_past_year,
+                perceived_e_cig_use, race_and_ethnicity, LGBT,
+                psych_distress, family_affluence, e_cig_use) %>%
+  na.omit()
+head(nyts_sub)
+```
+- now we only need to specify the lower formula in the scope
+```{r}
+model_full <- glm(e_cig_use ~ ., data = nyts_sub, family = binomial)
+mod_step <- step(model_full, direction = 'backward', 
+                 scope = list(lower = "e_cig_use ~ sex + grade + 
+                 race_and_ethnicity + location"))
+```
+- stepwise selection keeps most variables in the model and only drops family affluence
+  - in the following output, we can see the AUC for this model has improved to 0.818
+```{r}
+roc_mod_step <- roc(predictor = predict(mod_step, type = "response"),
+                    response = as.factor(mod_step$y),
+                    levels = c(0, 1), direction = "<")
+plot(roc_mod_step, print.auc = TRUE, print.thres = TRUE)
+```
+  
+- the `lrtest()` function allows us to input two nested `glm` models and performs a corresponding chi-square likelihood ratio test
+```{r}
+mod_start2 <- glm(e_cig_use ~ grade + sex + race_and_ethnicity +
+                    location, data = nyts_sub, family = binomial)
+print(lrtest(mod_start2, mod_step))
+```
+
+### ----- Extending Beyond Binary Outcomes -----
+- now we try to fit a Poisson model to model the number of e-cigarettes used in the last 30 days by setting `family = poisson`
+  - however, despite our outcome being a count value, this model does not appear to be a good fit for our data
+```{r}
+mod_poisson <- glm(num_e_cigs ~ grade + sex + race_and_ethnicity +
+                     location, data = nyts, family = poisson)
+par(mfrow=c(1,2))
+hist(predict(mod_poisson, type="response"), main = "Model",
+     xlab = "Predicted Values")
+hist(nyts$num_e_cigs, main = "Observed", xlab = "Number E-Cigs")
+```
+
+## ----- Model Selection -----
+- expanding upon the stepwise selection by focusing on regularized regression
+```{r}
+# install.packages('L0Learn')
+library(HDSinRdata)
+library(tidyverse)
+library(glmnet)
+library(L0Learn)
+```
+```{r}
+# load in data
+data(NHANESsample)
+
+# transform SBP and lead
+NHANESsample$SBP <- 
+  rowMeans(NHANESsample[c("SBP1", "SBP2", "SBP3", "SBP4")], 
+                             na.rm=TRUE)
+NHANESsample$LEAD <- log(NHANESsample$LEAD)
+
+# remove variables not to include in the model
+nhanes <- NHANESsample %>%
+  select(-c(ID, HYP, LEAD_QUANTILE, DBP1, DBP2, DBP3, DBP4,
+            SBP1, SBP2, SBP3, SBP4, YEAR)) %>%
+  na.omit()
+
+# convert to factors
+nhanes$SEX <- factor(nhanes$SEX)
+nhanes$RACE <- factor(nhanes$RACE)
+nhanes$EDUCATION <- factor(nhanes$EDUCATION)
+nhanes$BMI_CAT <- factor(nhanes$BMI_CAT)
+nhanes$ALC <- factor(nhanes$ALC)
+```
+
+
+### ----- Regularized Regression -----
+- when referring to regularized regression, we are referring to solving the following optimization problem that minimizes the average loss plus a penalty term
+
+
+
+
+
+
+
+
+
+
 
 
 
