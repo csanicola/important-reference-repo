@@ -3078,6 +3078,78 @@ nhanes$ALC <- factor(nhanes$ALC)
 ### ----- Regularized Regression -----
 - when referring to regularized regression, we are referring to solving the following optimization problem that minimizes the average loss plus a penalty term
 
+### ----- Elastic Net -----
+- the *glmnet* package implements elastic net regularizaation
+```{r}
+# we drop the first generated column which corresponds to the intercept
+x <- model.matrix(log(SBP) ~ ., nhanes)[, -1]
+head(x)
+```
+
+```{r}
+# our outcome vector corresponds to log transformed systolic blood pressure
+y <- log(nhanes$SBP)
+```
+
+```{r}
+mod_lasso <- glmnet(x, y, family = "gaussian", alpha = 1,
+                    nlambda = 25)
+```
+
+- by plotting the above object, we can see the model coefficients for each resulting model by plotting how the coefficient for each variable changes with the value or lambda
+- the `label` argument adds a label to each line, though these are hard to read
+  - the numbers at the top of the plot indicate how many non-zero coefficients were included in the model for different lambda values
+```{r}
+plot(mod_lasso, xvar = "lambda", label = TRUE)
+```
+- we can also print our results
+  - this prints a matrix with the values of lambda used 
+    - for each lambda value, we can also see the number of non-zero coefficients (`Df`) and the percent deviance explained (`%dev`)
+```{r}
+print(mod_lasso)
+```
+- we can extract the model for a particular value of lambda using the `coef()` function
+  - the argument `s` specifies the value of lambda
+    - for the particular value of lambda chosen in the following code, only age has a non-zero coefficient
+      - the `coef()` function returns the coefficients on the original scale
+```{r}
+coef(mod_lasso, s = 0.045920)
+```
+- we can also use the `predict()` functoin to predict blood pressure for this particular model
+  - in the function call, we have specified our value of lambda as well as our data matrix `x` as the data to predict on
+```{r}
+pred_lasso <- predict(mod_lasso, s = 0.45920, newx = x)
+```
+- this shows our observed model fit for a fairly penalty term
+- in order to choose the best value of lambda, we use 5-fold cross-validation
+- first, we randomly assign each observation to one of five folds using the `sample()` function
+  - we can see that this splits the data into folds of roughly equal size
+```{r}
+set.seed(1)
+foldid <- sample(1:5, size = nrow(x), replace = TRUE)
+table(foldid)
+```
+- next, we call the `cv.glmnet()` function which implements k-fold cross-validation across a grid of lambda values
+  - just like last time, we specified `x`, `y`, and `alpha = 1`
+  - this time, we also include the measure to use for cross-validation (`mse` indicates mean squared error) and provide the fold vector `foldid`
+    - if we do not want to provide folds, we can use the `nfolds` argument to specify the number of folds desired and the `cv.glmnet()` function
+- plotting the returned object shows us the estimated mean squared error for different values of lambda as well as error bars for each estimate
+  - it also shows the number of non-zero coefficients at the top
+```{r}
+cv_lasso <- cv.glmnet(x, y, foldid = foldid, alpha = 1,
+                      type.measure = "mse")
+plot(cv_lasso)
+```
+- there are two vertical dashed lines
+  - these correspond to two values of lambda that are stored in our object
+    - the first is `lambda.min` which is the lambda value with the lowest estimated mean squared error
+    - the other is `lambda.1se` which is the largest lambda value whose estimated mean squared error is within one standard error of the lowest value
+    
+- we use the `lambda.min` value as our chosen lambda value
+- to extract the coefficients 
+
+
+
 
 
 
