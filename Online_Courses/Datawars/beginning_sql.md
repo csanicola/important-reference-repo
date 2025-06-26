@@ -867,7 +867,7 @@ Choose the correct answer:
 
 [ ] MARY.SMITH@sakilacustomer.org
 
-[ ] JUANITA.MASON@sakilacustomer.org
+[X] JUANITA.MASON@sakilacustomer.org
 
 **2**What's the category which id is 8?
 
@@ -875,7 +875,7 @@ Write a query that returns the category name with `category_id` equal to `8` fro
 
 Choose the correct answer:
 
-[ ] Family
+[X] Family
 
 [ ] Comedy
 
@@ -893,7 +893,7 @@ Please select the correct answer:
 
 [ ] Tom
 
-[ ] Jon
+[X] Jon
 
 [ ] Mike
 
@@ -903,7 +903,7 @@ Please select the correct answer:
 
 Write a query that returns the first name of the employee that is not Jon from the `staff` table in the `sakila` database and then select the correct answer:
 
-[ ] Yes, Mike
+[X] Yes, Mike
 
 [ ] Yes, Sarah
 
@@ -915,7 +915,7 @@ Write a query that returns the first name of the employee that is not Jon from t
 
 In the `film` table of the `sakila` database, are there any movies whose rental rate is higher than `$5`? Please select the correct answer:
 
-[ ] No
+[X] No
 
 [ ] Yes
 
@@ -925,7 +925,7 @@ In the `film` table of the `sakila` database, are there any movies that were rel
 
 [ ] Yes
 
-[ ] No
+[X] No
 
 **7**What is the id of the first rental of the year 2006?
 
@@ -935,7 +935,7 @@ Table `rental` in the `sakila` database contains all the rentals that have been 
 
 [ ] 871
 
-[ ] 13421
+[X] 13421
 
 [ ] 9173
 
@@ -949,13 +949,13 @@ In the `actor` table of the `sakila` database, what's the name of the actor whos
 
 [ ] Bill
 
-[ ] Johnny
+[X] Johnny
 
 **9**Which is the first movie whose replacement cost is equal or higher than `$20`, when ordered alphabetically?
 
 In the `film` table of the `sakila` database, which is the first movie whose replacement cost is equal to or higher than `$20`, when ordered alphabetically? Please select the correct answer:
 
-[ ] ACADEMY DINOSAUR
+[X] ACADEMY DINOSAUR
 
 [ ] MAGUIRE APACHE
 
@@ -969,7 +969,7 @@ In the `film` table of the `sakila` database, what movie has a rental duration l
 
 [ ] AFRICAN EGG
 
-[ ] ACE GOLDFINGER
+[X] ACE GOLDFINGER
 
 [ ] MAGUIRE APACHE
 
@@ -981,7 +981,7 @@ In the `film` table of the `sakila` database, what's the rental rate of the shor
 
 [ ] 6.99
 
-[ ] 2.99
+[X] 2.99
 
 [ ] 4.99
 
@@ -996,7 +996,8 @@ Write a SQL query that displays the title and rental rate of all movies that hav
 ![img](https://static.prd.datawars.io/projects/lab-7224ebb9-sql-basic-sql-statements-sakila/2023-03-19-15-46-46.png)
 
 ```sql
-
+SELECT title, rental_rate FROM film
+WHERE rental_rate < 1.50;
 ```
 
 **13**Display the title and length of all movies that have a length of more than 2 hours.
@@ -1006,5 +1007,160 @@ Write a SQL query that displays the title and length of all movies that have a l
 ![img](https://static.prd.datawars.io/projects/lab-7224ebb9-sql-basic-sql-statements-sakila/2023-03-19-16-21-50.png)
 
 ```sql
-
+SELECT title, length FROM film
+WHERE length > 120;
 ```
+
+# Practice WHERE with Chinook
+
+#### Activities
+
+**1**Filter Customer from the USA
+
+Let's find out who's rocking out in the USA! Write a query to display the names of all customers from `Customer` table who live in the 'USA'.
+
+Your results should look like below: ![ACTIVITY-01](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_01.png)
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**2**Mega Tracks Alert!
+
+Ready for an epic listening session? Write a query to show tracks with a length greater than 5 minutes (`300000` milliseconds) from the `Track` table. Select the `Name` and `Milliseconds` columns.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_02.png)Preview
+
+> There are more rows in the output than shown in the screenshot.
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**3**Invoices Over $10
+
+Let's go shopping! Write a query to display all invoices with total greater than $10. Select the `InvoiceId`, `BillingCountry`, and `Total` columns from the `Invoice` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_03.png)Preview
+
+> There are more rows in the output than shown in the screenshot.
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**4**Rock 'n Roll Track
+
+Time to find the rock stars! Write a query to display all tracks with a `Name` equals `Rock & Roll`. Select all columns from the `Track` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_04.png)Preview
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**5**Cool Customers in Argentina
+
+Argentina calling! Write a query to find all customers from Argentina. Select the `FirstName`, `LastName`, and `Country` columns from the `Customer` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_05.png)Preview
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**6**New Millennium Employees
+
+New hires on the block! Write a query to display all employees who were hired after the year 2004 (`2004-01-01`). Select the `FirstName`, `LastName`, and `HireDate` columns from the `Employee` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_06.png)Preview
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**7**Non-Rock Tracks
+
+Let's find out what tracks aren't classified as rock! Write a SQL query to display all the tracks that aren't within the `Rock` genre. Remember that the `GenreId` for Rock is `1`. Your query should select the `Name` and `GenreId` columns from the `Track` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_07.png)Preview
+
+> There are more rows in the output than shown in the screenshot.
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**8**Mystery Companies
+
+The company is missing! Write a query to retrieve the customers who have no company information(ie. `Company` is NULL). Select the `FirstName`, `LastName`, and `Company` columns from the `Customer` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_08.png)Preview
+
+> There are more rows in the output than shown in the screenshot.
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**9**Composerless Tracks
+
+Where's the composer? Write a query to display all tracks with no composer information (ie. `Composer` is NULL). Select the `TrackId`, `Name`, and `UnitPrice` columns from the `Track` table.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_09.png)Preview
+
+> There are more rows in the output than shown in the screenshot.
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check ActivityStart project before checking your activities.
+
+**10**Matching Countries
+
+Let's find out who's rocking out in the Canada! Write a query to display the names of all customers from `Customer` table who live in the 'Canada'. Select the `FirstName`, `LastName`, `City`, and `Address` columns and alias the `City` column as `Location`.
+
+Your results should look like below:
+
+![](https://static.prd.datawars.io/projects/lab-9ec5431f-sql-basics-where-practice-where-with-chinook/activity_10.png)Preview
+
+> There are more rows in the output than shown in the screenshot.
+
+1
+
+![]()SELECT [columns] FROM [table]
+
+Check Activity
