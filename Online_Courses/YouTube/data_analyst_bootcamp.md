@@ -414,6 +414,104 @@ _CTEs_
   - they are just created temporarily in memory as part of the query but once the query is gone then its like they never existed
 
 ```sql
+/*
+Temp Tables
+*/
+
+CREATE TEMPORARY TABLE temp_Employee(
+EmployeeID int,
+JobTitle varchar(100),
+Salary int
+)
+
+SELECT *
+FROM temp_Employee
+
+INSERT INTO temp_Employee VALUES(
+'1001', 'HR', '45000'
+)
+
+-- you can also import the data from another table instead of manually importing the data
+INSERT INTO temp_Employee
+SELECT *
+FROM EmployeeSalary
+
+-- this is a more realistic way of using temp tables:
+CREATE TEMPORARY TABLE temp_Employee2(
+JobTitle varchar(50),
+EmployeesPerJob int,
+AveAge int,
+AvgSalary int
+)
+
+INSERT INTO temp_Employee2
+SELECT JobTitle, COUNT(JobTitle), AVG(Age), AVG(Salary)
+FROM EmployeeDemographics emp
+JOIN EmployeeSalary sal
+	ON emp.EmployeeID = sal.EmployeeID
+GROUP BY JobTitle
+
+SELECT *
+FROM temp_Employee2
+
+-- these temporary tables stay in place in the session unless you drop them but you can add the below in front of your script
+DROP TABLE IF EXISTS temp_Employee2
+```
+
+_String Functions - TRIM, LTRIM, RTRIM, Replace, Substring, Upper, Lower_
+
+```sql
+/*
+String Functions - TRIM, LTRIM, RTRIM, Replace, Substring, Upper, Lower
+*/
+
+-- DROP TABLE EmployeeErrors
+
+CREATE TABLE EmployeeErrors (
+EmployeeID varchar(50)
+,FirstName varchar(50)
+,LastName varchar(50)
+)
+
+INSERT INTO EmployeeErrors VALUES
+('1001 ', 'Jimbo', 'Halbert')
+,(' 1002', 'Pamela', 'Beasely')
+,('1005', 'TOby', 'Flenderson - Fired')
+
+SELECT *
+FROM EmployeeErrors
+
+-- Using TRIM, LTRIM, RTRIM
+SELECT EmployeeID, TRIM(EmployeeID) AS IDTRIM -- trim gets rid of blank spaces on both sides
+FROM EmployeeErrors
+
+SELECT EmployeeID, LTRIM(EmployeeID) AS IDTRIM -- trim gets rid of blank spaces on the left side of a character
+FROM EmployeeErrors
+
+SELECT EmployeeID, RTRIM(EmployeeID) AS IDTRIM -- trim gets rid of blank spaces on the right side of a character
+FROM EmployeeErrors
+
+-- Using Replace
+SELECT LastName, REPLACE(LastName, '- Fired', '') AS LastNameFixed
+FROM EmployeeErrors
+
+-- Using Substring
+SELECT SUBSTRING(FirstName,1,3) -- in the first name its going to take the first character and go three characters into the 'word'
+FROM EmployeeErrors
+
+
+
+
+-- Using UPPER and LOWER
+
+
+
+
+
+
+
+
+
 
 ```
 
