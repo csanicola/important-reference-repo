@@ -207,6 +207,214 @@ INNER JOIN EmployeeSalary
 	ON EmployeeDemographics.EmployeeID = EmployeeSalary.EmployeeID
 WHERE FirstName <> 'Michael'
 ORDER BY Salary DESC
+
+SELECT Jobtitle, AVG(Salary)
+FROM EmployeeDemographics
+INNER JOIN EmployeeSalary
+	ON EmployeeDemographics.EmployeeID = EmployeeSalary.EmployeeID
+WHERE JobTitle = 'Salesman'
+GROUP BY Jobtitle
+```
+
+_Union, Union All_
+
+- A way to allow for you to select data from multiple tables to output into one
+
+```sql
+/*
+Union, Union All
+*/
+
+SELECT *
+FROM EmployeeDemographics
+UNION
+SELECT *
+FROM WareHouseEmployeeDemographics
+ORDER BY EmployeeID
+
+SELECT *
+FROM EmployeeDemographics
+UNION ALL
+SELECT *
+FROM WareHouseEmployeeDemographics
+ORDER BY EmployeeID
+
+SELECT *
+FROM EmployeeDemographics
+FULL OUTER JOIN WareHouseEmployeeDemographics
+	ON EmployeeDemographics
+
+-- This is how not to do a union because it takes 3 columns from both but assumes it matches the first 3 so it mixes up columnes:
+SELECT EmployeeID, FirstName, Age
+FROM EmployeeDemographics
+UNION
+SELECT EmployeeID, JobTitle, Salary
+FROM EmployeeSalary
+ORDER BY EmployeeID
+```
+
+_Case Statement_
+
+```sql
+/*
+Case Statement
+*/
+
+SELECT FirstName, LastName, Age,
+CASE
+	WHEN Age > 30 THEN 'Old'
+	WHEN Age BETWEEN 27 AND 30 THEN 'Young'
+	ELSE 'Baby'
+END
+FROM EmployeeDemographics
+WHERE Age is NOT NULL
+ORDER BY Age
+
+SELECT FirstName, LastName, Age,
+CASE
+	WHEN Age > 30 THEN 'Old'
+	WHEN Age = 38 THEN 'Stanley' -- this won't show because the case was already met above
+	ELSE 'Baby'
+END
+FROM EmployeeDemographics
+WHERE Age is NOT NULL
+ORDER BY Age
+
+SELECT FirstName, LastName, Age,
+CASE
+	WHEN Age = 38 THEN 'Stanley'
+	WHEN Age > 30 THEN 'Old'
+	ELSE 'Baby'
+END
+FROM EmployeeDemographics
+WHERE Age is NOT NULL
+ORDER BY Age
+
+SELECT FirstName, LastName, JobTitle, Salary,
+CASE
+	WHEN JobTitle = 'Salesman' THEN Salary + (Salary * .10)
+	WHEN JobTitle = 'Accountant' THEN Salary + (Salary * .05)
+	WHEN JobTItle = 'HR' THEN Salary + (Salary * .000001)
+	ELSE Salary + (Salary * .03)
+END AS SalaryAfterRaise
+FROM EmployeeDemographics
+JOIN EmployeeSalary
+	ON EmployeeDemographics.EmployeeID = EmployeeSalary.EmployeeID
+```
+
+_Having Clause_
+
+```sql
+/*
+Having Clause
+*/
+
+SELECT JobTitle, COUNT(JobTitle)
+FROM EmployeeDemographics
+JOIN EmployeeSalary
+	ON EmployeeDemographics.EmployeeID = EmployeeSalary.EmployeeID
+GROUP BY JobTitle
+HAVING COUNT(JobTitle) > 1 -- this has to come after the group by statement because you can't ask for this without the data being grouped first
+
+SELECT JobTitle, AVG(Salary)
+FROM EmployeeDemographics
+JOIN EmployeeSalary
+	ON EmployeeDemographics.EmployeeID = EmployeeSalary.EmployeeID
+GROUP BY JobTitle
+HAVING AVG(Salary) > 45000
+ORDER BY AVG(Salary)
+```
+
+_Updating/Deleting Data_
+
+```sql
+/*
+Updating/Deleting Data
+*/
+
+SELECT *
+FROM EmployeeDemographics
+
+UPDATE EmployeeDemographics
+SET EmployeeID = 1012
+WHERE FirstName = 'Holly' AND LastName = 'Flax'
+
+UPDATE EmployeeDemographics
+SET Age = 31, Gender = 'Female'
+WHERE EmployeeID = 1012
+
+DELETE FROM EmployeeDemographics
+WHERE EmployeeID = 1005
+
+DELETE FROM EmployeeDemographics -- If you ran just this then it would delete the entire table which you have to be careful not to do
+```
+
+_Aliasing_
+
+```sql
+/*
+Aliasing
+*/
+
+SELECT FirstName AS Fname
+FROM EmployeeDemographics
+
+SELECT FirstName || ' ' || LastName AS FullName
+-- the mysql ver is SELECT FirstName + ' ' + LastName AS FullName
+FROM EmployeeDemographics
+
+SELECT AVG(Age) AS AvgAge
+FROM EmployeeDemographics
+
+SELECT Demo.EmployeeID, Sal.Salary
+FROM EmployeeDemographics AS Demo -- giving the table an alias makes it easier
+JOIN EmployeeSalary AS Sal
+	ON Demo.EmployeeID = Sal.EmployeeID
+
+-- the below is what we don't want to do with using a. b. c. as aliases for tables because it can make it more complicated to follow the bigger the query is
+SELECT a.EmployeeID, a.FirstName, a.LastName, b.JobTitle, c.Age
+FROM EmployeeDemographics a
+LEFT JOIN EmployeeSalary b
+	ON a.EmployeeID = b.EmployeeID
+LEFT JOIN WareHouseEmployeeDemographics c
+	ON a.EmployeeID = c.EmployeeID
+-- this is the preferred by using short aliases
+SELECT Demo.EmployeeID, Demo.FirstName, Demo.LastName, Sal.JobTitle, Ware.Age
+FROM EmployeeDemographics Demo
+LEFT JOIN EmployeeSalary Sal
+	ON Demo.EmployeeID = Sal.EmployeeID
+LEFT JOIN WareHouseEmployeeDemographics Ware
+	ON Demo.EmployeeID = Ware.EmployeeID
+```
+
+_Partition By_
+
+```sql
+/*
+Partition By
+*/
+
+SELECT FirstName, LastName, Gender, Salary
+	,COUNT(Gender) OVER (PARTITION BY Gender) as TotalGender
+FROM EmployeeDemographics dem
+JOIN EmployeeSalary sal
+	ON dem.EmployeeID = sal.EmployeeID
+
+-- this will show the same thing as above without the partition but you have to narrow it down to just showing the columns you are partitioning by
+SELECT Gender, COUNT(Gender)
+FROM EmployeeDemographics dem
+JOIN EmployeeSalary sal
+	ON dem.EmployeeID = sal.EmployeeID
+GROUP BY Gender
+```
+
+_CTEs_
+
+- These are known as **Common Table Expressions**
+  - they are just created temporarily in memory as part of the query but once the query is gone then its like they never existed
+
+```sql
+
 ```
 
 ---
