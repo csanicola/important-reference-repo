@@ -499,20 +499,136 @@ FROM EmployeeErrors
 SELECT SUBSTRING(FirstName,1,3) -- in the first name its going to take the first character and go three characters into the 'word'
 FROM EmployeeErrors
 
-
-
+SELECT err.FirstName, SUBSTRING(err.FirstName,1,3), dem.FirstName, SUBSTRING(dem.FirstName,1,3)
+FROM EmployeeErrors err
+JOIN EmployeeDemographics dem
+	ON SUBSTRING(err.FirstName,1,3) = SUBSTRING(dem.FirstName,1,3)
 
 -- Using UPPER and LOWER
+SELECT FirstName, LOWER(FirstName)
+FROM EmployeeDemographics
 
+SELECT FirstName, UPPER(FirstName)
+FROM EmployeeDemographics
+```
 
+_Stored Procedures_
 
+```sql
+/*
+Stored Procedures
+*/
 
+CREATE OR REPLACE FUNCTION test()
+RETURNS SETOF EmployeeDemographics
+LANGUAGE sql
+AS $$
+	SELECT * FROM EmployeeDemographics;
+$$;
+-- to run it:
+SELECT * FROM test();
 
+/*
+the microsoft sql server equivalent is:
+CREATE PROCEDURE TEST
+AS
+SELECT *
+FROM EmployeeDemographics
 
+EXEC TEST
+*/
 
+CREATE OR REPLACE FUNCTION temp_employee()
+RETURNS TABLE (
+    jobtitle varchar(100),
+    employeesperjob bigint,
+    avgage numeric,
+    avgsalary numeric
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        JobTitle,
+        COUNT(JobTitle) AS employeesperjob,
+        AVG(Age) AS avgage,
+        AVG(Salary) AS avgsalary
+    FROM
+        employeedemographics emp
+    JOIN
+        employeesalary sal ON emp.employeeid = sal.employeeid
+    GROUP BY
+        JobTitle;
+$$;
 
+SELECT * FROM temp_employee();
 
+-- we can also alter a function once its been created
+CREATE OR REPLACE FUNCTION temp_employee(p_jobtitle varchar(100))
+RETURNS TABLE (
+    jobtitle varchar(100),
+    employeesperjob bigint,
+    avgage numeric,
+    avgsalary numeric
+) AS $$
+    SELECT
+        JobTitle,
+        COUNT(JobTitle) AS employeesperjob,
+        AVG(Age) AS avgage,
+        AVG(Salary) AS avgsalary
+    FROM
+        employeedemographics emp
+    JOIN
+        employeesalary sal ON emp.employeeid = sal.employeeid
+    WHERE JobTitle = p_jobtitle
+    GROUP BY
+        JobTitle;
+$$ LANGUAGE sql;
 
+SELECT * FROM temp_employee();
+```
+
+_Subqueries_
+
+```sql
+/*
+Subqueries (in the Select, From, and Where Statement)
+*/
+SELECT *
+FROM EmployeeSalary
+
+-- Subquery in SELECT
+SELECT EmployeeID, Salary, (SELECT AVG(Salary) FROM EmployeeSalary) AS AllAvgSalary
+FROM EmployeeSalary
+
+-- How to do it with Partition By
+SELECT EmployeeID, Salary, AVG(Salary) OVER () AS AllAvgSalary
+FROM EmployeeSalary
+
+-- Why Group BY Doesn't Work
+SELECT EmployeeID, Salary, AVG(Salary) AS AllAvgSalary
+FROM EmployeeSalary
+GROUP BY EmployeeID, Salary
+ORDER BY 1,2
+
+-- Subquery in From
+SELECT a.EmployeeID, AllAvgSalary
+FROM (SELECT EmployeeID, Salary, AVG(Salary) OVER () AS AllAvgSalary
+	  FROM EmployeeSalary) a
+
+-- Subquery in Where
+SELECT EmployeeID, JobTitle, Salary
+FROM EmployeeSalary
+WHERE EmployeeID in (
+		SELECT EmployeeID
+		FROM EmployeeDemographics
+		WHERE Age > 30)
+```
+
+## Data Analyst Portfolio Project | SQL Data Exploration
+
+```sql
+-- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidDeaths.xlsx
+-- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidVaccinations.xlsx
 ```
 
 ---
