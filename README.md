@@ -1,4 +1,4 @@
- <!-- PROJECT LOGO -->
+<!-- PROJECT LOGO -->
 
 <br />
 <div align="center">
@@ -72,6 +72,7 @@ This repository serves as a **centralized reference hub** for healthcare data sc
 - **Reusable scripts** for common analytical tasks (data cleaning, statistical modeling, visualization).
 - **Tutorials** for healthcare-specific challenges (HIPAA compliance, EHR data wrangling).
 - **Best practices** for reproducible research and publication-ready outputs.
+
 <!-- KEY FEATURES -->
 
 ### Key Features
@@ -80,6 +81,7 @@ This repository serves as a **centralized reference hub** for healthcare data sc
 - 📚 **Modular Design** : Scripts are organized by use case (e.g., "ICD-10 Coding", "Survival Analysis").
 - 🔍 **Documented Workflows** : Jupyter/RMarkdown notebooks with step-by-step explanations.
 - 🛡️ **Compliance-Aware** : Guidance on de-identification and HIPAA considerations.
+
 <!-- DISCLAIMER -->
 
 ### Disclaimer
@@ -101,11 +103,11 @@ Use the `Readme.md` to get started.
 
 ### Prerequisites
 
-| Tool/Language | Recommended Version | Installation Guide                                |
-| ------------- | ------------------- | ------------------------------------------------- |
+| Tool/Language | Recommended Version | Installation Guide                             |
+| ------------- | ------------------- | ---------------------------------------------- |
 | Python        | 3.8+                | [python.org](https://www.python.org/downloads/)   |
 | R             | 4.0+                | [cran.r-project.org](https://cran.r-project.org/) |
-| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                          |
+| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                     |
 | Git           | Latest              | [git-scm.com](https://git-scm.com/downloads)      |
 
 ### Installation
@@ -133,17 +135,17 @@ source("install_pacakges.R")
 ## Repository Structure
 
 ├── 📂 Data/ # Open sources and Fake Generated Healthcare Data for practice
-│ ├── diabetes*012_health_indicators_BRFSS2015.csv
-│ ├── fake_healthcare_data.csv # Generated from fake_healthcare_data_practice.ipynb
+│ ├── diabetes_012_health_indicators_BRFSS2015.csv
+  |  ├── fake_healthcare_data.csv # Generated from fake_healthcare_data_practice.ipynb
 │ └── sample_patient_data.csv
 ├── 📂 Data_Engineer_Pathway/
 │ ├── 📂 1. Deepen Python Skills/
 │ │ ├── I.Concepts.md
-| │ └── II. Comprehension_Level.md
+  |  │ └── II. Comprehension_Level.md
 ├── 📂 Guides/
 │ ├── Data_Cleaning.md
 │ ├── Data_Modeling_for_Scientific_Papers.md
-│ ├── Exploratory_Data_Analysis*(EDA).md
+│ ├── Exploratory_Data_Analysis\*(EDA).md
 │ ├── Feature_Engineering.md
 │ ├── Modeling.md
 │ └── SQL.md

@@ -481,6 +481,7 @@ INSERT INTO EmployeeErrors VALUES
 SELECT *
 FROM EmployeeErrors
 
+
 -- Using TRIM, LTRIM, RTRIM
 SELECT EmployeeID, TRIM(EmployeeID) AS IDTRIM -- trim gets rid of blank spaces on both sides
 FROM EmployeeErrors
@@ -499,20 +500,52 @@ FROM EmployeeErrors
 SELECT SUBSTRING(FirstName,1,3) -- in the first name its going to take the first character and go three characters into the 'word'
 FROM EmployeeErrors
 
+SELECT SUBSTRING(FirstName,3,3)
+FROM EmployeeErrors
 
+-- fuzzy matching is when you use the first couple of characters to match another table with the same first number of characters (ex: matching Alex and Alexander with the first 4 digits)
+-- it can work sometimes but not all the time
+SELECT err.FirstName, SUBSTRING(err.FirstName,1,3), dem.FirstName, SUBSTRING(dem.FirstName,1,3)
+FROM EmployeeErrors err
+JOIN EmployeeDemographics dem
+	ON SUBSTRING(err.FirstName,1,3) = SUBSTRING(dem.FirstName,1,3)
 
 
 -- Using UPPER and LOWER
+SELECT FirstName, LOWER(FirstName) -- turns all characters to lower case
+FROM EmployeeErrors
 
+SELECT FirstName, UPPER(FirstName) -- turns all characters to upper case
+FROM EmployeeErrors
+```
 
+_Stored Procedures_
 
+```sql
+/*
+Stored Procedures
+- group of sql statements that have been created and stored in that sql database
+- can accept input parameters
+- these stored procedures can be used by anyone in the database who could be using different input data
+*/
 
+CREATE OR REPLACE FUNCTION test()
+RETURNS SETOF employeedemographics
+LANGUAGE sql
+AS $$
+    SELECT * FROM employeedemographics;
+$$;
 
+SELECT * FROM test();
+/*
+- the below is the mysql ver of creating a stored procedure
+CREATE PROCEDURE TEST
+AS
+SELECT *
+FROM EmployeeDemographics
 
-
-
-
-
+EXEC TEST
+*/
 ```
 
 ---
