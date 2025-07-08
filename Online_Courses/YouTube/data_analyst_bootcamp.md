@@ -481,7 +481,6 @@ INSERT INTO EmployeeErrors VALUES
 SELECT *
 FROM EmployeeErrors
 
-
 -- Using TRIM, LTRIM, RTRIM
 SELECT EmployeeID, TRIM(EmployeeID) AS IDTRIM -- trim gets rid of blank spaces on both sides
 FROM EmployeeErrors
@@ -500,23 +499,17 @@ FROM EmployeeErrors
 SELECT SUBSTRING(FirstName,1,3) -- in the first name its going to take the first character and go three characters into the 'word'
 FROM EmployeeErrors
 
-SELECT SUBSTRING(FirstName,3,3)
-FROM EmployeeErrors
-
--- fuzzy matching is when you use the first couple of characters to match another table with the same first number of characters (ex: matching Alex and Alexander with the first 4 digits)
--- it can work sometimes but not all the time
 SELECT err.FirstName, SUBSTRING(err.FirstName,1,3), dem.FirstName, SUBSTRING(dem.FirstName,1,3)
 FROM EmployeeErrors err
 JOIN EmployeeDemographics dem
 	ON SUBSTRING(err.FirstName,1,3) = SUBSTRING(dem.FirstName,1,3)
 
-
 -- Using UPPER and LOWER
-SELECT FirstName, LOWER(FirstName) -- turns all characters to lower case
-FROM EmployeeErrors
+SELECT FirstName, LOWER(FirstName)
+FROM EmployeeDemographics
 
-SELECT FirstName, UPPER(FirstName) -- turns all characters to upper case
-FROM EmployeeErrors
+SELECT FirstName, UPPER(FirstName)
+FROM EmployeeDemographics
 ```
 
 _Stored Procedures_
@@ -524,21 +517,19 @@ _Stored Procedures_
 ```sql
 /*
 Stored Procedures
-- group of sql statements that have been created and stored in that sql database
-- can accept input parameters
-- these stored procedures can be used by anyone in the database who could be using different input data
 */
 
 CREATE OR REPLACE FUNCTION test()
-RETURNS SETOF employeedemographics
+RETURNS SETOF EmployeeDemographics
 LANGUAGE sql
 AS $$
-    SELECT * FROM employeedemographics;
+	SELECT * FROM EmployeeDemographics;
 $$;
-
+-- to run it:
 SELECT * FROM test();
+
 /*
-- the below is the mysql ver of creating a stored procedure
+the microsoft sql server equivalent is:
 CREATE PROCEDURE TEST
 AS
 SELECT *
@@ -546,6 +537,98 @@ FROM EmployeeDemographics
 
 EXEC TEST
 */
+
+CREATE OR REPLACE FUNCTION temp_employee()
+RETURNS TABLE (
+    jobtitle varchar(100),
+    employeesperjob bigint,
+    avgage numeric,
+    avgsalary numeric
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        JobTitle,
+        COUNT(JobTitle) AS employeesperjob,
+        AVG(Age) AS avgage,
+        AVG(Salary) AS avgsalary
+    FROM
+        employeedemographics emp
+    JOIN
+        employeesalary sal ON emp.employeeid = sal.employeeid
+    GROUP BY
+        JobTitle;
+$$;
+
+SELECT * FROM temp_employee();
+
+-- we can also alter a function once its been created
+CREATE OR REPLACE FUNCTION temp_employee(p_jobtitle varchar(100))
+RETURNS TABLE (
+    jobtitle varchar(100),
+    employeesperjob bigint,
+    avgage numeric,
+    avgsalary numeric
+) AS $$
+    SELECT
+        JobTitle,
+        COUNT(JobTitle) AS employeesperjob,
+        AVG(Age) AS avgage,
+        AVG(Salary) AS avgsalary
+    FROM
+        employeedemographics emp
+    JOIN
+        employeesalary sal ON emp.employeeid = sal.employeeid
+    WHERE JobTitle = p_jobtitle
+    GROUP BY
+        JobTitle;
+$$ LANGUAGE sql;
+
+SELECT * FROM temp_employee();
+```
+
+_Subqueries_
+
+```sql
+/*
+Subqueries (in the Select, From, and Where Statement)
+*/
+SELECT *
+FROM EmployeeSalary
+
+-- Subquery in SELECT
+SELECT EmployeeID, Salary, (SELECT AVG(Salary) FROM EmployeeSalary) AS AllAvgSalary
+FROM EmployeeSalary
+
+-- How to do it with Partition By
+SELECT EmployeeID, Salary, AVG(Salary) OVER () AS AllAvgSalary
+FROM EmployeeSalary
+
+-- Why Group BY Doesn't Work
+SELECT EmployeeID, Salary, AVG(Salary) AS AllAvgSalary
+FROM EmployeeSalary
+GROUP BY EmployeeID, Salary
+ORDER BY 1,2
+
+-- Subquery in From
+SELECT a.EmployeeID, AllAvgSalary
+FROM (SELECT EmployeeID, Salary, AVG(Salary) OVER () AS AllAvgSalary
+	  FROM EmployeeSalary) a
+
+-- Subquery in Where
+SELECT EmployeeID, JobTitle, Salary
+FROM EmployeeSalary
+WHERE EmployeeID in (
+		SELECT EmployeeID
+		FROM EmployeeDemographics
+		WHERE Age > 30)
+```
+
+## Data Analyst Portfolio Project | SQL Data Exploration
+
+```sql
+-- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidDeaths.xlsx
+-- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidVaccinations.xlsx
 ```
 
 ---
