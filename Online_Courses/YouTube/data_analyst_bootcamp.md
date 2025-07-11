@@ -627,17 +627,484 @@ WHERE EmployeeID in (
 ## Data Analyst Portfolio Project | SQL Data Exploration
 
 ```sql
--- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidDeaths.xlsx
--- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidVaccinations.xlsx
+-- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidDeaths.csv
+-- /Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/CovidVaccinations.csv
+
+/*
+SQL PORTFOLIO PROJECT
+*/
+
+-- CREATE COVID DEATHS TABLE
+CREATE TABLE CovidDeaths (
+    iso_code varchar(10),
+    continent varchar(50),
+    location varchar(50),
+    date date,
+    population bigint,
+    total_cases int,
+    new_cases int,
+    new_cases_smoothed float,
+    total_deaths int,
+    new_deaths int,
+    new_deaths_smoothed float,
+    total_cases_per_million float,
+    new_cases_per_million float,
+    new_cases_smoothed_per_million float,
+    total_deaths_per_million float,
+    new_deaths_per_million float,
+    new_deaths_smoothed_per_million float,
+    reproduction_rate float,
+    icu_patients int,
+    icu_patients_per_million float,
+    hosp_patients int,
+    hosp_patients_per_million float,
+    weekly_icu_admissions float,
+    weekly_icu_admissions_per_million float,
+    weekly_hosp_admissions float,
+    weekly_hosp_admissions_per_million float
+);
+
+CREATE TABLE CovidVaccinations (
+	iso_code varchar(10),
+	continent varchar(50),
+	location varchar(50),
+	date date,
+	new_tests int,
+	total_tests int,
+	total_tests_per_thousand float,
+	new_tests_per_thousand float,
+	new_tests_smoothed float,
+	new_tests_smoothed_per_thousand float,
+	positive_rate float,
+	tests_per_case float,
+	tests_units varchar(50),
+	total_vaccinations int,
+	people_vaccinated int,
+	people_fully_vaccinated int,
+	new_vaccinations int,
+	new_vaccinations_smoothed int,
+	total_vaccinations_per_hundred float,
+	people_vaccinated_per_hundred float,
+	people_fully_vaccinated_per_hundred float,
+	new_vaccinations_smoothed_per_million int,
+	stringency_index float,
+	population_density float,
+	median_age float,
+	aged_65_older float,
+	aged_70_older float,
+	gdp_per_capita float,
+	extreme_poverty float,
+	cardiovasc_death_rate float,
+	diabetes_prevalence float,
+	female_smokers float,
+	male_smokers float,
+	handwashing_facilities float,
+	hospital_beds_per_thousand float,
+	life_expectancy float,
+	human_development_index float
+);
+
+SELECT * FROM CovidDeaths;
+
+SELECT * FROM CovidVaccinations;
+
+SELECT *
+FROM CovidDeaths
+ORDER BY 3, 4;
+
+SELECT *
+FROM CovidVaccinations
+ORDER BY 3, 4;
+
+-- Select data that we are going to be using
+SELECT location, date, total_cases, new_cases, total_deaths, population
+FROM CovidDeaths
+ORDER BY 1,2;
+
+-- Looking at Total Cases vs. Total Deaths
+-- Shows the likelihood of dying if you contract covid in your country
+SELECT location, date, total_cases, total_deaths,
+	(total_deaths::float / total_cases)*100 AS PercentPopulationInfected -- total_deaths needs to be converted to a float first so it doesn't default all deathpercentages as 0
+FROM CovidDeaths
+WHERE location like '%States%'
+ORDER BY 1,2;
+
+-- Looking at Total Cases vs Population
+-- Shows what percentage of population got Covid
+SELECT location, date, population, total_cases,
+	(total_cases::float / population)*100 AS PercentPopulationInfected
+FROM CovidDeaths
+WHERE total_deaths IS NOT NULL
+ORDER BY 1,2;
+
+
+-- Looking at Countries with Highest Infection Rate Compared to Population
+SELECT location, population, MAX(total_cases) AS HighestInfectionCount,
+	(MAX(total_cases::float / population))*100 AS PercentPopulationInfected
+FROM CovidDeaths
+WHERE total_deaths IS NOT NULL
+GROUP BY location, population
+ORDER BY PercentPopulationInfected DESC;
+
+-- Showing Countries with Highest Death Count per Population
+SELECT location, MAX(total_deaths) AS TotalDeathCount
+FROM CovidDeaths
+WHERE continent IS NOT NULL AND total_deaths IS NOT NULL
+GROUP BY location
+ORDER BY TotalDeathCount DESC;
+
+-- LET'S BREAK THINGS DOWN BY CONTINENT
+
+-- Showing continents with the highest death count per population
+SELECT continent, MAX(total_deaths) AS TotalDeathCount
+FROM CovidDeaths
+WHERE continent IS NOT NULL
+GROUP BY continent
+ORDER BY TotalDeathCount DESC;
+
+-- GLOBAL NUMBERS
+
+SELECT SUM(new_cases), SUM(new_deaths)
+		-- ,total_deaths
+		,(sum(new_deaths::float) / sum(total_cases))*100 AS DeathPercentage
+FROM CovidDeaths
+WHERE continent IS NOT NULL
+	AND new_cases IS NOT NULL
+ORDER BY 1, 2;
+
+-- Looking at Total Population vs. Vaccinations
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
+	SUM(COALESCE(vac.new_vaccinations::int) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS RollingPeopleVaccinated -- partition is to break it up by location so its going to sum up to the end of the location and then restart at the next location
+FROM CovidDeaths dea
+	JOIN CovidVaccinations vac
+	ON dea.location = vac.location
+	AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+ORDER BY 2, 3;
+
+
+-- USE CTE
+WITH PopvsVac AS (
+    SELECT
+        dea.continent,
+        dea.location,
+        dea.date,
+        dea.population,
+        vac.new_vaccinations,
+        SUM(COALESCE(vac.new_vaccinations::int, 0)) OVER (
+            PARTITION BY dea.location
+            ORDER BY dea.date
+        ) AS RollingPeopleVaccinated
+    FROM CovidDeaths dea
+    JOIN CovidVaccinations vac
+        ON dea.location = vac.location
+        AND dea.date = vac.date
+    WHERE dea.continent IS NOT NULL
+)
+SELECT
+    *,
+    (RollingPeopleVaccinated * 100.0 / NULLIF(population, 0)) AS VaccinationPercentage
+FROM PopvsVac
+ORDER BY location, date;
+
+-- TEMP TABLE
+CREATE OR REPLACE FUNCTION temp_percentpopulationvaccinated()
+RETURNS TABLE(
+	continent varchar(255),
+	location varchar(255),
+	date date,
+	population numeric,
+	new_vaccinations numeric,
+	rollingpeoplevaccinated numeric
+)
+LANGUAGE sql
+AS $$
+	SELECT
+		dea.continent,
+		dea.location,
+		dea.date,
+		dea.population,
+		vac.new_vaccinations,
+		SUM(COALESCE(vac.new_vaccinations::int, 0)) OVER (
+            PARTITION BY dea.location
+            ORDER BY dea.date
+        ) AS RollingPeopleVaccinated
+    FROM CovidDeaths dea
+    JOIN CovidVaccinations vac
+        ON dea.location = vac.location
+        AND dea.date = vac.date
+    WHERE dea.continent IS NOT NULL
+$$;
+
+SELECT
+    *,
+    (RollingPeopleVaccinated * 100.0 / NULLIF(population, 0)) AS VaccinationPercentage
+FROM temp_percentpopulationvaccinated()
+ORDER BY location, date;
+
+
+-- Creating view to store data for later visualizations
+CREATE VIEW PercentPopulationVaccinated AS
+	SELECT
+		dea.continent,
+		dea.location,
+		dea.date,
+		dea.population,
+		vac.new_vaccinations,
+		SUM(COALESCE(vac.new_vaccinations::int, 0)) OVER (
+            PARTITION BY dea.location
+            ORDER BY dea.date
+        ) AS RollingPeopleVaccinated
+	FROM CovidDeaths dea
+		JOIN CovidVaccinations vac
+		ON dea.location = vac.location
+		AND dea.date = vac.date
+	WHERE dea.continent IS NOT NULL;
+
+SELECT *
+FROM PercentPopulationVaccinated
+```
+
+## Portfolio Project 2: Cleaning up the Data
+
+```sql
+-- '/Users/carolinesanicola/Documents/GitHub/important-reference-repo/Data/Nashville Housing Data for Data Cleaning.xlsx'
+/*
+Portfolio Project: Cleaning Data in SQL Queries
+*/
+
+CREATE TABLE NashvilleHousing (
+	UniqueID int,
+	ParcelID varchar(100),
+	LandUse varchar(100),
+	PropertyAddress varchar(100),
+	SaleDate varchar(50),
+	SalePrice int,
+	LegalReference varchar(100),
+	SoldAsVacant varchar(10),
+	OwnerName varchar(100),
+	OwnerAddress varchar(100),
+	Acreage float,
+	TaxDistrict varchar(100),
+	LandValue int,
+	BuildingValue int,
+	TotalValue int,
+	YearBuilt varchar(50),
+	Bedrooms int,
+	FullBath int,
+	HalfBath int
+);
+
+SELECT * FROM NashvilleHousing;
+
+----------------------------------------------------------------------------------------
+-- Standardize Date Format
+
+SELECT
+    SaleDate,
+    TO_DATE(SaleDate, 'DD-Mon-YY') AS ConvertedDate
+FROM NashvilleHousing;
+
+UPDATE NashvilleHousing
+SET SaleDate = TO_DATE(SaleDate, 'DD-Mon-YY');
+
+ALTER TABLE NashvilleHousing
+ADD SaleDateConverted Date;
+
+UPDATE NashvilleHousing
+SET SaleDateConverted = TO_DATE(SaleDate, 'DD-Mon-YY')
+
+ALTER TABLE NashvilleHousing
+DROP COLUMN SaleDateConverted;
+
+----------------------------------------------------------------------------------------
+-- Populate Property Address Data
+-- since the parcelid and the address are always going to be the same, if there is a parcelid without an address, populate it from the parcelid with an address
+SELECT *
+FROM NashvilleHousing
+ORDER BY ParcelID;
+
+-- we now need to do a self join
+SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress,
+	COALESCE(a.PropertyAddress, b.PropertyAddress) AS MergedPropertyAddress -- in SQL Server you use ISNULL()
+FROM NashvilleHousing a
+JOIN NashvilleHousing b
+	ON a.ParcelID = b.ParcelID
+	AND a.UniqueID <> b.UniqueID
+WHERE a.PropertyAddress IS NULL
+
+UPDATE NashvilleHousing a
+SET PropertyAddress = COALESCE(a.PropertyAddress, b.PropertyAddress)
+FROM NashvilleHousing b
+WHERE
+    a.ParcelID = b.ParcelID
+    AND a.UniqueID <> b.UniqueID
+    AND a.PropertyAddress IS NULL;
+
+
+-- Breaking Out Address Into Individual Columns (Address, City, State)
+-- Currently the addresses are '101 Street, City' and we are gonna separate out with the character index to separate by comma
+SELECT PropertyAddress
+FROM NashvilleHousing
+
+SELECT
+    SUBSTRING(PropertyAddress, 1, STRPOS(PropertyAddress, ',') - 1) AS StreetAddress -- the mysql serv ver is 'CHARINDEX()'; Added - 1 to exclude the comma from the result
+	,SUBSTRING(PropertyAddress, STRPOS(PropertyAddress, ',') +1, LENGTH(PropertyAddress) - STRPOS(PropertyAddress, ',')) AS City
+FROM NashvilleHousing;
+
+ALTER TABLE NashvilleHousing
+ADD PropertySplitAddress varchar(250);
+
+UPDATE NashvilleHousing
+SET PropertySplitAddress = SUBSTRING(PropertyAddress, 1, STRPOS(PropertyAddress, ',') - 1);
+
+ALTER TABLE NashvilleHousing
+ADD PropertySplitCity varchar(250);
+
+UPDATE NashvilleHousing
+SET PropertySplitCity = SUBSTRING(PropertyAddress, STRPOS(PropertyAddress, ',') +1, LENGTH(PropertyAddress) - STRPOS(PropertyAddress, ','));
+
+SELECT *
+FROM NashvilleHousing;
+
+-- ver 2 of the above
+SELECT OwnerAddress
+FROM NashvilleHousing;
+
+SELECT
+    SPLIT_PART(REPLACE(OwnerAddress, ', ', ','), ',', 1) AS Street,  -- First part
+    SPLIT_PART(REPLACE(OwnerAddress, ', ', ','), ',', 2) AS City,  -- Second part
+    SPLIT_PART(REPLACE(OwnerAddress, ', ', ','), ',', 3) AS State   -- Third part (equivalent to PARSENAME(OwnerAddress,1))
+FROM NashvilleHousing;
+
+ALTER TABLE NashvilleHousing
+ADD OwnerSplitStreet varchar(250);
+
+UPDATE NashvilleHousing
+SET OwnerSplitStreet = SPLIT_PART(REPLACE(OwnerAddress, ', ', ','), ',', 1);
+
+ALTER TABLE NashvilleHousing
+ADD OwnerSplitCity varchar(250);
+
+UPDATE NashvilleHousing
+SET OwnerSplitCity = SPLIT_PART(REPLACE(OwnerAddress, ', ', ','), ',', 2);
+
+ALTER TABLE NashvilleHousing
+ADD OwnerSplitState varchar(250);
+
+UPDATE NashvilleHousing
+SET OwnerSplitState = SPLIT_PART(REPLACE(OwnerAddress, ', ', ','), ',', 3);
+
+SELECT *
+FROM NashvilleHousing;
+
+----------------------------------------------------------------------------------------
+-- Change Y and N to Yes and No in "Sold as Vacant" Field
+SELECT DISTINCT(SoldAsVacant), COUNT(SoldAsVacant)
+FROM NashvilleHousing
+GROUP BY SoldAsVacant
+ORDER BY 2;
+
+SELECT SoldAsVacant
+	, CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
+			WHEN SoldAsVacant = 'N' THEN 'No'
+			ELSE SoldAsVacant
+			END
+FROM NashvilleHousing;
+
+UPDATE NashvilleHousing
+SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
+			WHEN SoldAsVacant = 'N' THEN 'No'
+			ELSE SoldAsVacant
+			END
+
+----------------------------------------------------------------------------------------
+-- Remove Duplicates
+
+
+SELECT *,
+	ROW_NUMBER() OVER(
+		PARTITION BY ParcelID,
+					PropertyAddress,
+					SalePrice,
+					SaleDate,
+					LegalReference
+					ORDER BY
+						UniqueID
+						) row_num
+FROM NashvilleHousing
+ORDER BY ParcelID
+WHERE row_num;
+
+SELECT *
+FROM NashvilleHousing;
+-- check the duplicates
+WITH RowNumCTE AS (
+	SELECT
+		UniqueID,
+		ParcelID,
+		PropertyAddress,
+		SalePrice,
+		SaleDate,
+		LegalReference,
+		ROW_NUMBER() OVER(
+		PARTITION BY ParcelID,
+					PropertyAddress,
+					SalePrice,
+					SaleDate,
+					LegalReference
+					ORDER BY
+						UniqueID
+						) row_num
+	FROM NashvilleHousing
+	ORDER BY ParcelID
+)
+SELECT *
+FROM RowNumCTE
+WHERE row_num > 1
+ORDER BY PropertyAddress;
+
+-- delete the duplicates
+DELETE FROM NashvilleHousing
+WHERE UniqueID IN (
+    SELECT UniqueID
+    FROM (
+        SELECT
+            UniqueID,
+            ROW_NUMBER() OVER(
+                PARTITION BY ParcelID,
+                            PropertyAddress,
+                            SalePrice,
+                            SaleDate,
+                            LegalReference
+                ORDER BY UniqueID
+            ) AS row_num
+        FROM NashvilleHousing
+    ) AS subquery
+    WHERE row_num > 1
+);
+
+----------------------------------------------------------------------------------------
+-- Delete Unused Columns
+-- now that we split apart the address, we can delete the origins
+
+SELECT *
+FROM NashvilleHousing;
+
+ALTER TABLE NashvilleHousing
+DROP COLUMN SaleDate,
+DROP COLUMN OwnerAddress,
+DROP COLUMN TaxDistrict,
+DROP COLUMN PropertyAddress;
 ```
 
 ---
 
-# Excel
-
----
-
 # Tableau
+
+- the usecase for this data is if a person was trying to find the best location to have an AirBnB
+
+[Tableau Workbook](/Users/carolinesanicola/Documents/GitHub/important-reference-repo/Online_Courses/YouTube/bootcamp_Airbnb_data.twb)
 
 ---
 
