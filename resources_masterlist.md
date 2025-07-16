@@ -38,7 +38,7 @@ A categorized collection of resources for processing healthcare data, tagged by 
 
 ## Python-Centric Resources
 
-### 3. [Clinical NLP with spaCy](https://course.spacy.io/en/)
+### 1. [Clinical NLP with spaCy](https://course.spacy.io/en/)
 
 - **Type**: Course
 - **Language**: Python
@@ -46,7 +46,7 @@ A categorized collection of resources for processing healthcare data, tagged by 
 - **Focus Areas**: `Clinical NLP`, `Data Cleaning`
 - **Efficacy**: ★★☆ (Hands-on but narrow scope)
 
-### 4. [PyHealth Tutorials](https://pyhealth.readthedocs.io/en/latest/tutorials.html)
+### 2. [PyHealth Tutorials](https://pyhealth.readthedocs.io/en/latest/tutorials.html)
 
 - **Type**: Tutorial
 - **Language**: Python
@@ -54,11 +54,23 @@ A categorized collection of resources for processing healthcare data, tagged by 
 - **Focus Areas**: `EHR Analysis`, `Deep Learning`
 - **Notes**: Uses PyTorch for predictive modeling
 
+### 3. [How to do Exploratory Data Analysis (EDA) of crime using python?](https://medium.datadriveninvestor.com/exploratory-data-analysis-of-crime-against-women-in-india-using-python-38a997753b7a)
+
+### 4. [Exploring Descriptive Statistics Using Pandas and Seaborn](https://pub.towardsai.net/exploring-descriptive-statistics-using-pandas-and-seaborn-1b8501e1f27f)
+
+[/Descriptive_Statistics.py](Python\Descriptive_Statistics.py)
+
+### 5. [Dealing with Imbalanced Data: A Beginner&#39;s Guide](https://medium.com/@irfanalghani11/dealing-with-imbalanced-data-a-beginners-guide-262e6255a396)
+
+### 6. [Pivot tables in Pandas and Handling Multi-Index Data with Hands-On Examples in Python](https://towardsdatascience.com/pivot-tables-in-pandas-with-hands-on-examples-in-python-9f29a48796f2)
+
+### 7. [Compare Dependency of Categorical Variables with Chi-Square Test(Stat-12)](https://towardsdatascience.com/pivot-tables-in-pandas-with-hands-on-examples-in-python-9f29a48796f2)
+
 ---
 
 ## SQL-Centric Resources
 
-### 5. [OMOP CDM SQL Cookbook](https://ohdsi.github.io/CommonDataModel/sqlScripts.html)
+### 1. [OMOP CDM SQL Cookbook](https://ohdsi.github.io/CommonDataModel/sqlScripts.html)
 
 - **Type**: Tutorial
 - **Language**: SQL
@@ -66,11 +78,19 @@ A categorized collection of resources for processing healthcare data, tagged by 
 - **Focus Areas**: `Data Warehousing`, `Claims Processing`
 - **Efficacy**: ★★☆ (OHDSI-specific)
 
+### 2. [13 SQL Statements for 90% of Your Data Science Tasks](https://levelup.gitconnected.com/13-sql-statements-for-90-of-your-data-science-tasks-27902996dc2b)
+
+- **Type**:
+- **Language**:
+- **Level**:
+- **Focus Areas**:
+- **Efficacy**:
+
 ---
 
 ## Multi-Language Resources
 
-### 6. [MIMIC-III Critical Care Database](https://mimic.mit.edu/docs/iii/)
+### 1. [MIMIC-III Critical Care Database](https://mimic.mit.edu/docs/iii/)
 
 - **Type**: Dataset + Tutorials
 - **Language**: R, Python, SQL
@@ -78,18 +98,27 @@ A categorized collection of resources for processing healthcare data, tagged by 
 - **Focus Areas**: `ICU Data`, `Time-Series Analysis`
 - **Notes**: Includes Jupyter/R Markdown examples
 
+### 2. [Data Analyst Bootcamp for Beginneres](https://www.youtube.com/watch?v=PSNXoAs2FtQ&t)
+
+- **Type**: Dataset + Tutorials
+- **Language**: SQL, Tableau, Power BI, Python, Excel, Pandas, Projects
+- **Level**: Beginner to Advanced
+- **Focus Areas**: `SQL basics`, `dashboards`, `python web scraping`
+- **Notes**: full walkthrough for a data analyst going straight through with one resource
+  - \*\*Associated Git
+
 ---
 
 ## Language-Agnostic Resources
 
-### 7. [HL7 FHIR Specification](https://www.hl7.org/fhir/)
+### 1. [HL7 FHIR Specification](https://www.hl7.org/fhir/)
 
 - **Type**: Textbook
 - **Language**: N/A (Standard)
 - **Focus Areas**: `Data Modeling`, `Interoperability`
 - **Efficacy**: ★☆☆ (Conceptual only)
 
-### 8. [CMS Virtual Research Data Center Guide](https://resdac.org/)
+### 2. [CMS Virtual Research Data Center Guide](https://resdac.org/)
 
 - **Type**: Tutorial
 - **Language**: N/A

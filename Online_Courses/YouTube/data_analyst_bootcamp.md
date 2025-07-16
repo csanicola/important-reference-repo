@@ -1110,6 +1110,10 @@ DROP COLUMN PropertyAddress;
 
 # Power BI
 
+- _skipped over for the time being_
+
 ---
 
 # Python
+
+[Python Jupyter Notebook](\Online_Courses\YouTube\data_analyst_bootcamp_python.ipynb)

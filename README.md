@@ -103,11 +103,11 @@ Use the `Readme.md` to get started.
 
 ### Prerequisites
 
-| Tool/Language | Recommended Version | Installation Guide                             |
-| ------------- | ------------------- | ---------------------------------------------- |
+| Tool/Language | Recommended Version | Installation Guide                                |
+| ------------- | ------------------- | ------------------------------------------------- |
 | Python        | 3.8+                | [python.org](https://www.python.org/downloads/)   |
 | R             | 4.0+                | [cran.r-project.org](https://cran.r-project.org/) |
-| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                     |
+| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                          |
 | Git           | Latest              | [git-scm.com](https://git-scm.com/downloads)      |
 
 ### Installation
@@ -136,12 +136,12 @@ source("install_pacakges.R")
 
 ├── 📂 Data/ # Open sources and Fake Generated Healthcare Data for practice
 │ ├── diabetes_012_health_indicators_BRFSS2015.csv
-  |  ├── fake_healthcare_data.csv # Generated from fake_healthcare_data_practice.ipynb
+│ ├── fake_healthcare_data.csv # Generated from fake_healthcare_data_practice.ipynb
 │ └── sample_patient_data.csv
 ├── 📂 Data_Engineer_Pathway/
 │ ├── 📂 1. Deepen Python Skills/
 │ │ ├── I.Concepts.md
-  |  │ └── II. Comprehension_Level.md
+│ │ └── II. Comprehension_Level.md
 ├── 📂 Guides/
 │ ├── Data_Cleaning.md
 │ ├── Data_Modeling_for_Scientific_Papers.md
@@ -188,17 +188,78 @@ source("install_pacakges.R")
 │ │ │ └── resources.md
 │ │ └── README.md
 ├── 📂 Images
-│ │ │ ├── boxplot.png
-│ │ │ ├── correlation_matrix.png
-│ │ │ ├── IMPORTANT REFERENCES REPOSITORY.png
-│ │ │ ├── linear_regression.png
-│ │ │ └── logistic_regression.png
+│ │ │ ├── 🖼️ boxplot.png
+│ │ │ ├── 🖼️ correlation_matrix.png
+│ │ │ ├── 🖼️ IMPORTANT REFERENCES REPOSITORY.png
+│ │ │ ├── 🖼️ linear_regression.png
+│ │ │ └── 🖼️ logistic_regression.png
 ├── 📂 Online_Courses
-
+│ ├── 📂 coursera/
+│ │ └── Data_Analysis_with_Tableau.md
+│ ├── 📂 CS61A/
+│ │ └── CS61A_Plan.md
+│ ├── 📂 datacamp/
+│ │ └── Analyzing_Data_in_Tableau.md
+│ ├── 📂 Dataquest/
+│ │ ├── 📂 Data/
+│ │ │ └── 📂 data_apis/
+│ │ │ │ └── 📜 kaggle.json
+│ │ ├── kprojects.df
+│ │ ├── sql_fundamentals.md
+│ │ └── sql_project.ipynb
+│ ├── 📂 Datawars/
+│ │ ├── beginning_sql.md
+│ │ └── formula1_project.ipynb
+│ ├── 📂 freeCodeCamp/
+│ │ ├── 📂 College_Algebra_with_Python/
+│ │ │ └── college_algebra_with_python.ipynb
+│ │ ├── 📂 Scientific_Computing_with_Python/
+│ │ │ ├── scientific_computing_with_python.ipynb
+│ │ │ └── scientific_computing_with_python.md
+│ │ └── 📂 SQL-Relational_Databases/
+│ │ │ ├── relational_databases.ipynb
+│ │ │ └── relational_databases.md
+│ ├── 📂 SQLZoo/
+│ │ │ └── sqlzoo.md
+│ └── 📂 YouTube/
+│ │ │ ├── bootcamp_Airbnb_data.twb
+│ │ │ ├── data_analyst_bootcamp_python.ipynb
+│ │ │ ├── data_analyst_bootcamp.md
+│ │ │ └── data_analyst_bootcamp.sql
+│ │ ├── Create_New_Tables.sql
+│ │ └── flu_shots_dashboard.md
 ├── 📂 Practice
-
+│ ├── data_cleaning_crystal_report.ipynb
+│ ├── fake_healthcare_data_practice.ipynb
+│ ├── sr_data_analyst_project1_data_dictionary.md
+│ ├── sr_data_analyst_project1_v2.ipynb
+│ └── sr_data_analyst_project1.ipynb
 ├── 📂 Projects
-
+│ ├── 📂 iframe_figures/
+| │ ├── figure_240.html
+| │ ├── figure_290.html
+| │ ├── figure_291.html
+| │ ├── figure_292.html
+| │ └── sudoku_solver.py
+│ ├── amd.json
+│ ├── apple.json
+│ ├── arithmetic_arranger.py
+│ ├── bingo.sh
+│ ├── bisection_method.py
+│ ├── cipher.py
+│ ├── countdown.sh
+│ ├── creating_a_car_class.py
+│ ├── data_scientist_dashboard.ipynb
+│ ├── expense_tracker.py
+│ ├── five.sh
+│ ├── fortune.sh
+│ ├── html_data
+│ ├── interm_sql_healthcare.ipynb
+│ ├── luhn_algorithm.py
+│ ├── password_generator.py
+│ ├── questionnaire.sh
+│ ├── solve_the_hanoi_tower_puzzle.py
+│ └── time_calculator.py
 ├── 📂 Python
 
 ├── 📂 R
