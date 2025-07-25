@@ -407,6 +407,198 @@ xyplot(weight ~ time, groups = temperature)
 ```
 
 ## ----- Doing your statistics -----
+### ----- Chi-square -----
+- the chi-square contingency table analysis is an analysis of **count data**
+  - a test of association among two or more variables
+
+- currently testing the null hypothesis that there is no association between ladybird colors and their habitat
+  - the alternative hypothesis is that there is an association
+```{r}
+ladybirds <- read.csv("D:/GitHub/important-reference-repo/R/data/ladybirds.csv")
+
+count_table <- table(ladybirds$Habitat, ladybirds$colour)
+print(count_table)
+```
+
+
+```{r}
+# we are going to create a matrix of the 
+chi.data <- matrix(c(115, 30, 85, 70), 2, 2, byrow = TRUE,
+                   dimnames = list(c("Black", "Red"), c("Industrial", "Rural")))
+
+barplot(chi.data, beside = TRUE, col = c("Black", "Red"),
+        ylim = c(0,125), legend = TRUE)
+```
+- now we can test the associations with a chi-square test
+```{r}
+chisq.test(chi.data)
+```
+- the output shows that there is a very small probability (p=0.00001239) that the patterns are by chance 
+  - this allows us to reject the null hypothesis and say that there is an association with habitat and color
+  - we would write this up in a paper by stating:
+    "We tested the hypothesis that there is an association between color morphs of ladybirds and industrial and rural habits. Ladybird color morphs are not uniformly distributed in the habitats (X^2 = 19.1, df=1, p<0.001), with black morphs being more frequent in industrial habitats and red morphs are frequent in rural habitats."
+    
+- by assigning the chi-square results to a name, you will have access to the:
+  - "statistic", "parameter", "p.value", "method", "data.name", "observed", "expected", "residuals"
+```{r}
+my.chi <- chisq.test(chi.data)
+names(my.chi)
+
+my.chi$expected
+```
+
+### ----- Two sample t-test -----
+- the two sample t-test is a comparison of the means of two groups
+  - its appropriate when sample sizes in each group are small
+    - there are assumptions about the data being analyzed:
+      - data in each group are normally distributed 
+      - their variance are similar
+
+- now we want to look at ozone levels in two gardens
+  - ozone concentrations in part per hundred million (pphm) on ten summer days
+    - over 8 pphm can damage certain crops
+```{r}
+ozone <- read.csv("D:/GitHub/important-reference-repo/R/data/gardens.csv")
+names(ozone)
+head(ozone)
+str(ozone)
+```
+
+```{r}
+# Read in the data
+ozone <- read.csv("D:/GitHub/important-reference-repo/R/data/gardens.csv")
+# Check the data
+head(ozone)
+str(ozone)
+# subset the data 
+GA <- ozone[ozone$Garden == "A", ]
+GB <- subset(ozone, Garden == "B")
+
+# make a single figure with two plots (2 rows, 1 column plotting grid)
+par(mfrow = c(2, 1))
+hist(GA$Ozone)
+hist(GB$Ozone)
+```
+
+- the above looks the same but the x-axis are different for each 
+```{r}
+# set the layout
+par(mfrow = c(2, 1))
+
+# Add the histograms with fixed x axis range
+hist(GA$Ozone, col = "grey40", main = "", xlim = c(0, 7),
+     xlab = "A-Ozone")
+hist(GB$Ozone, col = "grey80", main = "", xlim = c(0, 7),
+     xlab = "B-Ozone")
+```
+- now we can see there is a skew in the data between different zones
+
+- now we can do the `t.test()`
+```{r}
+# do a t.test now
+t.test(GA$Ozone, GB$Ozone)
+```
+- there results are showing that since the difference would be 0 if the means were the same and since they are not, there is significance
+
+### ----- General linear models -----
+- these include regression, ANOVA, and ANCOVA
+
+
+```{r}
+limp <- read.csv("D:/GitHub/important-reference-repo/R/data/limpet.csv")
+
+limp$SEASON <- factor(limp$SEASON, levels = c("spring", "summer")) # without doing this, the column returns NA values when color assignments 
+names(limp)
+head(limp)
+str(limp)
+```
+
+```{r}
+# plot window
+par(mfrow = c(1,1))
+
+# the plot
+plot(EGGS ~ DENSITY, data = limp, pch = 19, cex = 1.5,
+     col = c("black", "red")[limp$SEASON],
+     xlab = list("Density", cex = 1.2),
+     ylab = list("Eggs Produced", cex = 1.2))
+
+# add a legend
+legend(35, 3, legend = c("spring", "summer"),
+       col = c("black", "red"), pch = c(19, 19))
+```
+
+- from the above graph, we can clearly see a decline in production with an increase in density
+- also from this, we are now asking: do we get a better description of the data by using more than one intercept and more than one slope?
+
+
+```{r}
+limp.mod <- lm(EGGS ~ DENSITY*SEASON, data = limp) # this is specifying that all we want to include an effect of DENSITY (main effect), as effect of SEASON (main effect), and the potential for the effect of DENSITY to depend on SEASON (interaction)
+
+names(limp.mod)
+```
+
+```{r}
+par(mfrow = c(2,2)) # make a four panel plot window
+plot(limp.mod) # add the four diagnostic plots to the window
+```
+
+```{r}
+hist(limp.mod$resid)
+```
+
+- now there are two functions that can aid in our interpretation of a general linear model:
+  - `anova()` - produces an ANOVA table listing sums of squares, mean squares, F-values, and P-values (IT DOESN'T ACTUALLY PERFORM AN ANOVA)
+  - `summary()` - (when given an **lm**) returns a table of coefficients (slopes and intercepts), standard errors, and t-values
+  
+```{r}
+anova(limp.mod)
+```
+- a write-up of these full results is:
+“We tested the hypothesis that the effect of density on egg production in limpets depends on the season in which they are reproducing. Data from a factorial,  replicated  experiment,  manipulating  density  in  spring  and  summer,  provided no evidence that the effect of density on egg production depended on the season (F=0.0711, df=1,20, p=0.79).”
+
+```{r}
+summary(limp.mod)
+```
+- the t-value and p-value reveal whether the season intercepts and slopes differ
+  - if the t-value is small and the p-value is large, we are unable to reject the null hypothesis that the two values are the same (there is no difference)
+    - we can reject the null hypothesis for intercepts but not slopes
+    
+- from all of the above we can find there is no evidence in these data that the effect of density on egg production depends on season
+
+```{r}
+names(limp.mod)
+```
+
+```{r}
+coef(limp.mod)
+```
+
+```{r}
+# plot window
+par(mfrow = c(1,1))
+
+# the plot
+plot(EGGS ~ DENSITY, data = limp, pch = 19, cex = 1.5,
+     col = c("black", "red")[limp$SEASON],
+     xlab = list("Density", cex = 1.2),
+     ylab = list("Eggs Produced", cex = 1.2))
+
+# add a legend
+legend(35, 3, legend = c("spring", "summer"),
+       col = c("black", "red"), pch = c(19, 19))
+ 
+abline(coef(limp.mod)[1], coef(limp.mod)[2]) # this accepts the intercept and slope of a line
+
+abline(coef(limp.mod)[1] + coef(limp.mod)[3], # summer intercept
+       coef(limp.mod)[2] + coef(limp.mod)[4], # summer slope
+       col="red")
+```
+
+
+
+
+
 
 
 
