@@ -1,0 +1,460 @@
+---
+title: "getting_started_with_R"
+output: html_document
+creation_date: 7/24/25
+---
+
+# ----- Getting Started with R: An Introduction for Biologists -----
+Sources:
+1. [Getting Started with R](D:\GitHub\important-reference-repo\R\Getting started with R an introduction for biologists [Second edition].pdf)
+
+*Keyboard shortcuts:*
+- `<-` (assignment operator)
+  - Windows:  `Alt + -`
+  - Mac:      `Option + -`
+- `%>%` (pipe operator)
+  - Windows:  `Ctrl + Shift + M` 
+  - Mac:      `Cmd + Shift + M` 
+- (Un)Comment Selection
+  - Windows:  `Ctrl + Shift + C` 
+  - Mac:      `Cmd + Shift + C` 
+- to insert a code block in `.Rmd`:
+  - Windows:  `Ctrl + Alt + I`
+  - Mac:      `Cmd + Option + I`
+___
+
+## ----- Import, Explore, Graph -----
+### ----- Getting Started -----
+- where the data is located is the `PATH` and usually is convention to use forward slashes
+- the `R CONSOLE` is the window into the engine of R
+  - this is where you send and it accepts commands
+- the second window is the `SCRIPT` 
+- annotations(commenting) are done with `#` 
+- functions are what we are asking to do in R
+  - to clear the "brain" of R, we run `ls.rm` which stands for `rm` = remove and `ls` = list
+    - `rm(list=ls())`
+```{r}
+rm(list=ls())
+# list=ls() is asking R to make a list of these objects
+# rm() asks R to remove all of these objects from this list
+# ls() gives a list of all objects in R's "brain"
+```
+
+- to see where R is looking at, you get ask to get what the current working directory is using `getwd()`
+  - to set the working directory, you use `setwd()` 
+
+- the first thing you should do when running a script for the first time:
+```{r}
+# ------------------------------------------
+# User Name
+# January 1, 2000
+# Analysis of Trends
+# ------------------------------------------
+
+# Reset R's brain
+rm(list=ls())
+
+# getwd tells you where R is currently looking
+getwd()
+
+# setwd tells R where to look
+setwd("D:/GitHub/important-reference-repo/R")
+
+# use getwd to confirm that R is now looking here
+getwd()
+```
+- to execute a script, you can use the windows/mac shortcuts:
+  - Windows:  `CTRL + R`
+  - Mac:      `cmd + Return`
+
+### ----- Importing and Exploring ------
+- getting data into R: `read.csv()`
+```{r}
+comp.dat <- read.csv('D:/GitHub/important-reference-repo/R/data/compensation.csv')
+
+ls() # this will show that the new dataset has been loaded in
+```
+- to see the data in this dataset, there are a few key functions to use:
+  - `names()` - tells you the names you assigned each column
+  - `head()` - returns the first 6 rows of the dataset
+  - `dim()` - tells you the number of rows and columns (**dimension**) of the dataset
+  - `str()` - returns the structure of the dataset 
+```{r}
+# Check the data - confirm it is what you expected
+names(comp.dat) # returns the names of the columns
+head(comp.dat) # returns the first 6 rows
+dim(comp.dat) # returns the number of rows and columns
+str(comp.dat) # a powerful compilation of the above
+```
+- using the `dim()` should make you check to see the data was imported correctly and that there are matching rows and columns to the `.csv` file
+
+- `summary()` is a **function** that will return a summary of the **numeric data** in the dataset (median, mean, inter-quartile range, minimum, maximum) and a levels and sample sizes of the **categoric** values
+```{r}
+summary(comp.dat)
+```
+- sometimes, when you want to take **subsets** of the data to do something like performing a **regression** model, you select specific columns that are called **indexing** the data.
+  - if all of the data in the subset is the same type, you can use a **matrix** which is a set of values that are all the same type
+    - either indexing or creating a matrix, you use `[]` square brackets and `,` commas
+      - the rule is *rows-then-columns-always*
+```{r}
+comp.dat[,1] # returns the first column of data
+comp.dat[1,] # returns the first row of data
+comp.dat[,1:3] # returns first three columns of data
+comp.dat[1:3,] # returns the first three rows of data
+comp.dat[1:3,1:3] # returns the first three rows and three columns of data 
+comp.dat[,'Fruit'] # you can use the actual column names too
+```
+- you can also call a column by using the `$` symbol
+```{r}
+comp.dat$Grazing
+```
+
+- subsetting the data, you can use the `subset()` function
+  - the syntax is: `subset(data.frame.name, column.name == value)`
+```{r}
+# if we want to look at the subset of data in the comp.dat df where we look only at the rows which have "Grazed" in the "Grazing" column
+subset(comp.dat, Grazing == "Grazed")
+```
+
+### ----- Graphs -----
+- the first start of data analysis SHOULD NEVER start with a statistical analysis, ALWAYS start with a picture first
+  - this is so that you have an expected pattern of what the data should look like
+    - this is to compare to if once you start running things, it starts not looking like that
+    
+- two main figure types that are important are:
+  - **bar graph +- error bars** - requires **mean** values of some variabel to generate the heights of the bars and then some variability to add **error bars**
+    - **tapply** - produces a **matrix** of aggregate data
+      - accommodates a range of functions (mean, standard deviation, etc)
+      - is the "best friend" of **barplot** because tapploy is a function that produces a matrix and barplot loves matrix
+  - **scatterplot** 
+
+```{r}
+# Set the working directory to the folder with all the stuff in it.
+# note ~ for home directory in Mac/Linux/Unix
+# /'s show path to "getting_started_with_R" folder
+setwd("D:/GitHub/important-reference-repo/R/data/")
+# Read in the data using read.csv function and assign it to the
+# object called mydata
+mydata <- read.csv("D:/GitHub/important-reference-repo/R/data/compensation.csv")
+# make sure the data are what I wanted
+head(mydata)
+str(mydata)
+```
+
+- no we want to think from this data what we might want to plot:
+  - we might want to explore mean +- standard deviation of fruit production for grazed and un-grazed conditions
+    - we can make a barplot with standard deviation error bars
+      - can also include text inside each bar (sample size used to calculate the mean and standard deviation)
+        - first we need to calculate the means, the stdev and the sample size
+          - use tapply!
+```{r}
+# Calculate mean of each group using tapply, which returns a matrix
+mean.fruit <- tapply(mydata$Fruit, list(mydata$Grazing), mean)
+mean.fruit
+# Calculate standard deviation of each group
+# using tapply, which returns a matrix-it will be the same dimension as mean.fruit
+sd.fruit <- tapply(mydata$Fruit, list(mydata$Grazing), sd)
+sd.fruit
+# Calculate sample size in each group
+n.fruit <- tapply(mydata$Fruit, list(mydata$Grazing), length)
+n.fruit
+```
+
+```{r}
+# make a barplot using the means returned from tapply
+barplot(mean.fruit)
+```
+- using `?barplot` we can see how to add the text and error bars
+
+
+
+```{r}
+barplot(mean.fruit,
+        xlab = "Treatment",
+        ylab = "Fruit Production",
+        ylim = c(0,100)) # c is a function in R that is for combining values into a vector; since the ylim needs a min and max for the axis, we use a vector to do this
+```
+
+- there is no automated way to do error bars in R
+  - there are packages you can do this with (`gplots`, `Hmisc`, `plotrix`, `ggplot2`)
+  - the native way to do this is to add a line with things on the ends (aka `arrows`)
+    - the bottom of the line should be the middle of the bars -> so we need to get the mid points of the bars
+```{r}
+mids <- barplot(mean.fruit,
+                xlab = "Treatment",
+                ylab = "Fruit Production",
+                ylim = c(0,100))
+mids
+```
+
+- the point below the mean is:
+  - `mean ] the standard deviation:mean.fruit ]sd.fruit`
+- the point above the mean is:
+  - `mean + standard deviation: mean.fruit + sd.fruit`
+```{r}
+# Make a barplot using the means returned from tapply
+mids <- barplot(mean.fruit,
+                xlab = "Treatment",
+                ylab = "Fruit Production",
+                ylim = c(0,100))
+# Use the arrows to put error bars on the plot
+arrows(mids, mean.fruit - sd.fruit, mids, mean.fruit + sd.fruit,
+       code = 3, # tells arrows to draw "arrows" at both ends of the line
+       angle = 90, # makes the arrow heads 90 degrees-flat
+       length = 0.1) # makes them short (0.1 mm)
+```
+
+- now the last step is to add the text 
+  - the function to do this is `text()`
+```{r}
+# Make a barplot using the means returned from tapply
+mids <- barplot(mean.fruit,
+                xlab = "Treatment",
+                ylab = "Fruit Production",
+                ylim = c(0,100))
+# Use the arrows to put error bars on the plot
+arrows(mids, mean.fruit - sd.fruit, mids, mean.fruit + sd.fruit,
+       code = 3, # tells arrows to draw "arrows" at both ends of the line
+       angle = 90, # makes the arrow heads 90 degrees-flat
+       length = 0.1) # makes them short (0.1 mm)
+# Add text at the midpoints (x) and at height 2 on the y-axis
+# paste the words n=followed by the n.fruit values
+text(mids, 6, paste("n=", n.fruit))
+```
+
+#### ----- Test -----
+- try to recreate the Figure 4.6 plot
+```{r}
+?barplot
+```
+
+```{r}
+# load in the data
+cow_growth <- read.csv("D:/GitHub/important-reference-repo/R/data/growth.csv")
+
+# Calculate mean of each group using tapply, which returns a matrix
+mean.comb <- tapply(cow_growth$gain, list(cow_growth$supplement, cow_growth$diet), mean)
+
+# Calculate standard deviation of each group
+sd.comb <- tapply(cow_growth$gain, list(cow_growth$supplement, cow_growth$diet), sd)
+
+# Calculate sample size in each group
+n.comb <- tapply(cow_growth$gain, list(cow_growth$supplement, cow_growth$diet), length)
+
+# x is Feed; y is Weight Gain; legend is supplement
+# make a barplot using the means returned from tapply
+mids <- barplot(mean.comb,
+                beside = TRUE,
+                main = "Types of Feeds and Supplements by Weight Gain",
+                xlab = "Feed",
+                ylab = "Weight Gain",
+                ylim = c(0,max(mean.comb + sd.comb, na.rm = TRUE) *1.2),
+                legend.text = rownames(mean.comb),
+                args.legend = list(x = "topright"))
+
+# Use Arrows to put error bars on the plot
+arrows(mids, mean.comb - sd.comb, mids, mean.comb + sd.comb,
+       code = 3, angle = 90, length = 0.1)
+
+# Add text at the midpoints(x) and at height 6 on the y-axis
+# paste the words n=followed by the n.gain values
+text(mids, 2, paste("n=", n.comb))
+```
+
+#### ----- Scatterplots -----
+- the function for plotting scatterplots is just `plot`
+  - it can plot x-y scattergplots given two columns of data
+    - `plot(data.set$x.column, data.set$y.column)`
+      - a variation is `plot.formula` which requires: **formula** and a **data frame**
+        - `plot(y ~ x, data = dataset)`
+```{r}
+plot(mydata$Root, mydata$Fruit)
+```
+```{r}
+# this executes the same things as above
+plot(Fruit ~ Root, data = mydata)
+```
+
+```{r}
+plot(Fruit ~ Root, data = mydata,
+     xlab = list("Root Biomass", cex = 1.5), # increases the default size by 1.5 times
+     ylab = list("Fruit Production", cex = 0.5)) # decreases the size by 0.5 times (half)
+```
+
+- other **plot** arguments: 
+  - `pch` - point character (controls the shape (symbol) of the points)
+  - `col` - the color
+  - `bg` - the point background color
+
+```{r}
+?par
+```
+
+- **par** is short for graphical parameters
+  - this will list all the things in your plot you can change
+    - we can use `?points` to see what customizable points are available
+```{r}
+?points
+```
+
+
+```{r}
+plot(Fruit ~ Root, data = mydata,
+     xlab = list("Root Biomass", cex = 1.5),
+     ylab = list("Fruit Production", cex = 0.5),
+     cex = 2, pch = 21, bg = "grey")
+```
+
+- if we want to add color, we can create a function to specify which colors we want to apply to which values of the data
+```{r}
+culr <- ifelse(mydata$Grazing == "Grazed", "green", "blue")
+plot(Fruit ~ Root, data = mydata,
+     xlab = list("Root Biomass", cex = 1.5),
+     ylab = list("Fruit Production", cex = 0.5),
+     cex = 2, pch = 21, bg = culr)
+```
+- now we can add a **legend** and see what options we have available
+```{r}
+?legend
+```
+
+- there are two versions of the legend we can try
+```{r}
+culr <- ifelse(mydata$Grazing == "Grazed", "green", "blue")
+plot(Fruit ~ Root, data = mydata,
+     xlab = list("Root Biomass", cex = 1.5),
+     ylab = list("Fruit Production", cex = 0.5),
+     cex = 2, pch = 21, bg = culr)
+legend("topleft", legend = c("Grazed", "Ungrazed"), # this is going to stick the legend in the top left corner of the plot
+       pch = 21, pt.bg = c("green", "blue"), pt.cex = 2)
+```
+
+```{r}
+culr <- ifelse(mydata$Grazing == "Grazed", "green", "blue")
+plot(Fruit ~ Root, data = mydata,
+     xlab = list("Root Biomass", cex = 1.5),
+     ylab = list("Fruit Production", cex = 0.5),
+     cex = 2, pch = 21, bg = culr)
+legend(5, 110, legend = c("Grazed", "Ungrazed"), # this is going to put the legend at plot point (5,110) on the graph
+       pch = 21, pt.bg = c("green", "blue"), pt.cex = 2) 
+```
+
+#### ----- Using the layout() and pdf() function to save multiple plots -----
+```{r}    
+# This snippet of code writes a pdf of a multi-panel plot to your hard drive.  
+# It firsts creates some fake data.  
+# It then opens a pdf "device" on your computer which prepares your  
+# working directory to receive a pdf.  
+# It then executes some plotting code and writes the pdf to the working  
+# directory with a specific filename you have specified.  
+# Finally, the dev.off  () function closes the connection to the  
+# working directory, turning off   the pdf device; this final step  
+# ensures that subsequent plotting is written to the graphics window  
+# Make the data 
+time <- seq(0,9.9,0.1) # a sequence 
+weight <- (time^2) + rnorm(100,0,10) # time^2 with deviation 
+temperature <- factor(sample(c("cold","hot"), 100, replace = TRUE)) 
+# Identify your working directory - this is where the PDF will be found 
+getwd() 
+# OPEN THE PDF DEVICE—specify a file name and a paper size 
+pdf(file = "PracticePDF.pdf", paper = "a4") 
+# set the layout of the plotting  
+# here we specify a 2 x 2 plot and place the figures into the plot by row 
+layout(matrix(c(1, 2, 3, 4), 2, 2, byrow = TRUE)) 
+# do your plotting—here we add three figures to the layout  
+# we also use the function mtext() to add letters outside each of the  
+# boxes as identifiers for a figure legend in your manuscript 
+plot(weight ~ time, pch = 21, bg = "green") 
+mtext("A", side = 3, line = 2, adj = 0) 
+
+plot(weight ~ temperature)
+mtext("B", side = 3, line= 2, adj = 0)
+
+plot(weight ~ time, col = c("black","red")[temperature])
+mtext("C", side = 3, line = 2, adj = 0) 
+
+# Close the connection to your hard drive 
+dev.off() # this NEEDS to be there or else you wont be able to actually access the pdf
+# Now, go to your hard drive and look in the working directory for the pdf.    
+```
+
+#### ----- A very brief introduction to lattice plots, from the lattice library, using xyplot() -----
+```{r}
+# This snippet of code shows the basics of the lattice
+# library using the function xyplot()
+# First, we load the package lattice as a library
+
+library(lattice) # Comes with the base installation of R
+
+# Now we make up some data
+time <- seq(0, 9.9, 0.1) # a sequence
+weight <- (time^2) + rnorm(100, 0, 10) # time^2 with deviation
+
+# random assignment of temperature
+temperature <- factor(sample(c("cold", "hot"), 100,
+                             replace = TRUE))
+
+# Now, we use xyplot in two different ways
+# First, we use the panel plot functionality via the "|" symbol
+# (also known as a pipe)
+# this creates two panels of weight versus time, each panel
+# representing the two temperatures
+xyplot(weight ~ time|temperature)
+
+# Next we use the groups argument to color each symbol according
+# to the two different temperatures:
+xyplot(weight ~ time, groups = temperature)
+```
+
+## ----- Doing your statistics -----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

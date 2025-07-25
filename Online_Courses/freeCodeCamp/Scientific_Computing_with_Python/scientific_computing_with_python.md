@@ -11,14 +11,12 @@
   - `for` is the keyword denoting the loop type
   - `i` is a variable that subsequently takes the value of the elements in the variable
     - the iteration variable (in this case `i`) can have any valid name, but its convenient to give it a meaningful name
-
 - strings are immutable → meaning they cannot be changed once created
 - the modulo operator `%` is used to return the remainder of the division between two numbers
 - a **function** is a reusable block of code
 
   - there are already built in functions like `print()`, `find()`, and `len()` but you can make your own custom function
   - to define a function you use `def`
-
 - **parameters** are variables that you can use inside your function:
 
   ```python
@@ -32,7 +30,6 @@
   def foo(a, b, c=value):
   	<code>
   ```
-
 - `.index()` method is identical to the `.find()` method but it throws a `ValueError` exception if it is unable to find the substring
 - A `ValueError` is a built-in exception that is raised when an argument with the right type but inappropriate value is passed to a function
 - `pass` is a keyword that can be used as a placeholder for future code. It doesn’t have any effect on the code but saves you from errors you would get in case of incomplete code
@@ -61,7 +58,6 @@ def foo():
   - add parenthesis `()` after the function’s name
   - inside the parenthesis, add any parameters that the function requires separated by commas
   - end the line with a semicolon `;`
-
 - you can use the index operator (`[]`) to access a range of characters in a string with `string[start:stop:step]`
 
   - `start` is the starting index (inclusive)
@@ -69,7 +65,6 @@ def foo():
   - `step` is the amount of characters to skip over (the default is 1 if nothing is specified)
   - you can’t use the `+=` trying to combine a string and an integer
     - you need to convert one to the other so they are the same type
-
 - lists are characterized by brackets and you can even create an empty list with just brackets by themselves `[]`
 
   - `append()` can be used to add an item to a list
@@ -79,16 +74,13 @@ def foo():
     example_list = [1, 2, 3]
     example_list[1] # this access the emlement at index 1 which is the second element which would be 2
     ```
-
 - you can change any value of any of the elements of a list
 
   - `.insert()` will change the position of any element. The first argument is the position and the second is the element that is added
   - `.pop()` is to remove an element from a list (default is that it removes the last element of the list)
-
 - you can’t have a `'` in a string without raising an error so the work around is either double quotes around the string or a `\` before the string:
 
   - `'I\’m a string!'` or `"I'm a string!"`
-
 - Lambda functions are brief, anonymous functions in python, ideal for simple, one-time tasks:
 
   - `lambda x: expre`
@@ -97,14 +89,12 @@ def foo():
     - `expr` is the expression that gets evaluated and returned when the lambda function is called
   - you can combine it with the `map()` function which executed a specified function for each element in a collection of objects such as a list:
     - `map(lambda x: x * 2, [1, 2, 3])`
-
 - the `filter()` function allows you to select items from an iterable, such as a list, based on the output of a function
 
   - `filter(my_function, my_list)`
     - `filter()` takes a functions as its first argument and an iterable as its second argument
     - it returns an iterator → a special object that enables you to iterate over the elements of a collection, like a list
     - the above result is an iterator containing the elements of `my_list` for which `my_function` returns `True`
-
 - a `while` loop is another kind of loop that runs a portion of code as long as a specified condition is `True`. The loop terminates when the condition becomes `False`
 - the `input()` function takes and returns the user input int he form of a string
 - the `.strip()` string method removes from a string any leading or trailing characters among a set of characters passed as its argument
@@ -118,7 +108,6 @@ def foo():
     - if the method doesn’t converge within this limit, you’ll assume the solution is not found
   - `raise` statement allows you to force a specific exception to occur
     - it consists of the `raise` keyword followed by the exception type and enables you to provide a custom error message: `raise ValueError("Invalid value")`
-
 - the `abs()` function returns the absolute value of a number which is always positive
 - a standalone single underscore is used to represent a value you don’t care or that won’t be used in your code
 - a `tuple` is another built-in data structure in python
@@ -128,23 +117,19 @@ def foo():
   - a tuple can be unpacked, meaning that the elements contained in the tuple can be assigned to variables, like this:
     - `spam = ('lemon', 'curry')`
     - `item1, item2 = spam`
-
 - the `re` module allows you to use _regular expressions_ in your code
 
   - often referred to as **regex** its a pattern used to match a specific combination of characters inside a string
   - it is a valid alternative to `if`/`else` conditional statements when you need to match or find patterns
   - the `search()` function from the `re` module analyzes the string passed as the argument looking for the first place where the regex pattern matches the string
   - the `findall()` function is similar to `search()` but returns a list with all the occurrences of the matched pattern
-
 - the dot character is a wildcard that matches any character in a string - except for a newline character by default
 - if you need to match a character that has a special meaning in the pattern such as `.` or `+`, you can escape it by prepending a backslash character `\`
 
   - ex: `\+`
-
 - raw strings are prefixed with a `r` and are different from regular strings lies in how they handle the backslash character
 
   - in raw strings, backslashes are treated as literal characters rather than escape characters
-
 - in a character class, you can combine multiple ranges by writing one range after another inside the square brackets (without any additional characters): `[a-d3-6]`
 - class equivalents:
 
@@ -152,24 +137,20 @@ def foo():
   - `[^0-9]` = `\D`
   - `[a-z]` or `[A-Z]` = `\w`
   - special characters = `\W`
-
 - generator expressions follow the syntax of list comprehensions but they use parentheses instead of square brackets
 - if you want to iterate over the values of dictionary keys, you can use the `.values()` function
 
   - using the `.items()` function will show the key-value pairs
-
 - to remove a key-value pair in a dictionary, you would use the `del` keyword
 - graphs are data structures representing relations between pairs of elements
 
   - _nodes_ are the elements and can be real-life objects, entities, points in space or others
   - connections between the nodes are called the _edges_
   - a graph is called a _weighted_ graph when its edges are associated with weights, representing a distance, time, or other quantitive value
-
 - the `list()` type constructor enables you to build a list from an iterable
 - with a dictionary comprehension, you can create a dictionary starting from an existing dictionary: `{key: val for key in dict}`
 
   - dictionary comprehensions support conditional `if/else` syntax too: `{key: val_1 if condition else val_2 for key in dict}`
-
 - the `.extend()` method allows you to add elements from an iterable to the end of a list
 - the `.remove()` method removes from a list the first matching element that is passed as the argument
 
@@ -197,6 +178,7 @@ class ClassName:
 - the instantiation creates an empty object
   - the `__init__` method is a special method that allows you to instantiate an object to a customized state.
     - when a class implements an `__init__` method, `__init__` is automatically called upon instantiation.
+  - these methods, which follow the `__<name>__` naming pattern, are referred to as special methods, magic methods, or dunder (which stands for double underscore) methods
 - the `enumerate` built-in function takes an iterable as its argument and returns an enumerate object you can iterate over. It provides the count (which by default starts at zero) and the value from the iterable.
   - the loop from the example below would output the tuples `0, a`, `1, b`, `2, c`.
 

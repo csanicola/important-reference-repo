@@ -103,11 +103,11 @@ Use the `Readme.md` to get started.
 
 ### Prerequisites
 
-| Tool/Language | Recommended Version | Installation Guide                                |
-| ------------- | ------------------- | ------------------------------------------------- |
+| Tool/Language | Recommended Version | Installation Guide                             |
+| ------------- | ------------------- | ---------------------------------------------- |
 | Python        | 3.8+                | [python.org](https://www.python.org/downloads/)   |
 | R             | 4.0+                | [cran.r-project.org](https://cran.r-project.org/) |
-| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                          |
+| Jupyter Lab   | 3.0+                | `pip install jupyterlab`                     |
 | Git           | Latest              | [git-scm.com](https://git-scm.com/downloads)      |
 
 ### Installation
@@ -236,11 +236,11 @@ source("install_pacakges.R")
 │ └── sr_data_analyst_project1.ipynb
 ├── 📂 Projects
 │ ├── 📂 iframe_figures/
-| │ ├── figure_240.html
-| │ ├── figure_290.html
-| │ ├── figure_291.html
-| │ ├── figure_292.html
-| │ └── sudoku_solver.py
+│ ├── figure_240.html
+│ ├── figure_290.html
+│ ├── figure_291.html
+│ ├── figure_292.html
+│ └── sudoku_solver.py
 │ ├── amd.json
 │ ├── apple.json
 │ ├── arithmetic_arranger.py

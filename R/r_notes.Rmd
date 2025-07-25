@@ -1,3 +1,8 @@
+---
+title: "r_notes"
+output: html_document
+---
+
 # ----- R Notes -----
 Sources:
 1. [Mastering Health Science Using R](https://alicepaul.github.io/health-data-science-using-r/book.html)

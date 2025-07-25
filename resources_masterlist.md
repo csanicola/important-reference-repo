@@ -98,7 +98,7 @@ A categorized collection of resources for processing healthcare data, tagged by 
 - **Focus Areas**: `ICU Data`, `Time-Series Analysis`
 - **Notes**: Includes Jupyter/R Markdown examples
 
-### 2. [Data Analyst Bootcamp for Beginneres](https://www.youtube.com/watch?v=PSNXoAs2FtQ&t)
+### 2. [Data Analyst Bootcamp for Beginners](https://www.youtube.com/watch?v=PSNXoAs2FtQ&t) ✅ [COMPLETED]
 
 - **Type**: Dataset + Tutorials
 - **Language**: SQL, Tableau, Power BI, Python, Excel, Pandas, Projects
