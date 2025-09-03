@@ -15,31 +15,114 @@ editor_options:
     wrap: 72
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# 2. The Basics
+- for R, the best application to use is RStudio which you need to download in addition to the language R
+- when using R notebooks, you can insert code chunks (use `ctrl + alt + i` to insert for windows)
+
+```{r}
+# scripts can use either just one line of code
+1+1
+# or multiple lines of code
+2*2
+1+2*3-5
+```
+- the main two concepts for R are **variables** (which are used for storing data) and **functions** (used for doing things with the data)
+```{r}
+# to store data in R you do the below to a variable name
+x <- 4
+# (shortcut for the `<-` is `alt + -`)
+```
+- once data is stored in a variable name, then you can do things with that variable/data
+```{r}
+x + x
+```
+- R is case sensitive for storing variables so the below are all different variables that can be used to store data:
+```{r}
+my_variable <- 5
+MY_VARIABLE <- 6
+My_Variable <- 7
 ```
 
-## R Markdown
+- variables aren't stored if there are spaces in the name or special characters 
 
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see <http://rmarkdown.rstudio.com>.
+- to turn multiple lines into comments, you can use the shortcut: `Ctrl + Shift + C`
 
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
+## Exercise
+1. What happens if you use an invalid character in a variable name?
 
-```{r cars}
-summary(cars)
+net income <- income - taxes
+net-income <- income - taxes
+ca$h <- income - taxes
+
+these will all just throw errors and won't let you save the variables 
+
+2. What happens if you put R code as a comment? For example,
+```{r}
+income <- 100
+taxes <- 20
+net_income <- income - taxes
+# gross_income <- net_income + taxes
 ```
+the variable commented out will not show up in the environment because it isn't being saved as a useable variable
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+3. What happens if you remove a line break and replace it by a semicolon ;? For example,
+```{r}
+income <- 200; taxes <- 30
 ```
+these will save as two separate variables -> the semicolon acts as a line separator 
 
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.
+4. What happens if you do two assignments on the same line? For example,
+```{r}
+income2 <- taxes2 <- 100
+```
+this saves both variables with the same number 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 3. The cornerstones of statistics
+
+
+# 4. Exploratory Data Analysis and Unsupervised Learning
+
+# 5. Dealing with messy data 
+
+# 6. R programming
+
+# 7. The role of simulation in modern statistics
+
+# 8. Regression models 
+
+# 9. Survival analysis and censored data 
+
+# 10. Structural equation models
+
+# 11. Predictive modeling and machine learning
+
+# 12. Advanced topics 
+
+# 13. Debugging
+
+# 14. Mathematical appendix
+

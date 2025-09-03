@@ -1757,51 +1757,194 @@ ModernStatisticswithR.com</h1>
 
 
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-text-begin -->
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting
-syntax for authoring HTML, PDF, and MS Word documents. For more details
-on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be
-generated that includes both content as well as the output of any
-embedded R code chunks within the document. You can embed an R code
-chunk like this:</p>
+<div id="the-basics" class="section level1">
+<h1>2. The Basics</h1>
+<ul>
+<li>for R, the best application to use is RStudio which you need to
+download in addition to the language R</li>
+<li>when using R notebooks, you can insert code chunks (use
+<code>ctrl + alt + i</code> to insert for windows)</li>
+</ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShjYXJzKVxuYGBgIn0= -->
-<pre class="r"><code>summary(cars)</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVJeUJ6WTNKcGNIUnpJR05oYmlCMWMyVWdaV2wwYUdWeUlHcDFjM1FnYjI1bElHeHBibVVnYjJZZ1kyOWtaVnh1TVNzeFhHNWdZR0FpZlE9PSAtLT5cblxuYGBgclxuIyBzY3JpcHRzIGNhbiB1c2UgZWl0aGVyIGp1c3Qgb25lIGxpbmUgb2YgY29kZVxuMSsxXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBzY3JpcHRzIGNhbiB1c2UgZWl0aGVyIGp1c3Qgb25lIGxpbmUgb2YgY29kZVxuMSsxXG5gYGAifQ== -->
+<pre class="r"><code># scripts can use either just one line of code
+1+1</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICBzcGVlZCAgICAgICAgICAgZGlzdCAgICAgICBcbiBNaW4uICAgOiA0LjAgICBNaW4uICAgOiAgMi4wMCAgXG4gMXN0IFF1LjoxMi4wICAgMXN0IFF1LjogMjYuMDAgIFxuIE1lZGlhbiA6MTUuMCAgIE1lZGlhbiA6IDM2LjAwICBcbiBNZWFuICAgOjE1LjQgICBNZWFuICAgOiA0Mi45OCAgXG4gM3JkIFF1LjoxOS4wICAgM3JkIFF1LjogNTYuMDAgIFxuIE1heC4gICA6MjUuMCAgIE1heC4gICA6MTIwLjAwICBcbiJ9 -->
-<pre><code>     speed           dist       
- Min.   : 4.0   Min.   :  2.00  
- 1st Qu.:12.0   1st Qu.: 26.00  
- Median :15.0   Median : 36.00  
- Mean   :15.4   Mean   : 42.98  
- 3rd Qu.:19.0   3rd Qu.: 56.00  
- Max.   :25.0   Max.   :120.00  </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDJcbiJ9 -->
+<pre><code>[1] 2</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVJeUJ2Y2lCdGRXeDBhWEJzWlNCc2FXNWxjeUJ2WmlCamIyUmxYRzR5S2pKY2JtQmdZQ0o5IC0tPlxuXG5gYGByXG4jIG9yIG11bHRpcGxlIGxpbmVzIG9mIGNvZGVcbjIqMlxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBvciBtdWx0aXBsZSBsaW5lcyBvZiBjb2RlXG4yKjJcbmBgYCJ9 -->
+<pre class="r"><code># or multiple lines of code
+2*2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDRcbiJ9 -->
+<pre><code>[1] 4</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVNU3N5S2pNdE5WeHVZR0JnSW4wPSAtLT5cblxuYGBgclxuMSsyKjMtNVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuMSsyKjMtNVxuYGBgIn0= -->
+<pre class="r"><code>1+2*3-5</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDJcbiJ9 -->
+<pre><code>[1] 2</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
-<div id="including-plots" class="section level2">
-<h2>Including Plots</h2>
-<p>You can also embed plots, for example:</p>
+<ul>
+<li>the main two concepts for R are <strong>variables</strong> (which
+are used for storing data) and <strong>functions</strong> (used for
+doing things with the data)</li>
+</ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-plot-begin eyJoZWlnaHQiOjQzMi42MzI5LCJ3aWR0aCI6NzAwLCJzaXplX2JlaGF2aW9yIjowLCJjb25kaXRpb25zIjpbXX0= -->
-<p><img src="data:image/png;base64,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" /></p>
-<!-- rnb-plot-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVJeUIwYnlCemRHOXlaU0JrWVhSaElHbHVJRklnZVc5MUlHUnZJSFJvWlNCaVpXeHZkeUIwYnlCaElIWmhjbWxoWW14bElHNWhiV1ZjYm5nZ1BDMGdORnh1SXlBb2MyaHZjblJqZFhRZ1ptOXlJSFJvWlNCZ1BDMWdJR2x6SUdCaGJIUWdLeUF0WUNsY2JtQmdZQ0o5IC0tPlxuXG5gYGByXG4jIHRvIHN0b3JlIGRhdGEgaW4gUiB5b3UgZG8gdGhlIGJlbG93IHRvIGEgdmFyaWFibGUgbmFtZVxueCA8LSA0XG4jIChzaG9ydGN1dCBmb3IgdGhlIGA8LWAgaXMgYGFsdCArIC1gKVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB0byBzdG9yZSBkYXRhIGluIFIgeW91IGRvIHRoZSBiZWxvdyB0byBhIHZhcmlhYmxlIG5hbWVcbnggPC0gNFxuIyAoc2hvcnRjdXQgZm9yIHRoZSBgPC1gIGlzIGBhbHQgKyAtYClcbmBgYCJ9 -->
+<pre class="r"><code># to store data in R you do the below to a variable name
+x &lt;- 4
+# (shortcut for the `&lt;-` is `alt + -`)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Note that the <code>echo = FALSE</code> parameter was added to the
-code chunk to prevent printing of the R code that generated the
-plot.</p>
+<ul>
+<li>once data is stored in a variable name, then you can do things with
+that variable/data</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVlQ0FySUhoY2JtQmdZQ0o5IC0tPlxuXG5gYGByXG54ICsgeFxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCArIHhcbmBgYCJ9 -->
+<pre class="r"><code>x + x</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDhcbiJ9 -->
+<pre><code>[1] 8</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ul>
+<li>R is case sensitive for storing variables so the below are all
+different variables that can be used to store data:</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHViWGxmZG1GeWFXRmliR1VnUEMwZ05WeHVUVmxmVmtGU1NVRkNURVVnUEMwZ05seHVUWGxmVm1GeWFXRmliR1VnUEMwZ04xeHVZR0JnSW4wPSAtLT5cblxuYGBgclxubXlfdmFyaWFibGUgPC0gNVxuTVlfVkFSSUFCTEUgPC0gNlxuTXlfVmFyaWFibGUgPC0gN1xuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlfdmFyaWFibGUgPC0gNVxuTVlfVkFSSUFCTEUgPC0gNlxuTXlfVmFyaWFibGUgPC0gN1xuYGBgIn0= -->
+<pre class="r"><code>my_variable &lt;- 5
+MY_VARIABLE &lt;- 6
+My_Variable &lt;- 7</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ul>
+<li><p>variables aren’t stored if there are spaces in the name or
+special characters</p></li>
+<li><p>to turn multiple lines into comments, you can use the shortcut:
+<code>Ctrl + Shift + C</code></p></li>
+</ul>
+<div id="exercise" class="section level2">
+<h2>Exercise</h2>
+<ol style="list-style-type: decimal">
+<li>What happens if you use an invalid character in a variable
+name?</li>
+</ol>
+<p>net income &lt;- income - taxes net-income &lt;- income - taxes ca$h
+&lt;- income - taxes</p>
+<p>these will all just throw errors and won’t let you save the
+variables</p>
+<ol start="2" style="list-style-type: decimal">
+<li>What happens if you put R code as a comment? For example,</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVhVzVqYjIxbElEd3RJREV3TUZ4dWRHRjRaWE1nUEMwZ01qQmNibTVsZEY5cGJtTnZiV1VnUEMwZ2FXNWpiMjFsSUMwZ2RHRjRaWE5jYmlNZ1ozSnZjM05mYVc1amIyMWxJRHd0SUc1bGRGOXBibU52YldVZ0t5QjBZWGhsYzF4dVlHQmdJbjA9IC0tPlxuXG5gYGByXG5pbmNvbWUgPC0gMTAwXG50YXhlcyA8LSAyMFxubmV0X2luY29tZSA8LSBpbmNvbWUgLSB0YXhlc1xuIyBncm9zc19pbmNvbWUgPC0gbmV0X2luY29tZSArIHRheGVzXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5jb21lIDwtIDEwMFxudGF4ZXMgPC0gMjBcbm5ldF9pbmNvbWUgPC0gaW5jb21lIC0gdGF4ZXNcbiMgZ3Jvc3NfaW5jb21lIDwtIG5ldF9pbmNvbWUgKyB0YXhlc1xuYGBgIn0= -->
+<pre class="r"><code>income &lt;- 100
+taxes &lt;- 20
+net_income &lt;- income - taxes
+# gross_income &lt;- net_income + taxes</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>the variable commented out will not show up in the environment
+because it isn’t being saved as a useable variable</p>
+<ol start="3" style="list-style-type: decimal">
+<li>What happens if you remove a line break and replace it by a
+semicolon ;? For example,</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVhVzVqYjIxbElEd3RJREl3TURzZ2RHRjRaWE1nUEMwZ016QmNibUJnWUNKOSAtLT5cblxuYGBgclxuaW5jb21lIDwtIDIwMDsgdGF4ZXMgPC0gMzBcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5jb21lIDwtIDIwMDsgdGF4ZXMgPC0gMzBcbmBgYCJ9 -->
+<pre class="r"><code>income &lt;- 200; taxes &lt;- 30</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>these will save as two separate variables -&gt; the semicolon acts as
+a line separator</p>
+<ol start="4" style="list-style-type: decimal">
+<li>What happens if you do two assignments on the same line? For
+example,</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVhVzVqYjIxbE1pQThMU0IwWVhobGN6SWdQQzBnTVRBd1hHNWdZR0FpZlE9PSAtLT5cblxuYGBgclxuaW5jb21lMiA8LSB0YXhlczIgPC0gMTAwXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5jb21lMiA8LSB0YXhlczIgPC0gMTAwXG5gYGAifQ== -->
+<pre class="r"><code>income2 &lt;- taxes2 &lt;- 100</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>this saves both variables with the same number</p>
+</div>
+</div>
+<div id="the-cornerstones-of-statistics" class="section level1">
+<h1>3. The cornerstones of statistics</h1>
+</div>
+<div id="exploratory-data-analysis-and-unsupervised-learning" class="section level1">
+<h1>4. Exploratory Data Analysis and Unsupervised Learning</h1>
+</div>
+<div id="dealing-with-messy-data" class="section level1">
+<h1>5. Dealing with messy data</h1>
+</div>
+<div id="r-programming" class="section level1">
+<h1>6. R programming</h1>
+</div>
+<div id="the-role-of-simulation-in-modern-statistics" class="section level1">
+<h1>7. The role of simulation in modern statistics</h1>
+</div>
+<div id="regression-models" class="section level1">
+<h1>8. Regression models</h1>
+</div>
+<div id="survival-analysis-and-censored-data" class="section level1">
+<h1>9. Survival analysis and censored data</h1>
+</div>
+<div id="structural-equation-models" class="section level1">
+<h1>10. Structural equation models</h1>
+</div>
+<div id="predictive-modeling-and-machine-learning" class="section level1">
+<h1>11. Predictive modeling and machine learning</h1>
+</div>
+<div id="advanced-topics" class="section level1">
+<h1>12. Advanced topics</h1>
+</div>
+<div id="debugging" class="section level1">
+<h1>13. Debugging</h1>
+</div>
+<div id="mathematical-appendix" class="section level1">
+<h1>14. Mathematical appendix</h1>
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2sgZm9sbG93aW5nIE1vZGVyblN0YXRpc3RpY3N3aXRoUi5jb20iDQphdXRob3I6IENhcm9saW5lIFNhbmljb2xhDQpkYXRlOiBKdW5lIDUsIDIwMjQNCm91dHB1dDogDQogIGh0bWxfbm90ZWJvb2s6DQogIHRvYzogdHJ1ZQ0KICB0b2NfZmxvYXQ6IHRydWUNCiAgdG9jX2RlcHRoOiAyDQogIG51bWJlcl9zZWN0aW9uczogdHJ1ZQ0KICB0aGVtZTogc2xhdGUNCiAgaGlnaGxpZ2h0OiBkZWZhdWx0DQplZGl0b3Jfb3B0aW9uczogDQogIG1hcmtkb3duOiANCiAgICB3cmFwOiA3Mg0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KGVjaG8gPSBUUlVFKQ0KYGBgDQoNCiMjIFIgTWFya2Rvd24NCg0KVGhpcyBpcyBhbiBSIE1hcmtkb3duIGRvY3VtZW50LiBNYXJrZG93biBpcyBhIHNpbXBsZSBmb3JtYXR0aW5nIHN5bnRheA0KZm9yIGF1dGhvcmluZyBIVE1MLCBQREYsIGFuZCBNUyBXb3JkIGRvY3VtZW50cy4gRm9yIG1vcmUgZGV0YWlscyBvbg0KdXNpbmcgUiBNYXJrZG93biBzZWUgPGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20+Lg0KDQpXaGVuIHlvdSBjbGljayB0aGUgKipLbml0KiogYnV0dG9uIGEgZG9jdW1lbnQgd2lsbCBiZSBnZW5lcmF0ZWQgdGhhdA0KaW5jbHVkZXMgYm90aCBjb250ZW50IGFzIHdlbGwgYXMgdGhlIG91dHB1dCBvZiBhbnkgZW1iZWRkZWQgUiBjb2RlDQpjaHVua3Mgd2l0aGluIHRoZSBkb2N1bWVudC4gWW91IGNhbiBlbWJlZCBhbiBSIGNvZGUgY2h1bmsgbGlrZSB0aGlzOg0KDQpgYGB7ciBjYXJzfQ0Kc3VtbWFyeShjYXJzKQ0KYGBgDQoNCiMjIEluY2x1ZGluZyBQbG90cw0KDQpZb3UgY2FuIGFsc28gZW1iZWQgcGxvdHMsIGZvciBleGFtcGxlOg0KDQpgYGB7ciBwcmVzc3VyZSwgZWNobz1GQUxTRX0NCnBsb3QocHJlc3N1cmUpDQpgYGANCg0KTm90ZSB0aGF0IHRoZSBgZWNobyA9IEZBTFNFYCBwYXJhbWV0ZXIgd2FzIGFkZGVkIHRvIHRoZSBjb2RlIGNodW5rIHRvDQpwcmV2ZW50IHByaW50aW5nIG9mIHRoZSBSIGNvZGUgdGhhdCBnZW5lcmF0ZWQgdGhlIHBsb3QuDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2sgZm9sbG93aW5nIE1vZGVyblN0YXRpc3RpY3N3aXRoUi5jb20iDQphdXRob3I6IENhcm9saW5lIFNhbmljb2xhDQpkYXRlOiBKdW5lIDUsIDIwMjQNCm91dHB1dDogDQogIGh0bWxfbm90ZWJvb2s6DQogIHRvYzogdHJ1ZQ0KICB0b2NfZmxvYXQ6IHRydWUNCiAgdG9jX2RlcHRoOiAyDQogIG51bWJlcl9zZWN0aW9uczogdHJ1ZQ0KICB0aGVtZTogc2xhdGUNCiAgaGlnaGxpZ2h0OiBkZWZhdWx0DQplZGl0b3Jfb3B0aW9uczogDQogIG1hcmtkb3duOiANCiAgICB3cmFwOiA3Mg0KLS0tDQoNCiMgMi4gVGhlIEJhc2ljcw0KLSBmb3IgUiwgdGhlIGJlc3QgYXBwbGljYXRpb24gdG8gdXNlIGlzIFJTdHVkaW8gd2hpY2ggeW91IG5lZWQgdG8gZG93bmxvYWQgaW4gYWRkaXRpb24gdG8gdGhlIGxhbmd1YWdlIFINCi0gd2hlbiB1c2luZyBSIG5vdGVib29rcywgeW91IGNhbiBpbnNlcnQgY29kZSBjaHVua3MgKHVzZSBgY3RybCArIGFsdCArIGlgIHRvIGluc2VydCBmb3Igd2luZG93cykNCg0KYGBge3J9DQojIHNjcmlwdHMgY2FuIHVzZSBlaXRoZXIganVzdCBvbmUgbGluZSBvZiBjb2RlDQoxKzENCiMgb3IgbXVsdGlwbGUgbGluZXMgb2YgY29kZQ0KMioyDQoxKzIqMy01DQpgYGANCi0gdGhlIG1haW4gdHdvIGNvbmNlcHRzIGZvciBSIGFyZSAqKnZhcmlhYmxlcyoqICh3aGljaCBhcmUgdXNlZCBmb3Igc3RvcmluZyBkYXRhKSBhbmQgKipmdW5jdGlvbnMqKiAodXNlZCBmb3IgZG9pbmcgdGhpbmdzIHdpdGggdGhlIGRhdGEpDQpgYGB7cn0NCiMgdG8gc3RvcmUgZGF0YSBpbiBSIHlvdSBkbyB0aGUgYmVsb3cgdG8gYSB2YXJpYWJsZSBuYW1lDQp4IDwtIDQNCiMgKHNob3J0Y3V0IGZvciB0aGUgYDwtYCBpcyBgYWx0ICsgLWApDQpgYGANCi0gb25jZSBkYXRhIGlzIHN0b3JlZCBpbiBhIHZhcmlhYmxlIG5hbWUsIHRoZW4geW91IGNhbiBkbyB0aGluZ3Mgd2l0aCB0aGF0IHZhcmlhYmxlL2RhdGENCmBgYHtyfQ0KeCArIHgNCmBgYA0KLSBSIGlzIGNhc2Ugc2Vuc2l0aXZlIGZvciBzdG9yaW5nIHZhcmlhYmxlcyBzbyB0aGUgYmVsb3cgYXJlIGFsbCBkaWZmZXJlbnQgdmFyaWFibGVzIHRoYXQgY2FuIGJlIHVzZWQgdG8gc3RvcmUgZGF0YToNCmBgYHtyfQ0KbXlfdmFyaWFibGUgPC0gNQ0KTVlfVkFSSUFCTEUgPC0gNg0KTXlfVmFyaWFibGUgPC0gNw0KYGBgDQoNCi0gdmFyaWFibGVzIGFyZW4ndCBzdG9yZWQgaWYgdGhlcmUgYXJlIHNwYWNlcyBpbiB0aGUgbmFtZSBvciBzcGVjaWFsIGNoYXJhY3RlcnMgDQoNCi0gdG8gdHVybiBtdWx0aXBsZSBsaW5lcyBpbnRvIGNvbW1lbnRzLCB5b3UgY2FuIHVzZSB0aGUgc2hvcnRjdXQ6IGBDdHJsICsgU2hpZnQgKyBDYA0KDQojIyBFeGVyY2lzZQ0KMS4gV2hhdCBoYXBwZW5zIGlmIHlvdSB1c2UgYW4gaW52YWxpZCBjaGFyYWN0ZXIgaW4gYSB2YXJpYWJsZSBuYW1lPw0KDQpuZXQgaW5jb21lIDwtIGluY29tZSAtIHRheGVzDQpuZXQtaW5jb21lIDwtIGluY29tZSAtIHRheGVzDQpjYSRoIDwtIGluY29tZSAtIHRheGVzDQoNCnRoZXNlIHdpbGwgYWxsIGp1c3QgdGhyb3cgZXJyb3JzIGFuZCB3b24ndCBsZXQgeW91IHNhdmUgdGhlIHZhcmlhYmxlcyANCg0KMi4gV2hhdCBoYXBwZW5zIGlmIHlvdSBwdXQgUiBjb2RlIGFzIGEgY29tbWVudD8gRm9yIGV4YW1wbGUsDQpgYGB7cn0NCmluY29tZSA8LSAxMDANCnRheGVzIDwtIDIwDQpuZXRfaW5jb21lIDwtIGluY29tZSAtIHRheGVzDQojIGdyb3NzX2luY29tZSA8LSBuZXRfaW5jb21lICsgdGF4ZXMNCmBgYA0KdGhlIHZhcmlhYmxlIGNvbW1lbnRlZCBvdXQgd2lsbCBub3Qgc2hvdyB1cCBpbiB0aGUgZW52aXJvbm1lbnQgYmVjYXVzZSBpdCBpc24ndCBiZWluZyBzYXZlZCBhcyBhIHVzZWFibGUgdmFyaWFibGUNCg0KMy4gV2hhdCBoYXBwZW5zIGlmIHlvdSByZW1vdmUgYSBsaW5lIGJyZWFrIGFuZCByZXBsYWNlIGl0IGJ5IGEgc2VtaWNvbG9uIDs/IEZvciBleGFtcGxlLA0KYGBge3J9DQppbmNvbWUgPC0gMjAwOyB0YXhlcyA8LSAzMA0KYGBgDQp0aGVzZSB3aWxsIHNhdmUgYXMgdHdvIHNlcGFyYXRlIHZhcmlhYmxlcyAtPiB0aGUgc2VtaWNvbG9uIGFjdHMgYXMgYSBsaW5lIHNlcGFyYXRvciANCg0KNC4gV2hhdCBoYXBwZW5zIGlmIHlvdSBkbyB0d28gYXNzaWdubWVudHMgb24gdGhlIHNhbWUgbGluZT8gRm9yIGV4YW1wbGUsDQpgYGB7cn0NCmluY29tZTIgPC0gdGF4ZXMyIDwtIDEwMA0KYGBgDQp0aGlzIHNhdmVzIGJvdGggdmFyaWFibGVzIHdpdGggdGhlIHNhbWUgbnVtYmVyIA0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQojIDMuIFRoZSBjb3JuZXJzdG9uZXMgb2Ygc3RhdGlzdGljcw0KDQoNCiMgNC4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcyBhbmQgVW5zdXBlcnZpc2VkIExlYXJuaW5nDQoNCiMgNS4gRGVhbGluZyB3aXRoIG1lc3N5IGRhdGEgDQoNCiMgNi4gUiBwcm9ncmFtbWluZw0KDQojIDcuIFRoZSByb2xlIG9mIHNpbXVsYXRpb24gaW4gbW9kZXJuIHN0YXRpc3RpY3MNCg0KIyA4LiBSZWdyZXNzaW9uIG1vZGVscyANCg0KIyA5LiBTdXJ2aXZhbCBhbmFseXNpcyBhbmQgY2Vuc29yZWQgZGF0YSANCg0KIyAxMC4gU3RydWN0dXJhbCBlcXVhdGlvbiBtb2RlbHMNCg0KIyAxMS4gUHJlZGljdGl2ZSBtb2RlbGluZyBhbmQgbWFjaGluZSBsZWFybmluZw0KDQojIDEyLiBBZHZhbmNlZCB0b3BpY3MgDQoNCiMgMTMuIERlYnVnZ2luZw0KDQojIDE0LiBNYXRoZW1hdGljYWwgYXBwZW5kaXgNCg0K</div>
 
 
 
