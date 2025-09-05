@@ -78,30 +78,1122 @@ income2 <- taxes2 <- 100
 this saves both variables with the same number 
 
 
+- in R, `c` stands for _combine_ and so its used to combine data into a vector (aka a list)
+```{r}
+age <- c(28, 48, 47, 71, 22, 80, 48, 30, 31)
+purchase <- c(20, 59, 2, 12, 22, 160, 34, 34, 29)
+```
+- the numbers in the vector are referred to as `elements` and you can reference any of the elements in the vector in many different ways
+
+- you can also combine multiple vectors into a dataframe using the `data.frame` #function
+```{r}
+bookstore <- data.frame(age, purchase)
+bookstore
+```
+
+## Exercise
+1. Create two vectors, height and weight, containing the heights and weights of five fictional people (i.e., just make up some numbers!).
+```{r}
+height <- c(61, 62, 60, 65, 65, 63, 70)
+weight <- c(120, 200, 220, 200, 195, 200, 210)
+```
+
+2. Combine your two vectors into a data frame.
+```{r}
+height_weight <- data.frame(height, weight)
+height_weight
+```
+
+3. Try creating a vector using x <- 1:5. What happens? What happens if you use 5:1 instead? How can you use this notation to create the vector (1,2,3,4,5,4,3,2,1)?
+```{r}
+x <- 1:5 # this creates a vector with numbers 1 through 5
+x
+y <- 5:1 # this creates a vector with numbers 5 through 1 in reverse order
+y
+
+z <- c(1:5, 4:1) # need to start the second part at 4 or else would have duplicate 5's
+z
+```
+
+- the default for performing a function in R is **function_name**(**variable_name**)
+```{r}
+mean(age)
+```
+
+- some functions have **arguments** (aka parameters) that can control the function
+  - ex: the `cor` function (which compute correlation) has an argument of which method you want to use to compute the correlation
+    - #correlation = the measure of dependence between two variables which ranges from strong negative dependence (-1) to strong positive dependence (1) or no dependence (0)
+```{r}
+cor(age, purchase) # the default method is pearson
+cor(age, purchase, method = "spearman") # but the method argument lets you specify if you want to calculate using another way
+
+```
+- by running `?cor`, we can see the different arguments and details of the function and see what other methods or versions we can use 
+
+## Exercise
+1. Compute the mean height of the people.
+```{r}
+mean(height)
+```
+
+2. Compute the correlation between height and weight.
+```{r}
+cor(height, weight)
+```
+
+3. Read the documentation for the function `length`. What does it do? Apply it to your `height` vector.
+```{r}
+?length # this will return the number of variables in a vector
+length(height) 
+```
+
+4. Read the documentation for the function `sort`. What does it do? What does the argument `decreasing` (the values of which can be either `FALSE` or `TRUE`) do? Apply the function to your `weight` vector.
+```{r}
+?sort # sorts the order of a vector by either ascending or descending order
+sort(weight)
+sort(weight, decreasing = TRUE) # the decreasing argument is logical and is asking if the sorting should be done in increasing or decreasing order; by default it is sorted by ascending
+```
+- there are a whole list of mathematical operations that can be used in R:
+  - `abs(x)`: computes the absolute value |x|.
+  - `sqrt(x)`: computes  √x .
+  - `log(x)`: computes the logarithm of x  with the natural number e as the base.
+  - `log(x, base = a)`: computes the logarithm of x with the number a as the base.
+  - `a^x`: computes  ax .
+  - `exp(x)`: computes  ex .
+  - `sin(x)`: computes  sin(x) .
+  - `sum(x)`: when x is a vector x=(x1,x2,x3,…,xn), computes the sum of the elements of x: ∑ni=1xi.
+  - `prod(x)`: when x is a vector x=(x1,x2,x3,…,xn), computes the product of the elements of x: ∏ni=1xi.
+  - `pi`: a built-in variable with value π, the ratio of the circumference of a circle to its diameter.
+  - `x %% a`: computes x modulo a.
+  - `factorial(x)`: computes x!.
+  - `choose(n,k)`: computes (nk).
+
+## Exercise
+1. √π
+```{r}
+sqrt(pi)
+```
+
+2. e2⋅log(4)
+```{r}
+exp(2) * log(4)
+```
+
+R will return non-numerical answers if you try to perform computations where the answer is infinite or undefined. Try the following to see some possible results:
+1. Compute 1/0.
+```{r}
+1/0
+```
+2. Compute 0/0.
+```{r}
+0/0
+```
+
+3. Compute √−1.
+```{r}
+sqrt(-1)
+```
+
+- #packages are collections of functions and datasets that add new features to the base R
+  - most packages are available from CRAN which is the official R repo
+  - some of the most important packages used are:
+    - `ggplot2`
+  
+```{r}
+install.packages('ggplot2')
+library(ggplot2)
+```
+
+## Exercise
+1. Install the palmerpenguins package from CRAN. We’ll use it for many of the exercises and examples that follow.
+```{r}
+install.packages('palmerpenguins')
+library(palmerpenguins)
+```
+
+- the `msleep` package has a dataset describing the sleep times of 83 mammals
+```{r}
+msleep
+View(msleep) # this will show us the dataframe in a separate window within Rstudio so we can see the entire dataset 
+```
+
+- the baseline for finding info about the dataframe is by using the below
+```{r}
+head(msleep) # shows the first few rows of the dataframe
+tail(msleep) # shows the last few rows of the dataframe
+dim(msleep) # shows how big the dataframe is (rows x columns)
+str(msleep) # returns info about the dataframe like column name, data type, how many rows of data, sample of types of data in each column
+names(msleep) # returns a vector of the names of the variables in the dataframe (column names)
+```
+
+- to see a quick descriptive summary of the data (including summary info for the numeric columns), you can use the `summary()` function
+```{r}
+summary(msleep)
+```
+
+- to access a particular column of data in a dataframe, you use the dollar sign in between the name of the data and the column you are referencing and then from that can run descriptive statistics on that column of data:
+```{r}
+msleep$sleep_total
+
+mean(msleep$sleep_total)      # Mean
+median(msleep$sleep_total)    # Median
+max(msleep$sleep_total)       # Max
+min(msleep$sleep_total)       # Min
+sd(msleep$sleep_total)        # Standard deviation
+var(msleep$sleep_total)       # Variance
+quantile(msleep$sleep_total)  # Various quantiles
+```
+- To see how many animals sleep for more than 8 hours a day, we can use the following:
+```{r}
+sum(msleep$sleep_total > 8)   # Frequency (count)
+mean(msleep$sleep_total > 8)  # Relative frequency (proportion)
+```
+
+- if there are missing values in any of the columns, we can add the argument `na.rm = TRUE` which will ignore the `NA` values in the dataframe 
+```{r}
+mean(msleep$sleep_rem, na.rm = TRUE)
+```
+- if we want to find the correlation and still ignore `NA` values, we need to use a different argument:
+```{r}
+cor(msleep$sleep_total, msleep$sleep_rem, use = "complete.obs")
+```
+
+- if we want to look at categorical values and see that summary data, we can create a table that shows the frequency of the variables in each column that we want to look at 
+```{r}
+table(msleep$vore)
+```
+- we can also see the proportions of the variables in the columns (how much percent of the whole do each variable represent)
+```{r}
+proportions(table(msleep$vore))
+```
+
+- if there are two variables we want to compare to one another, we can use the below options for viewing the comparison:
+```{r}
+# Counts:
+table(msleep$vore, msleep$conservation)
+
+# Proportions, per row:
+proportions(table(msleep$vore, msleep$conservation),
+            margin = 1)
+
+# Proportions, per column:
+proportions(table(msleep$vore, msleep$conservation),
+            margin = 2)
+
+# Proportions, out of total:
+proportions(table(msleep$vore, msleep$conservation))
+```
+
+## Exercise
+Load the `palmerpenguins` package that you installed in Exercise 2.10, using `library(palmerpenguins)`. In this exercise, we’ll study the `penguins` dataset contained in said package.
+
+1. View the documentation for the penguins data and read about its variables.
+```{r}
+?penguins
+```
+
+2. Check the data structures: how many observations and variables and what type of variables (numeric, categorical, etc.) are there?
+```{r}
+summary(penguins)
+str(penguins)
+```
+
+3. Compute summary statistics (means, median, min, max, counts for categorical variables). Are there any missing values?
+```{r}
+table(penguins$species)
+table(penguins$island)
+table(penguins$sex)
+```
+
+- for plotting our data, there are 3 elements of graphing that we can focus on:
+  - **data** - the observations of the dataset
+  - **aesthetics** - the mappings of the data like axes and sizes of the points
+  - **geoms** - the geometric aspects of the plot like the lines or points
+  
+```{r}
+# the most basic version of a plot:
+plot(msleep$sleep_total, msleep$sleep_rem)
+```
+
+```{r}
+# now if we want to add further customization using the ggplot2 package:
+ggplot(msleep, # this is the data we will be using for the plot
+       aes(sleep_total, sleep_rem, # we will specifically be looking at sleep_total on the x and sleep_rem on the y axis
+           colour = vore)) + # the colors of the points will be by vore and a legend will be added for this
+  geom_point() + # the type of graph we are creating is a point plot
+  labs(
+    title = "Total Sleep Time vs Rem Sleep", # this will give us a title on our graph
+    subtitle = "Using the msleep data", # this creates a subtitle on the graph
+    x = "Total sleep time (h)", # this renames the x axis
+    y = "Rem sleep (h)", # this renames the y axis
+    colour = "Feeding Behavior" # this renames the legend
+    )
+```
 
 
+## Exercise 
+1. Create a scatterplot with bill length along the x-axis and flipper length along the y-axis. Change the x-axis label to read “Bill length (mm)” and the y-axis label to “Flipper length (mm)”. Use species to set the colour of the points.
+```{r}
+ggplot(penguins, aes(bill_length_mm, flipper_length_mm, colour = species)) +
+  geom_point() +
+  labs(
+    x = "Bill length (mm)",
+    y = "Flipper length (mm)"
+  )
+```
+
+2. Try adding the argument alpha = 1 to geom_point, i.e., geom_point(alpha = 1). Does anything happen? Try changing the 1 to 0.75 and 0.25 and see how that affects the plot.
+```{r}
+ggplot(penguins, aes(bill_length_mm, flipper_length_mm, colour = species)) +
+  geom_point(alpha = 0.25) + # changing the alpha changes the transparency of the points on the plot
+  labs(
+    x = "Bill length (mm)",
+    y = "Flipper length (mm)"
+  )
+```
+
+```{r}
+?shape
+```
+
+3. Change the scatterplot from Exercise 2.13 so that animals from different islands are represented by different shapes.
+```{r}
+ggplot(penguins, aes(bill_length_mm, flipper_length_mm, colour = species)) +
+  geom_point(alpha = 1,
+             aes(shape = island) # now the shape of the points will differ depending on the island variable
+             ) + 
+  labs(
+    x = "Bill length (mm)",
+    y = "Flipper length (mm)"
+  )
+```
 
 
+4. Then change it so that the size of each point is determined by the body mass, i.e., the variable body_mass_g.
+```{r}
+ggplot(penguins, aes(bill_length_mm, flipper_length_mm, colour = species)) +
+  geom_point(alpha = 1,
+             aes(shape = island,
+                 size = body_mass_g)) + # now the size is based on body mass
+  labs(
+    x = "Bill length (mm)",
+    y = "Flipper length (mm)"
+  )
+```
+
+- for values that are outside the scope of what we want to look at, we can set axis limits
+```{r}
+ggplot(msleep, aes(brainwt, sleep_total, colour = vore)) + 
+      geom_point() +
+      labs(x = "Brain weight",
+           y = "Total sleep time")
+# too much of the data from this plot is hugging the left axis
+
+ggplot(msleep, aes(brainwt, sleep_total, colour = vore)) + 
+      geom_point() +
+      labs(x = "Brain weight",
+           y = "Total sleep time") +
+      xlim(0, 1.5) # now we can remove the extreme outliers and see the plot better
+```
+
+- by adding **log transformations** to the data, we can see the plot even better 
+```{r}
+ggplot(msleep, aes(log(brainwt), sleep_total, colour = vore)) + 
+      geom_point() +
+      labs(x = "log(Brain weight)",
+           y = "Total sleep time")
+```
+
+```{r}
+options(scipen = 1000) # this controls the scientific notion view of the x axis so we can see what the numbers are
+ggplot(msleep, aes(brainwt, sleep_total, colour = vore)) + 
+      geom_point() +
+      labs(x = "Brain weight (logarithmic scale)",
+           y = "Total sleep time") +
+      scale_x_log10() # now transforming the log10, we can see the values a lot better
+```
 
 
+## Exercise
+1. Using the msleep data, create a plot of log-transformed body weight versus log-transformed brain weight. Use total sleep time to set the colours of the points. Change the text on the axes to something informative.
+```{r}
+ggplot(msleep, aes(bodywt, brainwt, colour = sleep_total)) +
+  geom_point() +
+  labs(
+    x = "Body Weight (logarithmic scale)",
+    y = "Brain Weight (logarithmic scale)"
+  ) +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+- #facetting = creating a grid of plots corresponding to the different groups 
+  - adding the function `facet_wrap()` does this in ggplots
+```{r}
+ggplot(msleep, aes(brainwt, sleep_total)) +
+  geom_point() +
+  labs(x = "Brain weight (logarithmic scale)",
+       y = "Total sleep time") +
+  scale_x_log10() +
+  facet_wrap(~ vore) # this means that for each unique `vore` there will be a different graph of plots
+```
+
+## Exercise
+1. Create a scatterplot with bill_length_mm along the x-axis and flipper_length_mm along the y-axis, facetted by species.
+```{r}
+ggplot(penguins, aes(bill_length_mm, flipper_length_mm)) +
+  geom_point() +
+  labs(x = "Bill length (mm)",
+       y = "Flipper length (mm)") +
+  facet_wrap(~ species)
+```
+
+2. Read the documentation for facet_wrap (?facet_wrap). How can you change the number of rows in the plot grid? Create the same plot as in part 1, but with 2 rows.
+```{r}
+?facet_wrap
+```
+```{r}
+ggplot(penguins, aes(bill_length_mm, flipper_length_mm)) +
+  geom_point() +
+  labs(x = "Bill length (mm)",
+       y = "Flipper length (mm)") +
+  facet_wrap(~ species,
+             nrow = 2)
+```
+
+- box-and-whisker plots (aka boxplots) are good for comparing groups 
+```{r}
+# Base R:
+boxplot(sleep_total ~ vore, data = msleep)
+
+# ggplot2:
+ggplot(msleep, aes(vore, sleep_total)) +
+  geom_boxplot()
+```
+
+- the information we are able to get from boxplots:
+  - *Median*: thick black line inside the box
+  - *First quartile*: bottom of the box
+  - *Third quartile*: top of the box
+  - *Minimum*: end of the line ("whisker") that extends from the bottom of the box
+  - *Maximum*: end of the line that extends from the top of the box
+  - *Outliers*: observations that deviate too much from the rest are shown as separate points. These outliers are not included in the computation of the median, quartiles and the extremes
+  
+## Exercise
+Using the penguins data, do the following:
+1. Create boxplots of bill lengths, grouped by species.
+```{r}
+ggplot(penguins, aes(species, bill_length_mm)) +
+  geom_boxplot()
+```
+
+2. Read the documentation for geom_boxplot. How can you change the colours of the boxes and their outlines?
+```{r}
+?geom_boxplot
+# colors are changes:
+# geom_boxplot(fill = "white", colour = "red")
+```
+
+3. Add geom_jitter(size = 0.5, alpha = 0.25) to the plot. What happens?
+```{r}
+ggplot(penguins, aes(species, bill_length_mm)) +
+  geom_boxplot() +
+  geom_jitter(size = 0.5, alpha = 0.25) # this is now going to add the points that are being summarized in the boxplot
+```
+
+- histograms are ways to show distributions of continuous variables by binning them and seeing the number of observations in each bin
+```{r}
+# Base R:
+hist(msleep$sleep_total)
+
+# ggplot2:
+ggplot(msleep, aes(sleep_total)) +
+  geom_histogram()
+```
+
+## Exercise
+Using the penguins data, do the following:
+1. Create a histogram of bill lengths.
+```{r}
+ggplot(penguins, aes(bill_length_mm)) +
+  geom_histogram()
+```
+
+2. Create histograms of bill lengths for different species, using facetting.
+```{r}
+ggplot(penguins, aes(bill_length_mm)) +
+  geom_histogram() +
+  facet_wrap(~ species)
+```
+
+3. Add a suitable argument to geom_histogram to add black outlines around the bars
+```{r}
+ggplot(penguins, aes(bill_length_mm)) +
+  geom_histogram(colour = "black")
+```
+
+- bar charts are mostly used for categorical variables and their counts 
+```{r}
+# Base R:
+barplot(table(msleep$vore))
+
+# ggplot2:
+ggplot(msleep, aes(vore)) +
+  geom_bar()
+```
+
+- for stacked bar charts, ggplot2 is better for that and is done using `factor(1)` in the `aes()` function
+```{r}
+ggplot(msleep, aes(factor(1), fill = vore)) +
+  geom_bar()
+```
+
+## Exercise
+Using the penguins data, do the following:
+1. Create a bar chart of species.
+```{r}
+ggplot(penguins, aes(species)) +
+  geom_bar()
+```
+
+2. Add different colours to the bars by adding a fill argument to geom_bar.
+```{r}
+ggplot(penguins, aes(species)) +
+  geom_bar(fill = "purple")
+```
+
+3. Check the documentation for geom_bar. How can you decrease the width of the bars?
+```{r}
+ggplot(penguins, aes(species)) +
+  geom_bar(fill = "purple", width = 0.5)
+```
+
+4. Return to the code you used for part 1. Add fill = sex to the aes. What happens?
+```{r}
+ggplot(penguins, aes(species, fill = sex)) +
+  geom_bar()
+```
 
 
+5. Next, add position = "dodge" to geom_bar. What happens?
+```{r}
+ggplot(penguins, aes(species, fill = sex)) +
+  geom_bar(position = "dodge") # this will have the "sex" types as bars side by side for the species instead of stacked 
+```
+
+6. Add coord_flip() to the plot. What happens?
+```{r}
+ggplot(penguins, aes(species, fill = sex)) +
+  geom_bar(position = "dodge") +
+  coord_flip() # this is now going to make the graph horizontal instead of vertical
+```
+
+- now the important part is saving the plots which you can save as a variable name
+```{r}
+myPlot <- ggplot(msleep, aes(sleep_total, sleep_rem)) +
+  geom_point()
+```
+
+- you can even add additional elements to the plot even after you save it
+```{r}
+myPlot + labs(x = "I forgot to add a label!")
+```
+
+- then to save the image itself, use the function `ggsave` and you can even use the option width and height arguments to specify the size
+```{r}
+ggsave("sample_plot.jpg", myPlot, width = 5, height = 5)
+```
 
 
+R has six basic data types. For most people, it suffices to know about the first three in the list below:
+- *numeric*: numbers like 1 and 16.823 (sometimes also called double).
+- *logical*: true/false values (Boolean): either TRUE or FALSE.
+- *character*: text, e.g., "a", "Hello! I'm Ada." and "name@domain.com".
+- *integer*: integer numbers, denoted in R by the letter L: 1L, 55L.
+- *complex*: complex numbers, like 2+3i. Rarely used in statistical work.
+- *raw*: used to hold raw bytes.
+
+- using the `class()` function, you can see what the data type of any variable is:
+```{r}
+x <- 6
+y <- "Scotland"
+z <- TRUE
+
+class(x)
+class(y)
+class(z)
+
+numbers <- c(6, 9, 12)
+class(numbers)
+
+all_together <- c(x, y, z)
+all_together
+class(all_together)
+```
+
+- not only are there different data types but there are different ways to store data:
+  - *matrix*: a table where all columns must contain objects of the same type (e.g., all numeric or all character). Uses less memory than other types and allows for much faster computations, but it is difficult to use for certain types of data manipulation, plotting and analyses.
+  - *data.frame*: the most common type, where different columns can contain different types (e.g., one numeric column, one character column).
+  - *data.table*: an enhanced version of data.frame.
+  - *tbl_df* (“tibble”): another enhanced version of data.frame.
+
+```{r}
+# First, an example of data stored in a matrix:
+?WorldPhones
+class(WorldPhones)
+View(WorldPhones)
+
+# Next, an example of data stored in a data frame:
+?airquality
+class(airquality)
+View(airquality)
+
+# Finally, an example of data stored in a tibble:
+library(ggplot2)
+?msleep
+class(msleep)
+View(msleep)
+```
+
+- there are ways to convert objects into other types
+```{r}
+WorldPhonesDF <- as.data.frame(WorldPhones)
+class(WorldPhonesDF)
+
+airqualityMatrix <- as.matrix(airquality)
+class(airqualityMatrix)
+```
+
+## Exercise
+1. Create a text variable using, e.g., a <- "A rainy day in Edinburgh". Check that it gets the correct type. What happens if you use single quotes marks instead of double quotes when you create the variable?
+```{r}
+text_variable <- "This is a test"
+class(text_variable) # character
+
+text_variable_2 <- 'Using single quotes now' # no difference using single or double quotes
+class(text_variable_2) # character
+```
+
+2. What data types are the sums 1 + 2, 1L + 2 and 1L + 2L?
+```{r}
+sum_1 <- 1 + 2 
+sum_2 <- 1L + 2
+sum_3 <- 1L + 2L
+
+class(sum_1) # numeric
+class(sum_2) # numeric
+class(sum_3) # integer
+```
+
+3. What happens if you add a numeric to a character, e.g., "Hello" + 1?
+```{r}
+test_1 <- "Hello" + 1
+
+class(test_1) # error
+```
+
+4. What happens if you perform mathematical operations involving a numeric and a logical, e.g., FALSE * 2 or TRUE + 1?
+```{r}
+test_2 <- FALSE * 2
+test_3 <- TRUE + 1
+
+class(test_2) # numeric
+class(test_3) # numeric
+```
+
+5. What do the functions ncol, nrow, dim, names, and row.names return when applied to a data frame?
+```{r}
+ncol(WorldPhonesDF) # number of columns
+nrow(WorldPhonesDF) # number of rows
+dim(WorldPhonesDF) # dimension of the dataframe (rows x columns)
+names(WorldPhonesDF) # column names
+row.names(WorldPhonesDF) # row names (from the first column)
+```
+
+6. matrix tables can be created from vectors using the function of the same name. Using the vector x <- 1:6 use matrix to create the following matrices: 
+```{r}
+?matrix
+```
 
 
+```{r}
+x <- 1:6
+matrix_1 <- matrix(data = x,
+                   nrow = 2,
+                   ncol = 3)
+class(matrix_1)
+matrix_1
+
+matrix_2 <- matrix(data = x,
+                   nrow = 3,
+                   ncol = 2)
+class(matrix_2)
+matrix_2
+```
+
+- accessing vectors/variables in a dataframe is done in the following way with square brackets, depending on how you want to pull the data
+```{r}
+airquality$Temp[5]
+
+# First, we check the order of the columns:
+names(airquality)
+# We see that Temp is the 4th column.
+
+airquality[5, 4]    # The 5th element from the 4th column,
+                    # i.e. the same as airquality$Temp[5]
+airquality[5,]      # The 5th row of the data
+airquality[, 4]     # The 4th column of the data, like airquality$Temp
+airquality[[4]]     # The 4th column of the data, like airquality$Temp
+airquality[, c(2, 4, 6)] # The 2nd, 4th and 6th columns of the data
+airquality[, -2]    # All columns except the 2nd one
+airquality[, c("Temp", "Wind")] # The Temp and Wind columns
+```
+
+## Exercise
+1. Why does airquality[, 3] not return the third row of airquality?
+- because the second part of the brackets after the comma is for column (before is for row)
+2. Extract the first five rows from airquality. Hint: a fast way of creating the vector c(1, 2, 3, 4, 5) is to write 1:5.
+```{r}
+airquality[1:5, ]
+```
+
+3. Compute the correlation between the Temp and Wind vectors of airquality without referring to them using $.
+```{r}
+cor(airquality[,3:4])
+cor(airquality[,3], airquality[,4])
+cor(airquality[,"Wind"], airquality[,"Temp"])
+```
+
+4. Extract all columns from airquality except Temp and Wind.
+```{r}
+airquality[, -c(3, 4)]
+```
+
+- you can also use the dollar sign to manipulate data already in a dataframe (because you know exactly where it is located so can insert that way)
+```{r}
+age <- c(28, 48, 47, 71, 22, 80, 48, 30, 31)
+purchase <- c(20, 59, 2, 12, 22, 160, 34, 34, 29)
+bookstore <- data.frame(age, purchase)
+```
+
+```{r}
+bookstore$age[2] <- 18
+# or
+bookstore[2, 1] <- 18
+bookstore
+```
+
+```{r}
+bookstore$age <- bookstore$age * 12
+bookstore
+
+bookstore$age <- bookstore$age / 12
+bookstore
+```
+```{r}
+bookstore$visit_length <- c(5, 2, 20, 22, 12, 31, 9, 10, 11)
+bookstore
+```
 
 
+## Exercise 
+Use the bookstore data frame to do the following:
+1. Add a new variable rev_per_minute which is the ratio between purchase and the visit length.
+```{r}
+bookstore$rev_per_minute <- bookstore$purchase / bookstore$visit_length
+bookstore
+```
+
+2. Oh no, there’s been an error in the data entry! Replace the purchase amount for the 80-year-old customer with 16.
+```{r}
+bookstore$age[6] <- 16
+bookstore
+```
+
+- not only can you do calculations on columns of data but also can find values within the column (like what is the max and min value)
+```{r}
+which.max(airquality$Temp) # this is asking what is the maximum volume in this column; will return what the index value of the first column is so in this case: day 120
+
+airquality[120, ] # then we can pull the rest of the values in the row now that we know what the first value is
+
+airquality[which.max(airquality$Temp),] # this is the way to do it all in one line
+```
+
+- you can also use the `subset()` function 
+  - in this example, we are using the subset to create a subset of the data where the temperature is above 90 meaning these are the hottest days
+```{r}
+airquality_hotdays <- subset(airquality, Temp > 90)
+airquality_hotdays
+```
+  
+- below are samples of the operators that can be used with the data in R
+```{r}
+a <- 3
+b <- 8
+
+a == b     # Check if a equals b
+a > b      # Check if a is greater than b
+a < b      # Check if a is less than b
+a >= b     # Check if a is equal to or greater than b
+a <= b     # Check if a is equal to or less than b
+a != b     # Check if a is not equal to b
+is.na(a)   # Check if a is NA
+a %in% c(1, 4, 9) # Check if a equals at least one of 1, 4, 9
+```
+
+- other functions that act as ways to index the data are:
+```{r}
+which(airquality$Temp > 90) # returns the indices of the elements that match the condition
+all(airquality$Temp > 90) # returns TRUE or FALSE depends on if all the values in that column match the condition
+any(airquality$Temp > 90) # this will return TRUE or FALSE depends if any of the values match the condition
+sum(airquality$Temp > 90) # this is going to return the sum of all the numbers in this column
+```
+- other important operators are `&` (AND), `|` (OR) and `xor` (exclusive, or XOR):
+```{r}
+a <- 3
+b <- 8
+
+# Is a less than b and greater than 1?
+a < b & a > 1
+
+# Is a less than b and equal to 4?
+a < b & a == 4
+
+# Is a less than b and/or equal to 4?
+a < b | a == 4
+
+# Is a equal to 4 and/or equal to 5?
+a == 4 | a == 5
+
+# Is a less than b XOR equal to 4?
+# I.e. is one and only one of these satisfied?
+xor(a < b, a == 4)
+```
+
+## Exercise
+The following tasks all involve checking conditions for the airquality data:
+1. Which was the coldest day during the period?
+```{r}
+which.min(airquality$Temp) 
+# day 5
+```
+
+2. How many days was the wind speed greater than 17 mph?
+```{r}
+sum(airquality$Wind > 17)
+# 3 days 
+```
+
+3. How many missing values are there in the Ozone vector?
+```{r}
+sum(is.na(airquality$Ozone))
+# 37 missing values 
+```
+
+4. How many days are there where the temperature was below 70 and the wind speed was above 10?
+```{r}
+sum(airquality$Temp < 70 & airquality$Wind > 10)
+# 22 days
+```
+
+5. The function `cut` can be used to create a categorical variable from a numerical variable, by dividing it into categories corresponding to different intervals. Read its documentation and then create a new categorical variable in the `airquality` data, `TempCat`, which divides `Temp` into three intervals `(50, 70]`, `(70, 90]`, `(90, 110]`.
+```{r}
+airquality$TempCat <- cut(airquality$Temp, 
+                          breaks = c(50, 70, 90, 110))
+airquality
+```
+
+- the `aggregate()` function is used to create grouped summaries of the data 
+```{r}
+aggregate(Temp ~ Month, data = airquality, FUN = mean) # `FUN` is which function we are using to compute the data with; here it is mean
+aggregate(cbind(Temp, Wind) ~ Month, data = airquality, FUN = sd) # here we are computing standard deviation
+```
+
+- using `length` for `FUN`, we can see how many observations are in the group; aka how many months days are being returned for each month for the below example (it returns the length of the vector that is created with the aggregate function)
+```{r}
+aggregate(Temp ~ Month, data = airquality, FUN = length)
+```
+
+- another function that is used for group summaries is `by` which just makes the output nicer 
+```{r}
+by(airquality$Temp, airquality$Month, mean)
+```
+
+- it works better than aggregate for functions that want to take more than one variable
+```{r}
+names(airquality) # to check which columns the Wind (3) and Temp (4) are
+by(airquality[ , 3:4], airquality$Month, cor)
+```
+
+## Exercise
+Install the `datasauRus` package using `install.packages("datasauRus")` (note the capital R!). It contains the dataset `datasaurus_dozen`. Check its structure and then do the following:
+1. Compute the mean of x, mean of y, standard deviation of x, standard deviation of y, and correlation between x and y, grouped by dataset. Are there any differences between the 12 datasets?
+```{r}
+install.packages('datasauRus')
+library(datasauRus)
+?datasaurus_dozen
+```
+```{r}
+mean(datasaurus_dozen$x)
+mean(datasaurus_dozen$y)
+
+sd(datasaurus_dozen$y)
+by(datasaurus_dozen[ , 2:3], datasaurus_dozen$dataset, cor)
+```
+
+2. Make a scatterplot of x against y for each dataset (use facetting!). Are there any differences between the 12 datasets?
+```{r}
+ggplot(datasaurus_dozen, aes(x, y)) +
+  geom_point() +
+  facet_wrap(~dataset)
+```
+
+- pipes (`|>`) are a way to combine multiple aspects of a code 
+```{r}
+install.packages("dplyr")
+library(dplyr)
+
+# old way of writing code:
+# new_variable <- function_2(function_1(your_data))
+
+# new way with piping
+# your_data |> function_1() |> function_2() -> new_variable
+```
+
+- the is the way we just learned to find the grouped means
+```{r}
+# Extract hot days:
+airquality2 <- filter(airquality, Temp > 80)
+# Convert wind speed to m/s:
+airquality2 <- mutate(airquality, Wind = Wind * 0.44704)
+# Compute mean wind speed for each month:
+airquality <- group_by(airquality, Month)
+hot_wind_means <- summarise(airquality, Mean_wind_speed = mean(Wind))
+
+hot_wind_means
+```
+
+- but with piping, we can make it a lot quicker:
+```{r}
+airquality |>
+      filter(Temp > 80) |> 
+      mutate(Wind = Wind * 0.44704) |>
+      group_by(Month) |> 
+      summarise(Mean_wind_speed = mean(Wind)) ->
+      hot_wind_means
+
+hot_wind_means
+```
 
 
+## Exercise 
+Using the bookstore data:
+age <- c(28, 48, 47, 71, 22, 80, 48, 30, 31)
+purchase <- c(20, 59, 2, 12, 22, 160, 34, 34, 29)
+visit_length <- c(5, 2, 20, 22, 12, 31, 9, 10, 11)
+bookstore <- data.frame(age, purchase, visit_length)
+1. Add a new variable rev_per_minute which is the ratio between purchase and the visit length, using a pipe and a function from dplyr.
+```{r}
+age <- c(28, 48, 47, 71, 22, 80, 48, 30, 31)
+purchase <- c(20, 59, 2, 12, 22, 160, 34, 34, 29)
+visit_length <- c(5, 2, 20, 22, 12, 31, 9, 10, 11)
+bookstore <- data.frame(age, purchase, visit_length)
 
+library(magrittr)
 
+bookstore |> mutate(rev_per_minute = purchase/visit_length) -> bookstore
 
+bookstore
+```
 
+- adding the `with` function to pipping helps with certain functions where the right hand of it doesn't agree with the output of the left hand of it 
+```{r}
+library(ggplot2)
+# this won't work:
+# msleep |> cor(sleep_total, sleep_rem, use = "complete.obs")
 
+# this will work:
+msleep |> with(cor(sleep_total, sleep_rem, use = "complete.obs"))
+```
+
+- also if we need to include a placeholder, you can add `_` as one:
+```{r}
+airquality |> 
+  aggregate(Temp ~ Month,
+            data = _,
+            FUN = mean)
+```
+
+- to read in csv or data files in general:
+```{r}
+# imported_data <- read.csv("data_file.csv")
+
+# to have a popup open to select which data you want to use:
+# imported_data2 <- read.csv(file.choose())
+```
 
 
 # 3. The cornerstones of statistics
+
+- three main schools in statistical modeling:
+  - **frequentist** - uses frequency (long-run proportion) of an event to describe the probability it occurs
+    - traditionally using p-values and confidence intervals 
+    - more objective approach
+    - suitable for analyzing experiments
+  - **Bayesian** - incorportates prior knowledge and personal beliefs about the event occuring
+    - more flexible and incorporates prior knowledge and can be updated when new evidence is available
+  - **machine learning** - focused on developing algorithms and computational tools for automatically idenfiying patterns in data then making predictions on those patterns
+    - only care about if they are good at predicting test datasets 
+
+- tools used for all 3 are *frequency tables* and *contingency tables*
+```{r}
+library(palmerpenguins)
+# we want to see the frequency (amount of times) each value occurs in the data
+# so lets take a look at species of penguins
+
+table(penguins$species) # without pipes
+
+library(dplyr)
+penguins |> select(species) |> table() # with pipes
+```
+
+- but we will eventually want to publish the findings so we need to update the aesthetics for the table
+```{r}
+# install the additional packages:
+install.packages(c("gtsummary", "flextable", "ivo.table"))
+```
+```{r}
+library(gtsummary)
+library(dplyr)
+
+tbl_summary(penguins[, "species"]) # without pipes
+
+penguins |> 
+  select(species) |> 
+  tbl_summary()
+```
+
+- and here is how we can export the table:
+```{r}
+library(flextable)
+penguins |>
+  select(species) |>
+  tbl_summary() |> 
+  as_flex_table() |> # Convert the table to a format that can be exported
+  save_as_docx(path = "sample_my_table.docx")
+```
+
+- and here is how to construct tables using the `ivo.table` package:
+```{r}
+library(ivo.table)
+ivo_table(penguins[,"species"]) # without pipes
+
+library(dplyr)
+library(ivo.table)
+penguins |>
+  select(species) |>
+  ivo_table()
+```
+
+- and the table that results is editable for colors and fonts
+```{r}
+penguins |>
+  select(species) |>
+  ivo_table(color = "darkred",
+            font = "Garamond",
+            percent_by = "row")
+```
+
+- or can have long format tables
+```{r}
+penguins |>
+  select(species) |>
+  ivo_table(long_table = TRUE)
+```
+
+- and these can also be saved as documents:
+```{r}
+library(flextable)
+penguins |>
+  select(species) |>
+  ivo_table() |> 
+  save_as_docx(path = "sample_my_table2.docx")
+```
+
+- **contingency tables** (cross-tabulations/cross-tables) - summarise the relationship between two or more variables
+```{r}
+ftable(penguins$species,
+       penguins$island) # without pipes
+
+penguins |> 
+  select(species, island) |> 
+  ftable()
+```
+
+- to make these tables more aesthetically pleasing you can use the ivo_table, highlight specific values (and save it)
+```{r}
+library(ivo.table)
+penguins |> select(species, island) |> 
+  ivo_table(color = "darkred",
+            font = "Garamond",
+            percent_by = "tot",
+            highlight_cols = 2,
+            highlight_rows = 3) |> 
+  save_as_docx(path = "penguins.docx") # this is how to save the table
+
+penguins |> select(species, island) |> 
+  ivo_table(color = "darkred",
+            font = "Garamond",
+            percent_by = "tot",
+            highlight_cols = 2,
+            highlight_rows = 3)
+```
+
+- there is also a way to do this with `tbl_summary`
+```{r}
+library(gtsummary)
+tbl_summary(penguins[,c("species",
+                        "island")],
+            by = species) # without pipes
+
+library(dplyr)
+library(gtsummary)
+penguins |> 
+  select(species, island) |> 
+  tbl_summary(by = species)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 4. Exploratory Data Analysis and Unsupervised Learning

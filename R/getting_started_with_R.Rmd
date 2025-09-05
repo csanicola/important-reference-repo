@@ -1,7 +1,18 @@
 ---
 title: "getting_started_with_R"
-output: html_document
-creation_date: 7/24/25
+author: Caroline Sanicola
+date: July 24, 2025
+output: 
+  html_notebook:
+  toc: true
+  toc_float: true
+  toc_depth: 2
+  number_sections: true
+  theme: slate
+  highlight: default
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # ----- Getting Started with R: An Introduction for Biologists -----
