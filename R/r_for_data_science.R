@@ -903,7 +903,7 @@ ggplot(diamonds, aes(x = cut, fill = color, y = after_stat(prop))) +
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # bar charts ca be either outlined in color or filled with color 
-# if you map the fill to another variable that isnt the x or y, it stackes the colors on top of one another in the bars 
+# if you map the fill to another variable that isnt the x or y, it stacks the colors on top of one another in the bars 
 # there is a position argument when you have stacked bars
 # they are: 
 # - identity
@@ -1088,6 +1088,59 @@ ggplot(diamonds, aes(x = cut, y = price)) +
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Exercises 
+
+mean(c(0, 1, 2, NA), na.rm = TRUE)
+sum(c(0, 1, 2, NA), na.rm = TRUE)
+
+nycflights13::flights |> 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  ) |> 
+  ggplot(aes(x = sched_dep_time)) + 
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/2)
+
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(x=sched_dep_time, y=..density..)) + 
+  geom_freqpoly(mapping = aes(colour = cancelled), binwidth = .25)+
+  xlim(c(5,25))
+
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(x=sched_dep_time)) + 
+  geom_density(mapping = aes(fill = cancelled), alpha = 0.30)+
+  xlim(c(5,25))
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ggplot(diamonds, aes(x = price)) + 
+  geom_freqpoly(aes(color = cut), binwidth = 500, linewidth = 1)
+
+
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_boxplot()
+
+ggplot(mpg, aes(x = fct_reorder(class, hwy, median), y = hwy)) + # the previous defaulted to alphabetical order for class but if we want to sort it by median value instead then you would use fct_reorder and specify how you want it reordered 
+  geom_boxplot()
+
+ggplot(mpg, aes(x = hwy, y = fct_reorder(class, hwy, median))) + # since the names are long, we want to make the display horizontal and you would do that by switching the x and y
+  geom_boxplot()
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Exercises
+
 nycflights13::flights %>%
   mutate(
     cancelled = is.na(dep_time),
@@ -1098,21 +1151,185 @@ nycflights13::flights %>%
   ggplot() +
   geom_boxplot(mapping = aes(y = sched_dep_time, x = cancelled))
 
+###
+?diamonds
+
+ggplot(data = diamonds, mapping = aes(x = carat, y = price)) +
+  geom_boxplot(mapping = aes(group = cut_width(carat, 0.1)), orientation = "x")
+
+###
+install.packages("ggstance")
+library(gg)
+
+?coord_flip
+
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy)) +
+  coord_flip() # this plot shows horizontally 
+
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(y = reorder(class, hwy, FUN = median), x = hwy)) # this plot also shows horizontally
+
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(y = reorder(class, hwy, FUN = median), x = hwy), orientation = "y") # but you can also explicitly specify the orientation too
+
+###
+install.packages("lvplot")
+library(lvplot)
+
+?geom_lv
+ggplot(diamonds, aes(x = cut, y = price)) +
+  geom_lv()
+
+###
+?geom_violin
+
+ggplot(data = diamonds, mapping = aes(x = price, y = ..density..)) +
+  geom_freqpoly(mapping = aes(color = cut), binwidth = 500)
+
+ggplot(data = diamonds, mapping = aes(x = price)) +
+  geom_histogram() +
+  facet_wrap(~cut, ncol = 1, scales = "free_y")
+
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) +
+  geom_violin() +
+  coord_flip()
+
+###
+install.packages("ggbeeswarm")
+library(ggbeeswarm)
+
+?geom_quasirandom
+?geom_beeswarm
+
+ggplot(data = mpg) +
+  geom_quasirandom(mapping = aes(
+    x = reorder(class, hwy, FUN = median),
+    y = hwy
+  ))
+
+ggplot(data = mpg) +
+  geom_quasirandom(
+    mapping = aes(
+      x = reorder(class, hwy, FUN = median),
+      y = hwy
+    ),
+    method = "tukey"
+  )
+
+ggplot(data = mpg) +
+  geom_quasirandom(
+    mapping = aes(
+      x = reorder(class, hwy, FUN = median),
+      y = hwy
+    ),
+    method = "tukeyDense"
+  )
+
+ggplot(data = mpg) +
+  geom_quasirandom(
+    mapping = aes(
+      x = reorder(class, hwy, FUN = median),
+      y = hwy
+    ),
+    method = "frowney"
+  )
+
+ggplot(data = mpg) +
+  geom_quasirandom(
+    mapping = aes(
+      x = reorder(class, hwy, FUN = median),
+      y = hwy
+    ),
+    method = "smiley"
+  )
+
+ggplot(data = mpg) +
+  geom_beeswarm(mapping = aes(
+    x = reorder(class, hwy, FUN = median),
+    y = hwy
+  ))
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+ggplot(diamonds, aes(x = cut, y = color)) +
+  geom_count()
+
+diamonds %>%
+  count(color, cut)
+
+diamonds %>%
+  count(color, cut) %>%
+  ggplot(aes(x = color, y = cut)) +
+  geom_tile(aes(fill = n))
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Exercises
+
+diamonds %>%
+  count(color, cut) %>%
+  group_by(color) %>%
+  mutate(prop = n / sum(n)) %>%
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = prop))
+
+diamonds %>%
+  count(color, cut) %>%
+  group_by(cut) %>%
+  mutate(prop = n / sum(n)) %>%
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = prop))
+
+### 
+?geom_tile
+
+flights %>%
+  group_by(month, dest) %>%
+  summarise(dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  ggplot(aes(x = factor(month), y = dest, fill = dep_delay)) +
+  geom_tile() +
+  labs(x = "Month", y = "Destination", fill = "Departure Delay")
+
+flights %>%
+  group_by(month, dest) %>%                                 # This gives us (month, dest) pairs
+  summarise(dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  group_by(dest) %>%                                        # group all (month, dest) pairs by dest ..
+  filter(n() == 12) %>%                                     # and only select those that have one entry per month 
+  ungroup() %>%
+  mutate(dest = reorder(dest, dep_delay)) %>%
+  ggplot(aes(x = factor(month), y = dest, fill = dep_delay)) +
+  geom_tile() +
+  labs(x = "Month", y = "Destination", fill = "Departure Delay")
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+smaller <- diamonds %>%
+  filter(carat <= 2.5)
+
+ggplot(smaller, aes(x = carat, y = price)) +
+  geom_point()
+
+ggplot(smaller, aes(x = carat, y = price)) +
+  geom_point(alpha = 1/100)
+
+ggplot(smaller, aes(x = carat, y = price)) +
+  geom_bin2d()
+
+install.packages("hexbin")
+library(hexbin)
+
+ggplot(smaller, aes(x = carat, y = price)) +
+  geom_hex()
+
+ggplot(smaller, aes(x = carat, y = price)) + 
+  geom_boxplot(aes(group = cut_width(carat, 0.1)))
+#> Warning: Orientation is not uniquely specified when both the x and y aesthetics are
+#> continuous. Picking default orientation 'x'.
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-
-
-
-
-
-
-
-
-
-
+# Exercises
 
 
 
