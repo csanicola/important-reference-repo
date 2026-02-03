@@ -1,0 +1,89 @@
+---
+title: "linear_regression_in_R"
+output: html_document
+---
+
+# StatQuest: Doing Linear Regression in R
+[Source](https://www.youtube.com/watch?v=u1cc1r_Y7M0&list=PLblh5JKOoLUIzaEkCLIUxQFjPIlapw8nU&index=7)
+
+# Loading Data 
+```{r}
+# first create the dataframe which we will be working with 
+mouse.data <- data.frame(
+  weight=c(0.9, 1.8, 2.4, 3.5, 3.9, 4.4, 5.1, 5.6, 6.3),
+  size=c(1.4, 2.6, 1.0, 3.7, 5.5, 3.2, 3.0, 4.9, 6.3)
+)
+# you can also just load in an existing dataframe too
+mouse.data
+```
+
+# Looking at the Data 
+```{r}
+# Now, we want to look at a basic plot of the data to see what it is doing
+plot(mouse.data$weight, mouse.data$size)
+```
+
+# Linear Regression
+```{r}
+# we can now set up the linear regression
+# we call the lm(linear model) function, and pass it a formula and the mouse data 
+# the formula is `y-values = y-intercept + slope x x-values`
+# size = y-intercept + slope x weight
+mouse.regression <- lm(size ~ weight, data=mouse.data)
+summary(mouse.regression)
+```
+
+the meat of doing a regression is in the summary function and generates a lot of output:
+
+Call:
+lm(formula = size ~ weight, data = mouse.data)
+>this first line just prints out the original call to the lm() function
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.5482 -0.8037  0.1186  0.6186  1.8852 
+>This is a summary of the residuals (the distance from the data to the fitted line). Ideally, they should be symmetrically distributed around the line.
+The ideal numbers we would want: the min and max approximately the same distance from zero; the 1Q and 3Q to be equidistant from zero too; ideally the median would be close to zero too
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)  
+(Intercept)   0.5813     0.9647   0.603   0.5658  
+weight        0.7778     0.2334   3.332   0.0126 *
+>This tells us about the least-squares estimates for the fitted line
+size = y-intercept + slope x weight -> size = 0.5813 + 0.7778 x weight
+the standard error of the estimates and the "t value" are both provided to show you how the p-values were calculated 
+lastly, these are the p-values (at the end) for the estimated parameters; generally speaking, we are usually not interested in the intercept, so it doesn't matter what it's p-value is; however, we want the p-value for "weight" to be < 0.05. That is, we want it to be statistically significant 
+
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+>this are just there to show what are marked as significant values or not 
+
+Residual standard error: 1.19 on 7 degrees of freedom
+>This is the square root of the denominator in the equation for F
+
+Multiple R-squared:  0.6133,	Adjusted R-squared:  0.558 
+>"multiple R-squared" is just R² as described in normal linear regressions -> in this example it is saying that weight can explain 61% of the variation in size
+"adjusted R-squared" is the R² scaled by the number of parameters in the model 
+
+F-statistic:  11.1 on 1 and 7 DF,  p-value: 0.01256
+>This tells us if the R² is significant or not:
+`F-statistic: 11.1` is the value for F
+`1 and 7 DF` are the degrees of freedom 
+and the p-value is repeated again
+
+```{r}
+# now, we can add the regression line to the graph from before 
+plot(mouse.data$weight, mouse.data$size)
+abline(mouse.regression, col="blue")
+```
+
+
+
+
+
+
+
+
+
+
+
+
