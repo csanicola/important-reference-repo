@@ -4,7 +4,7 @@ output: html_document
 ---
 
 # StatQuest: Doing Multiple Regression in R
-[Source](https://www.youtube.com/watch?v=hokALdIst8k&list=PLblh5JKOoLUIzaEkCLIUxQFjPIlapw8nU&index=8)
+[Source](https://www.youtube.com/watch?v=hokALdIst8k)
 
 # Loading Data 
 ```{r}

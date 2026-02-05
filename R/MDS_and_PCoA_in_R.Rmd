@@ -1,0 +1,199 @@
+---
+title: "MDS_and_PCoA_in_R"
+output: html_document
+---
+
+# StatQuest: MDS and PCoA in R
+
+[Source](https://www.youtube.com/watch?v=pGAUHhLYp5Q)
+
+# Load in Library and Fake Data
+
+```{r}
+# for a fancier looking plot, we will be using ggplot2
+library(ggplot2)
+
+data.matrix <- matrix(nrow=100, ncol=10) # we are creating the same fake data as we did in the PCA example;we are creating a matrix of data with 100 rows and 10 columns
+colnames(data.matrix) <- c(
+  paste("wt", 1:5, sep=""), # the first 5 columns for the data will all start with "wt" for "wild type"; "wt" are normal, everyday samples
+  paste("ko", 1:5, sep="")) # the last 5 columns will be "ko" for "knock-out" samples; these are samples that are missing a gene because we knocked it out
+rownames(data.matrix) <- paste("gene", 1:100, sep="") # this is naming each row of data (aka giving each gene a name w/ number)
+for (i in 1:100) {
+  wt.values <- rpois(5, lambda=sample(x=10:1000, size=1))
+  ko.values <- rpois(5, lambda=sample(x=10:1000, size=1))
+  
+  data.matrix[i, ] <- c(wt.values, ko.values)
+} # this is giving each gene a fake read count
+head(data.matrix)
+```
+
+## Create a PCA for Comparison
+
+Refer to [PCA_in_R.Rmd](D:/GitHub/important-reference-repo/R/PCA_in_R.Rmd) for full breakdown of each step in creating a PCA
+
+We will add a PCA here for comparative purposes
+
+```{r}
+pca <- prcomp(t(data.matrix), scale=TRUE, center=TRUE)
+pca.var <- pca$sdev^2
+pca.var.per <- round(pca.var/sum(pca.var)*100, 1)
+pca.var.per
+```
+
+We also are going to create a PCA plot too
+
+```{r}
+ggplot(data=pca.data, aes(x=X, y=Y, label=Sample)) +
+  geom_text() +
+  xlab(paste("PC1 - ", pca.var.per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", pca.var.per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+```
+
+# MDS/PCoA Plot
+
+Now, we can create a MDS/PCoA plot to compare to the PCA plot
+
+## Step 1: Create a distance matrix
+
+-   this is done with the `dist()` function
+
+```{r}
+distance.matrix <- dist(scale(t(data.matrix), center=TRUE, scale=TRUE), # just like with PCA, we need to transpose the matrix; we also center and scale the measurements for each gene which are now the columns in the data
+                        method="euclidean") # we are also telling the `dist()` function that we want it to create the matrix using the Euclidean distance metric; this function has 6 different methods to choose from
+```
+
+## Step 2: Perform multi-dimensional scaling on the distance matrix using the cmdscale() function
+
+```{r}
+mds.stuff <- cmdscale(distance.matrix, eig=TRUE, x.ret=TRUE)
+
+```
+
+-   `cmdscale()` stands for Classical Multi-Dimensional scaling
+
+-   `eig=TRUE` -\> we tell this function that we want it to return the eigen values
+
+    -   which we then use to calculate how much variation in the distance matrix each axis in the final MDS plot accounts for
+
+-   `x.ret=TRUE` -\> this tells the function to return the doubly centered (both rows and columns are centered) version of the distance matrix that we just created
+
+```         
+-   this is useful for demonstrating how to do MDS using the `eigen()` function instead of the `cmdscale()` function
+```
+
+## Step 3: Calculate the amount of variation each axis in the MDS plot accounts for using the eigen values
+
+```{r}
+mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100, 1)
+mds.var.per
+```
+
+-   this is similar to PCA where we want to find the percentages because that is more useful than the actual values
+
+## Step 4: Format the data for ggplot
+
+```{r}
+mds.values <- mds.stuff$points
+mds.data <- data.frame(Sample=rownames(mds.values),
+                       X=mds.values[,1],
+                       Y=mds.values[,2])
+mds.data
+```
+
+## Step 5: Use the ggplot function to make the plot
+
+```{r}
+ggplot(data=mds.data, aes(x=X, y=Y, label=Sample)) +
+  geom_text() +
+  theme_bw() +
+  xlab(paste("MDS1 - ", mds.var.per[1], "%", sep="")) +
+  ylab(paste("MDS2 - ", mds.var.per[2], "%", sep="")) +
+  ggtitle("MDS plot using Euclidean distance")
+```
+
+-   similarly to the PCA graph, the "wt" samples are on the left side of the graph and the "ko" samples are at the right side of the graph
+
+-   the MDS1 and PC1 also account for the majority of the variation in the data
+
+-   both the PCA and MDS plot look exactly the same because we used the Euclidean metric to calculate the distance matrix
+
+# MDS/PCoA Plot using log fold
+
+This is another method of calculating the distances between the plots
+
+## Step 1: Calculate the log2 values of the measurements for each gene
+
+```{r}
+log2.data.matrix <- log2(data.matrix)
+```
+
+### Get the absolute values of the log-fold change
+
+The average of absolute values of the log-fold change isn't one fo the distance metrics built into the `dist()` function, so we will create our own distance matrix by hand
+
+```{r}
+# first we create an empty matrix
+log2.distance.matrix <- matrix(0,
+                               nrow=ncol(log2.data.matrix),
+                               ncol=ncol(log2.data.matrix),
+                               dimnames=list(colnames(log2.data.matrix),
+                                             colnames(log2.data.matrix)))
+
+# then we fill the matrix with the average of the absolute values of the log fold changes
+for(i in 1:ncol(log2.distance.matrix)) {
+  for(j in 1:i) {
+    log2.distance.matrix[i, j] <- 
+      mean(abs(log2.data.matrix[,i] - log2.data.matrix[,j]))
+  }
+}
+
+log2.distance.matrix
+```
+
+## Step 2: Perform Multi-Dimensional Scaling on our new distance matrix
+
+```{r}
+mds.stuff <- cmdscale(as.dist(log2.distance.matrix), 
+                      eig=TRUE,
+                      x.ret=TRUE)
+```
+
+-   `(as.dist(log2.distance.matrix)` -\> this is converting the homemade matrix into a 'true' distance matrix, so `cmdscale()` knows what it's working with
+
+    -   this just means that a true distance matrix just needs the bottom of the triangle to be computed and not the whole thing
+
+## Step 3: Calculate the amount of variation each axis in the MDS plot accounts for using the eigen values
+
+```{r}
+mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100, 1)
+mds.var.per
+```
+
+## Step 4: Format the data for ggplot
+
+```{r}
+mds.values <- mds.stuff$points
+mds.data <- data.frame(Sample=rownames(mds.values),
+                       X=mds.values[,1],
+                       Y=mds.values[,2])
+mds.data
+```
+
+## Step 5: Use the ggplot function to make the plot
+
+```{r}
+ggplot(data=mds.data, aes(x=X, y=Y, label=Sample)) +
+  geom_text() +
+  theme_bw() +
+  xlab(paste("MDS1 - ", mds.var.per[1], "%", sep="")) +
+  ylab(paste("MDS2 - ", mds.var.per[2], "%", sep="")) +
+  ggtitle("MDS plot using avg(logFC) as the distance")
+```
+
+**In Summary**:
+
+The two different MDS plots (one using the Euclidean distance, the other using the average absolute value of the log fold change) are similar, but not the same.
+
+In the new graph, the x-axis accounts more of the variation (99% vs 88.5%)
