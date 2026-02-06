@@ -3,9 +3,9 @@ title: "PCA_in_R"
 output: html_document
 ---
 
-# StatQuest: PCA in R
+# PCA in R
 
-[Source](https://www.youtube.com/watch?v=0Jp4gsfOLMs) \## Overview: - using `prcomp()` function to do PCA - drawing a PCA plot using **base graphics** and **ggplot2** - determine how much variation each principal component accounts for - examine the loading scores to determine what variables have the largest effect on the graph
+[Source](https://www.youtube.com/watch?v=0Jp4gsfOLMs)
 
 # Loading Data
 
