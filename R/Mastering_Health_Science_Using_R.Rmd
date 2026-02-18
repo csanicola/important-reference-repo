@@ -1,150 +1,239 @@
-# From the Textbook Mastering Health Science Using R
-# https://alicepaul.github.io/health-data-science-using-r/book.html
+---
+title: "Mastering_Health_Science_Using_R"
+output: html_document
+---
 
-# ----- 1. Getting Started with R ----- 
+# My Notes from the textbook "Mastering Health Science Using R"
 
-# ----- 1.2.1 Basic Computations Objects ----- 
+[Source](https://alicepaul.github.io/health-data-science-using-r/)
+
+# Getting Started with R
+
+## Basic Computations Objects
+
+```{r}
 # Addition
 5+6
+
 # Subtraction
 7-2
+
 # Multiplication
 2*3
+
 # Division
 6/3
+
 # Exponentiation
 4^2
+
 # Modulo
 100 %% 4
+```
 
-# solving the result of any computation you would store as an object called a variable
+Solving the result of any computation, you would store as an **object** called a **variable**
+
+```{r}
 x <- 2+3
 x <- x+1
 x
+```
 
-# if you want to run all lines of code in our script, you would use the source button but
-# you can use the source function
-source("test.R")
+If you want to run all lines of code in our script, you would use the **source button** but you can use the **source()** function too
 
-# calling a function 
-# ceiling() returns the ceiling of your input
-# floor() returns the floor of your input
-# round() rounds your input to the closest integer - it rounds a number in 0.5 to the closest even integer
+```{r}
+# source("test.R")
+```
+
+## Calling a Function
+
+-   **ceiling()** returns the ceiling of your input
+
+-   **floor()** returns the floor of your input
+
+-   **round()** rounds your input to the closest integer -\> it rounds a number in 0.5 to the closest even integer
+
+```{r}
 ceiling(3.7)
 floor(3.7)
 round(2.5)
 round(3.5)
+```
 
-# to read a csv file, you would use read.csv()
+## Importing Data
 
-# you can also see what the current working directory is by using getwd()
-getwd() # "/Users/carolinesanicola/" on Mac
-# to set the current working directory, you can use setwd()
-setwd('/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R')
-# check
+To read a **csv file**, you would use the **read.csv()** function.
+
+You can also see what the current working directory is by using **getwd()**
+
+```{r}
+getwd() # "/Users/carolinesanicola" on Mac
+        # "D:/GitHub/important-reference-repo/R" on Windows
+
+# to set the current working directory, you can use `setwd()`
+setwd("D:/GitHub/important-reference-repo/R") # for Mac: '/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R'
+
+# check new working directory
 getwd()
+```
 
+```{r}
 # now update the path to the csv file
 df <- read.csv("https://raw.githubusercontent.com/alicepaul/health-data-science-using-r/b71bbec95709d0107c166d97654890b9500678ef/book/data/fake_names.csv")
 df
-# another way to load in a csv is using readr::
-df <- readr::read_csv("https://raw.githubusercontent.com/alicepaul/health-data-science-using-r/refs/heads/main/book/data/test.csv", show_col_types = FALSE)
 
-# the most important thing to do is download packages and one of the most important is 'tidyverse'
-# to see what packages are already installed use `installed.packages()`
+# another way to load in a csv is using `readr::`
+df <- readr::read_csv("https://raw.githubusercontent.com/alicepaul/health-data-science-using-r/b71bbec95709d0107c166d97654890b9500678ef/book/data/fake_names.csv", show_col_types = FALSE)
+df
+```
+
+The most important thing to do is download **packages** and one of the most important is "**tidyverse**".
+
+To see what packages are already installed use `installed.packages()`
+
+```{r}
 installed.packages()
 # the most important package to download is tidyverse
-install.packages('tidyverse')
+install.packages("tidyverse")
 library(tidyverse)
+```
 
+# Data Structures in R
 
-# ----- 2. Data Structures in R ----- 
+An **object** is a named instance of a data structure.
 
-# an object is a named instance of a data structure
+```{r}
 ex_num <- 4
+```
 
-# data structures in R are vectors, factors, matrices, arrays, lists, and data frames
+## Data Types
 
-# ----- 2.1 Data Types ----- 
-# each individual value in R has a type: logical, integer, double or character
-# you can use typeof() function to find the type of vector
+Data structures in R are vectors, factors, matrices, arrays, lists, and data frames.
+
+Each individual value in R has a type: logical integer, double or character.
+
+You can use `typeof()` function to find the type of vector.
+
+```{r}
 typeof(ex_num) # double
-# double is a numeric value with a stored decimal
-# an integer is a whole number without a decimal
+# "double" is a numeric value with a stored decimal
+# an integer is a whole number without a decimal 
 # to indicate we want the number to be an integer object, you need to use `L` after the number
 ex_int <- 4L
 typeof(ex_int)
+
 # characters have letters
 ex_char <- "Alice"
 typeof(ex_char)
+
 # logicals or booleans are TRUE and FALSE
 ex_bool <- TRUE
 typeof(ex_bool)
-# booleans can actually be interpreted as 0/1 and can be used in logic
-TRUE + FALSE + TRUE
+# booleans can actually be interpreted as 0/1 and can be used in logic 
 
-# ----- 2.2 Vectors ----- 
-# vectors are one-dimensional data structures that can store multiple data types of the same type (ex: character, Boolean, numeric)
+TRUE + FALSE + TRUE
+```
+
+## Vectors
+
+Vectors are one-dimensional data structures that can store multiple data types of the same type (ex: character, Boolean, numeric)
+
+```{r}
 # you can confirm if something is a vector by using:
 is.vector(ex_bool)
+```
 
-# one way to create a vector with multiple values is to use the combine function: c()
+```{r}
+# one way to create a vector with multiple values is to use the combine function: `c()`
 days <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 rain <- c(5, 0.1, 0, 0, 0.4)
-# vectors can only store the same type of values so if you try and combine "Monday" and 5, it will convert 5 to a string "5". 
-c("Monday", 5)
 
-# the `class()` function returns the data structure of an object
+# vectors can only store the same type of values so if you try and combine "Monday" and 5, it will convert 5 to a string "5"
+c("Monday", 5)
+```
+
+```{r}
+# the `class()` function returns the data structure of an object 
 class(days)
 class(rain)
-# you can even create an empty vector
+
+# you can create an empty vector
 ex_empty <- c()
 class(ex_empty)
+
 # you can also set the type of the empty vector:
 ex_empty <- vector(mode = "numeric")
 class(ex_empty)
+```
 
-# another way to create a vector is with rep() or seq()
-# rep(x, times) takes the vector x and a number of times and outputs x the number of times entered
-rep(0,5)
+Another way to create a vector is with `rep()` or `seq()`
+
+-   `rep(x, times)` takes the vector x and a number of times and outputs x the number of times entered.
+
+-   `seq(from, to, step)` takes a numeric starting value (from) and end value (to) and step size (step) with specifies the sequence to get from to
+
+```{r}
+rep(0, 5)
 rep("Monday", 4)
-# seq(from, to, step) takes a numeric starting value (from) and end value (to) and step size (step) with specifies the sequence to get from from to to 
-seq(1,5,1)
-seq(0,-10,-2)
 
-# ----- 2.2.1 Indexing a Vector ----- 
-# when a vector is created, you can access certain values in it by indexing []
+seq(1, 5, 1)
+seq(0, -10, -2)
+```
+
+### Indexing a Vector
+
+```{r}
+# when a vector is created, you can access values in it by indexing []
 days[1]
 days[4]
+
 # not only can you access a single value, but a subset of the values using c()
 days[c(1,4)]
 days[-c(1,4)] # this is saying to return everything BUT the 1 and 4 values
+```
 
+```{r}
 # another option is to associate a name with each value
 names(rain) <- days
 print(rain)
 rain["Friday"]
+```
 
+```{r}
 # another option is using TRUE and FALSE values to index the values in a vector (both vectors need to be the same length)
 ind_bools <- c(TRUE, FALSE, FALSE, TRUE, FALSE)
 days[ind_bools] # this is now going to return only the TRUE values in the vector
+```
 
-# ----- 2.2.2 Modifying a Vector and Calculations ----- 
-# exp() - exponential
-# log() - log
-# sqrt() - square root
-# abs() - absolute value
-# round() - round to nearest integer value
-# ceiling() - round up to the nearest integer value
-# floor() - round down to the nearest integer value
-# signif(, dig) - round to dig number of significant digits
-# the above logical functions can be used to combine vectors or as operators on vector values
+### Modifying a Vector and Calculations
+
+-   `exp()` - exponential
+
+-   `log()` - log
+
+-   `sqrt()` - square root
+
+-   `abs()` - absolute value
+
+-   `round()` - round to nearest integer value
+
+-   `ceiling()` - round up to the nearest integer value
+
+-   `floor()` - round down to the nearest integer value
+
+-   `signif(, dig)` - round to dig number of significant digits
+
+The above logical functions can be used to combine vectors or as operators on vector values.
+
+```{r}
 c(1, 2, 3) + c(1, 1, 1)
-c(1, 2, 3) + 1 # the above is identical to this
+c(1, 2, 3) + 1 # the above is identical to this 
 sqrt(c(1, 4, 16))
 signif(c(0.23, 0.19), dig = 1)
+```
 
-# you can also change a value in a vector
+```{r}
+# you can also change a value in a vector 
 rain["Friday"] <- 0.5
 rain
 # you can also add extra entries to the vector and can use c() to do so
@@ -153,95 +242,153 @@ length(rain)
 days <- c(days, "Saturday", "Sunday") # add the weekend with no rain
 rain <- c(rain, 0, 0)
 length(rain)
-# you can also use sum(), max(), and min() to get the sum, maximum value, minimum value of the vector
+
+# you can also use sum(), max(), and min(), to get the sum, maximum value, minimum value of the vector 
 sum(rain)
 max(rain)
 min(rain)
+```
 
-# Practice Question
-# create a vector of the odd numbers from 1 to 11 using the seq() function then find the third value in the vector using indexing
+#### Practice Question
+
+1.  Create a vector of the odd numbers from 1 to 11 using the `seq()` function then find the third value in the vector using indexing
+
+```{r}
 practice_one <- seq(1, 11, 2)
 practice_one[3]
+```
 
-# ----- 2.2.4 Common Vector Functions ----- 
-# sum() - summation
-# median() - median value
-# mean() - mean
-# sd() - standard deviation
-# var() - variance
-# max() - maximum value
-# which.max() - index of the first element with the maximum value
-# min() - minimum value
-# which.min() - index of the first element with the minimum value
+### Common Vector Functions
+
+-   `sum()` - summation
+
+-   `median()` - median value
+
+-   `mean()` - mean
+
+-   `sd()` - standard deviation
+
+-   `var()` - variance
+
+-   `max()` - maximum value
+
+-   `which.max()` - index of the first element with the maximum value
+
+-   `min()` - minimum value
+
+-   `which.min()` - index of the first element with the minimum value
+
+```{r}
 mean(rain)
 min(rain)
 which.min(rain) # this will tell you which value is the min value (if it was given a name)
+```
 
+```{r}
 # you can also use sort() to sort the values and order() which returns the permutation of the elements to be sorted in order
-order(rain) # this is returning what is the lowest values to highest values but in the order they currently are in
-days[order(rain)] # this is returning the days of the week in the order of the smallest rain value to largest rain value 
-# for both order() and sort() they have the extra argument of `decreasing` which can either be `TRUE` or `FALSE`
-days[order(rain, decreasing=TRUE)] # now it will show the days in order of highest rain to lowest rain values
+order(rain) # this is returning what is the lowest values to the highest values but in the order they currently are in
+days[order(rain)] # this is returning the days of the week in the order of the smallest rain value to the largest rain value
+# for both order() and sort() they have the extra argument of 'decreasing' which can either be 'TRUE' or 'FALSE'
+days[order(rain, decreasing=TRUE)] # now it will show the days in order of highest rain to lowest rain values 
+```
 
-# ----- 2.3 Factors ----- 
-# a special kind of vector that behaves like a regular vector, except that it represents values from a category
-# it keeps tracks of all possible values of that category in what are called levels of the factor
-# the function `as.factor()` converts a vector to a factor
+## Factors
+
+A special kind of vector that behaves like a regular vector, except that it represents values from a category.
+
+It keeps track of all possible values of that category in what are called **levels** of the factor.
+
+The function `as.factor()` converts a vector to a factor.
+
+```{r}
 days <- c("Monday", "Tuesday", "Wednesday", "Monday", "Thursday", "Wednesday")
 days_fct <- as.factor(days)
-class(days_fct)
 levels(days_fct)
+```
+
+```{r}
+
 # using the factor() function instead of as.factor() will allow you to specify the levels of the factor
-days_fct <- factor(days, 
+days_fct <- factor(days,
                    levels = c("Monday", "Tuesday", "Wednesday",
-                              "Thursday", "Friday", "Saturday", "Sunday")) # so this is saying that there may not be all theses values but these are the possible levels in the factor
+                              "Thursday", "Friday", "Saturday", "Sunday")) # so this is saying that there may not be all these values but these are the positions the values should be in 
 class(days_fct)
 levels(days_fct)
 days_fct[2] <- "Friday" # this is going to insert "Friday" into the second index of days_fct
 days_fct
+```
 
-# factors can also be used for numeric vectors
-# if we want to have 0/1 to represent whether a day is a weekend or not this is something we can do with factor levels
+Factors can also be used for numeric vectors.
+
+If we want to have 0/1 to represent whether a day is a weekend or not, this is something we can do with factor levels.
+
+```{r}
 weekend <- as.factor(c(1, 0, 0, 0, 1, 1))
 levels(weekend)
+```
 
-# ----- 2.4 Matrices ----- 
-# similar to vectors in that they store data of the same type but matrices are two-dimensional and consist of rows and columns
-# matricies can be created using the matrix() function
-# matrix(data, nrow, ncol, byrow) = data is the values, nrow is number of rows, ncol is number of columns, byrow is either TRUE if you want the data values to be filled in by row or FALSE if its by column
-rainfall <- matrix(c(5, 6, 0.1, 3, 0, 1, 0, 1, 0.4, 0.2, 
+## Matrices
+
+Similar to vectors in that they store data of the same type but matrices are two-dimensional and consist of rows and columns.
+
+Matricies can be created using the `matrix()` function.
+
+`matrix(data, nrow, ncol, byrow)` -\> **data** is the values, **nrow** is the number of rows, **ncol** is the number of columns, **byrow** is either `TRUE` if you want the data values to be filled in by row or `FALSE` if its by column.
+
+```{r}
+rainfall <- matrix(c(5, 6, 0.1, 3, 0, 1, 0, 1, 0.4, 0.2,
                      0.5, 0.3, 0, 0),
                    ncol=7, nrow=2, byrow=TRUE)
 rainfall
-# to find the dimensions of the matrix, you can use nrow(), ncol(), or dim() 
-# nrow() returns how many rows
-# ncol() returns how many columns
-# dim() returns the number of rows and columns
+```
+
+To find the dimensions of the matrix, you can use `nrow()`, `ncol()`, or `dim()`:
+
+-   `nrow()` = how many rows
+
+-   `ncol()` = how many columns
+
+-   `dim()` = the number of rows and columns
+
+```{r}
 nrow(rainfall)
 ncol(rainfall)
 dim(rainfall)
+```
 
-# ----- 2.4.1 Indexing a Matrix ----- 
-# as opposed to vectors, since there are rows and columns, you need to know both when trying to index a value in a matrix
+### Indexing a Matrix
+
+As opposed to vectors, since there are rows and columns, you need to know both when trying to index a value in a matrix
+
+```{r}
 rainfall[1, 4]
+
 # you can provide multiple indexes to return multiple values
 rainfall[1, c(4, 5, 7)]
+
 # you can also index by boolean
-rainfall[c(FALSE, TRUE), ] # don't have to include column because we are indexing all the values
-rainfall[ ,c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)]
+rainfall[c(FALSE, TRUE), ] # don't have to include column because we are indexing all the values 
+rainfall[ , c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)]
+
 # we can also specify row and column names in the indices
 # colnames() and rownames() returns the names of the rows and columns
 colnames(rainfall) <- c("Monday", "Tuesday", "Wednesday", "Thursday",
                         "Friday", "Saturday", "Sunday")
 rownames(rainfall) <- c("Week1", "Week2")
 rainfall["Week1", c("Friday", "Saturday")]
+```
 
-# ----- 2.4.2 Modifying a Matrix ----- 
-# to change the values in a matrix, you need to index the values first and then assign new values
+### Modifying a Matrix
+
+To change the values in a matrix, you need to index the values first and then assign new values.
+
+```{r}
 rainfall["Week1", "Friday"] <- 3
 rainfall["Week1", c("Monday", "Tuesday")] <- 0
 print(rainfall)
+```
 
+```{r}
 # the functions rbind() and cbind() can add rows and columns
 rainfall <- rbind(rainfall, "Week3" = c(0.4, 0.0, 0.0, 0.0, 1.2, 2.2, 0.0)) # this will add a new row with values
 rainfall <- cbind(rainfall, "Total" = c(7.1, 2.4, 3.8)) # this will add a new column with values
@@ -254,15 +401,23 @@ C
 # you can also use mathematical operators to combine too
 A+B
 exp(C)
+```
 
-# Practice Question
+#### Practice Question
+
+```{r}
 practice_two <- matrix(rep(1,12), ncol=3, nrow=4, byrow=TRUE)
 print(practice_two)
 practice_two[ ,c(1,3)]
+```
 
-# ----- 2.5 Data Frames ----- 
-# like matrices, they store data in rows and columns, but you can use different data types 
-# you can create a data frame from data using the data.frame() function
+## Data Frames
+
+Like matrices, they store data in rows and columns, but you can use different data types
+
+You can create a data frame from data using the `data.frame()` function
+
+```{r}
 weather_data <- data.frame(day_of_week = c("Monday", "Tuesday", "Wednesday", "Monday"),
                            temp = c(70, 62, 75, 50),
                            rain = c(5, 0.1, 0.0, 0.5))
@@ -280,8 +435,11 @@ names(weather_data)
 rownames(weather_data) <- c("6/1", "6/2", "6/3", "6/8")
 head(weather_data)
 rownames(weather_data)
+```
 
-# ----- 2.5.1 Indexing a Data Frame ----- 
+### Indexing a Data Frame
+
+```{r}
 # done the same way as with a matrix
 weather_data[1, 2]
 weather_data[1, c("day_of_week", "temp")]
@@ -291,31 +449,48 @@ weather_data$temp
 # the day_of_week column is categorical and can only take a limited number of values so it would be useful to convert it to a factor to limit what is allowed in it
 weather_data$day_of_week <- factor(weather_data$day_of_week)
 levels(weather_data$day_of_week)
+```
 
-# ----- 2.5.2 Modifying a Data Frame ----- 
+### Modifying a Data Frame
+
+```{r}
 # can also modify the data the same as with a matrix
 weather_data[1, "rain"] <- 2.2
 weather_data
+```
 
+```{r}
 # can also combine data frames using the rbind() or cbind() but can also use $
 weather_data$aq_warning <- as.factor(c(1, 0, 0, 0))
 weather_data
+```
 
-# Practice Question
+#### Practice Question
+
+```{r}
 weather_data$air_quality_index <- rep(NA,4)
 weather_data
 weather_data["6/2", "air_quality_index"] <- 57
 weather_data
+```
 
-# ----- 2.6 Lists ----- 
-# a data frame is actually a special type of another data structure called a list
-# a list is a collection of objects under the same name
-# these objects can be vectors, matrices, data frames, or even other lists
-# they don't have to be the same size, type, or any other matching attribute
+## Lists
+
+a data frame is actually a special type of another data structure called a list
+
+a list is a collection of objects under the same name
+
+these objects can be vectors, matrices, data frames, or even other lists
+
+they don't have to be the same size, type, or any other matching attribute
+
+```{r}
 ex_list <- list("John", c("ibuprofen", "metformin"),
                 c(136, 142, 159))
 print(ex_list)
+```
 
+```{r}
 print(class(ex_list[2])) # this will print "list"
 ex_list[2] # this is going to return a list of the sublist we are indexing
 # to return just the values themselves, you would use double brackets
@@ -325,37 +500,53 @@ ex_list <- list(name="John",
                 medication=c("ibuprofen", "metformin"),
                 past_weights=c(136, 142, 159))
 print(ex_list)
+```
+
+```{r}
 # now we have names to easily access things in the list to change or call upon them
 ex_list$supplements <- c("vitamin D", "biotin")
 ex_list$supplements[2] <- "collagen"
 ex_list
+```
 
+# Working with Data Files in R
 
-# ----- 3. Working with Data Files in R ----- 
-
+```{r}
 # the library to load in for this is HDSinRdata which contains a sample dataset
 install.packages("HDSinRdata")
 library(HDSinRdata)
+```
 
+```{r}
 # importing data you would use the data() function
 data(pain)
 dim(pain)
+```
 
+```{r}
 # another way to use your own data, you would need to install the readr package
 install.packages("readr")
 library(readr)
 # this contains read_csv() function which will be the function most used
+```
 
+```{r}
 # but you can also create a csv file from a dataframe you've created
 df <- data.frame(x = c(1, 0, 1), y = c("A", "B", "C"))
 # write.csv(df, "data/test.csv", row.names=FALSE)
+```
 
+```{r}
 head(pain)
+```
 
+```{r}
 # the below will return the values from row 1 to 5 in the column specified
 pain$PAIN_INTENSITY_AVERAGE[1:5]
 pain[["PAIN_INTENSITY_AVERAGE"]][1:5]
+```
 
+```{r}
 # to explore distributions and ranges of the values in certain columns, you can use the summary() function
 summary(pain$PAIN_INTENSITY_AVERAGE)
 # if there are NA values in the column, you can add `na.rm=TRUE` so that it won't return NA for anything you ask
@@ -368,75 +559,113 @@ quantile(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE) # returns the sample quantiles
 IQR(pain$PAIN_INTENSITY_AVERAGE, na.rm=TRUE) # returns the interquartile range for a numeric vector
 # by default the quantile() function returns the sample quantiles but you can specify which quantiles you want to use
 quantile(pain$PAIN_INTENSITY_AVERAGE, probs = c(0.1, 0.9), na.rm=TRUE)
+```
 
+```{r}
 # we can also see a histogram of the values in a row (which is the distribution of values)
 hist(pain$PAIN_INTENSITY_AVERAGE)
+```
 
+#### Practice Question
 
+```{r}
 # Practice Question
 summary(pain$PROMIS_SLEEP_DISTURB_V1_0)
 hist(pain$PROMIS_SLEEP_DISTURB_V1_0)
+```
 
+```{r}
 # using the summary() function works with categorical values too, it will return the counts for each level
 summary(pain$PAT_SEX)
 # it is easier to view the results in a table view
 table(pain$PAT_SEX, useNA="always") # the useNA argument will show if there are any NA values in the table because by default it ignores NA's in the output
 # using the prob.table() function will convert the counts to proportions (what percentage of the total values is that category value)
 prop.table(table(pain$PAT_SEX))
+```
 
+```{r}
 # because this has a limited types of values that can be in this column, we can convert the column to a factor
 is.factor(pain$PAT_SEX)
 pain$PAT_SEX <- as.factor(pain$PAT_SEX)
 is.factor(pain$PAT_SEX)
+```
 
+```{r}
 # you can also take a subset of the data and store it into a new dataframe
 body_map_cols <- names(pain)[2:75]
 pain_body_map <- pain[, body_map_cols]
 head(pain_body_map)
 hist(rowSums(pain_body_map))
+```
 
+```{r}
 # we will now fine the number of patients who selected each body region divided by the total number of patients
 # this will show the percentage of body regions by total patients
 perc_patients <- colSums(pain_body_map, na.rm=TRUE) /  
   nrow(pain_body_map)
 hist(perc_patients)
+```
 
+```{r}
 which.max(perc_patients) # returns which value is the max value
+```
 
+```{r}
 # pmax() and pmin() return the pairwise max or min across the vectors
 v1 = c(5, 9, 12)
 v2 = c(2, 18, 4)
 pmax(v1, v2)
+```
 
+```{r}
 # if we want to create a new column called lower_back_pain that corresponds to whether someone selects either x218 or x219, you can use the pmax() function to find the maximum value between columns x218 and x219
 lower_back <- pmax(pain_body_map$X218, pain_body_map$X219)
 prop.table(table(lower_back))
+```
 
+```{r}
 # if we want to store the total number of pain regions and out indicator of whether or not a patient has a lower back pain as new columns
 pain$NUM_REGIONS <- rowSums(pain_body_map)
 pain$LOWER_BACK <- lower_back
 dim(pain)
+```
 
-# another useful function that allows us to perform computation over the rows or columns of a matrix or data frame is the apply(X, MARGIN, FUN) function
-# the X is the data frame or matrix
-# the MARGIN indicates whether to compute over the rows (1) or columns (2)
-# the FUN argument is the function to apply across that margin
-# below is finds the maximum value for each row in the data frame
+Another useful function that allows us to perform computation over the rows or columns of a matrix or data frame is the `apply(X, MARGIN, FUN)` function:
+
+-   the **X** is the data frame or matrix
+
+-   the **MARGIN** indicates whether to compute over the rows (1) or columns (2)
+
+-   the **FUN** argument is the function to apply across that margin
+
+```{r}
+# below finds the maximum value for each row in the data frame
 any_selected <- apply(pain_body_map, 1, max)
 min(any_selected, na.rm=TRUE)
+```
+
+```{r}
 # the min shows that every patient selected at least one body map region
 # you can also use colSums() for find the sum of the columns for the above example
 # if we use apple() function it will pass any additional arguments to the function FUN
 perc_patients <- apply(pain_body_map, 2, sum, na.rm=TRUE) /
   nrow(pain_body_map)
 summary(perc_patients)
+```
 
-# ----- 3.2.5 Missing Infinite and NaN Values ----- 
-# missing values in R are represented by NA
-# to confirm is there is a missing value, you can use the function `is.na()`
+## Missing Infinite and NaN Values
+
+Missing values in R are represented by NA.
+
+To confirm is there is a missing value, you can use the function `is.na()`
+
+```{r}
 sum(is.na(pain$PATIENT_NUM))
 # to see if there are NAs accross multiple columns and not just one, we can use apply() function too
 num_missing_col <- apply(pain, 2, function(x) sum(is.na(x)))
+```
+
+```{r}
 min(num_missing_col)
 # the above will tell us that there is at least one missing value in each column
 # since that is just seeing minimally how many missing, we may want to see if there is an entire column of missing values; to do so, we need to see how many columns there are total and if there is a row that matches that number indicating that there are all missing values for every column for an entire row
@@ -447,7 +676,11 @@ pain <- pain[-11749, ] # this is going to remove that row from the dataset
 # once we remove that row, if we find the percentage of missing values per column we can see which has the most NAs
 num_missing_col <- apply(pain, 2, function(x) sum(is.na(x))/nrow(pain))
 num_missing_col
-# you will see that for PAIN_INTESITY_AVERAGE.FOLLOW_UP it is 0.670422015 which is saying there is only about 33% of responses/valid data for this column
+```
+
+You will see that for **PAIN_INTESITY_AVERAGE.FOLLOW_UP** it is **0.670422015** which is saying there is only about **33%** of responses/valid data for this column
+
+```{r}
 # from this we can create new columns of data
 # first is a column for the change in pain at follow-up
 pain$PAIN_CHANGE <- pain$PAIN_INTENSITY_AVERAGE.FOLLOW_UP - pain$PAIN_INTENSITY_AVERAGE
@@ -465,20 +698,35 @@ pain_sub1 <- na.omit(pain)
 pain_sub2 <- pain[complete.cases(pain), ]
 dim(pain_sub1)
 dim(pain_sub2)
-# ----- 3.2.6 Dates in R ----- 
-# Symbol	Description
-# %Y	Four-digit year.
-# %y	Two-digit year.
-# %m	Numeric month.
-# %b%	Abbreviated name of month.
-# %B	Full name of month.
-# %d	Numeric day of the month.
-# %H	Military time hour (24 hours).
-# %I	Imperial time hour (12 hours).
-# %M	Minute.
-# %S	Seconds.
-# %p	AM/PM
+```
 
+## Dates in R
+
+**Symbol Description:**
+
+-   %Y Four-digit year.
+
+-   %y Two-digit year.
+
+-   %m Numeric month.
+
+-   %b% Abbreviated name of month.
+
+-   %B Full name of month.
+
+-   %d Numeric day of the month.
+
+-   %H Military time hour (24 hours).
+
+-   %I Imperial time hour (12 hours).
+
+-   %M Minute.
+
+-   %S Seconds.
+
+-   %p AM/PM
+
+```{r}
 # to convert an object to a dat object, you would use the `as.Date()` function
 # for date/time columns, you would use `as.POSIXct()`
 date_example <- data.frame(x = c("2020-01-15", "2021-11-16",
@@ -492,73 +740,111 @@ date_example$x <- as.Date(date_example$x, format = "%Y-%m-%d",
                            tz = "EST")
 date_example$y <- as.POSIXct(date_example$y,
                               format = "%Y-%m-%d %I:%M %p")
+```
 
+```{r}
 # add date to z and convert
 date_example$z <- paste("2024-06-24", date_example$z)
 date_example$z <- as.POSIXct(date_example$z,
                              format = "%Y-%m-%d %H:%M:%S")
 date_example
+```
 
+```{r}
 # having date specified columns, you are now able to find the time between dates using the difftime() function
 difftime(date_example$x[2], date_example$x[1], units = "days")
 # you can also use the function `seq()` to add or subtract time from a date using `by`
 seq(date_example$x[1], by = "month", length=3)
 # the lubridate package does more date manipulation
+```
 
-# ----- 3.3 Using Logic to Subset, Summarize, and Transform ----- 
-# the below are more logic operators that can be used in R
-# < less than
-# <= less than or equal to
-# > greater than
-# >= greater than or equal to
-# == equal to
-# != not equal to
-# a %in% b a’s value is in a vector of values b
+## Using Logic to Subset, Summarize, and Transform
 
+The below are more logical operators that can be used in R:
+
+-   \< less than
+
+-   \<= less than or equal to
+
+-   \> greater than
+
+-   \>= greater than or equal to
+
+-   == equal to
+
+-   != not equal to
+
+-   a %in% b a’s value is in a vector of values b
+
+```{r}
 2 < 2
 2 <= 2
 3 > 2
 3 >= 2
 "A" == "B"
 "A" != "B"
+```
 
+```{r}
 # there is also a natural order between comparisons
 TRUE < FALSE # aka this will ask is 1 < 0
 
 # the %in% operator checks whether a value is in a set of possible values
 1 %in% c(4, 1, 2)
 c(0, 1, 5) %in% c(4, 1, 2)
+```
 
-# Additionally, we can use the following operators, which allow us to negate or combine logical operators.
-# !x - the NOT operator ! reverses TRUE/FALSE values
-# x | y - the OR operator | checks whether either x or y is equal to TRUE
-# x & y - the AND operator & checks whether both x and y are equal to TRUE
-# xor(x,y) - the xor function checks whether exactly one of x or y is equal to TRUE (called exclusive or)
-# any(x) - the any function checks whether any value in x is TRUE (equivalent to using an OR operator | between all values)
-# all(x) - the all function checks whether all values in x are TRUE (equivalent to using an AND operator & between all values)
+Additionally, we can use the following operators, which allow us to negate or combine logical operators.
+
+-   !x - the NOT operator ! reverses TRUE/FALSE values
+
+-   x \| y - the OR operator \| checks whether either x or y is equal to TRUE
+
+-   x & y - the AND operator & checks whether both x and y are equal to TRUE
+
+-   xor(x,y) - the xor function checks whether exactly one of x or y is equal to TRUE (called exclusive or)
+
+-   any(x) - the any function checks whether any value in x is TRUE (equivalent to using an OR operator \| between all values)
+
+-   all(x) - the all function checks whether all values in x are TRUE (equivalent to using an AND operator & between all values)
+
+```{r}
 !(2 < 3)
 ("Alice" < "Bob") | ("Alice" < "Aaron")
 ("Alice" < "Bob") & ("Alice" < "Aaron")
 xor(TRUE, FALSE)
 any(c(FALSE, TRUE, TRUE))
 all(c(FALSE, TRUE, TRUE))
+```
 
+```{r}
 # the below example is checking those who do or do not have Medicaid and assigns a new value in that column
 pain$MEDICAID_BIN[pain$MEDICAID_BIN == "no"] <- "No Medicaid"
 pain$MEDICAID_BIN[pain$MEDICAID_BIN == "yes"] <- "Medicaid"
 table(pain$MEDICAID_BIN)
+```
+
+```{r}
 # now if we want to include only those who have a follow-up, we would combine functions
 pain_follow_up <- pain[!is.na(pain$PAIN_INTENSITY_AVERAGE.FOLLOW_UP), ] # this is asking for the data of the rows that don't have missing(na) values for the PAIN_INTENSITY_AVERAGE.FOLLOW_UP column
 # we can now also use the any() function in combination with our previous column we created for lower back pain to see if there are any patients with general back pain (it will see if any of the columns comes back TRUE but we can use all() if we need all of the columns to come back TRUE)
 pain$BACK <- any(pain$X208==1, pain$X209==1, pain$X212==1,
                  pain$X213==1, pain$X218==1, pain$X219==1)
+```
 
-# PRACTICE QUESTION
+#### Practice Question
+
+```{r}
 pain_subset <- pain[pain$PAIN_INTENSITY_AVERAGE >= 5, ]
 head(pain_subset)
+```
 
+```{r}
 # if we want to now look at the patient race columns...
 table(pain$PAT_RACE)
+```
+
+```{r}
 # most patients are either black or white
 # you can also use the unique() function to see how many unique variables are in a column
 unique(pain$PAT_RACE)
@@ -571,127 +857,175 @@ pain$PAT_RACE[pain$PAT_RACE %in%
                 c("ALASKA NATIVE", "AMERICAN INDIAN")] <- "AI/AN"
 table(pain$PAT_RACE)
 
+```
+
+```{r}
 # there is another function `which()` that can be used to return the index value for all the TRUE values
 # we can use this with the race 'DECLINED' as not specified
 pain$PAT_RACE[which (pain$PAT_RACE == "DECLINED")] <- "NOT SPECIFIED"
 subset(pain, pain$PAT_RACE == "OTHER")
 pain$PAT_RACE[pain$PATIENT_NUM==3588] <- "NOT SPECIFIED"
 table(pain$PAT_RACE)
+```
 
+# Intro to Exploratory Data Analysis
 
-# ----- 4. Intro to Exploratory Data Analysis -----
-
-install.packages('GGally')
-install.packages('gt')
-install.packages('gtsummary')
+```{r}
+# install.packages('GGally')
+# install.packages('gt')
+# install.packages('gtsummary')
 
 library(HDSinRdata)
 library(GGally)
 library(gt)
 library(gtsummary)
+```
 
-# ----- 4.1 Univariate Distributions -----
+## Univariate Distributions
 
-# the database we are working with is a sample of the National Health and Nutrition Examination Survey (Centers for Disease Control and Prevention (CDC) 1999-2018) containing lead, blood pressure, BMI, smoking status, alcohol use, and demographic variables from NHANES 1999-2018.
-# if you ever need to see the column descriptions, you can use:
+The database we are working with is a sample of the National Health and Nutrition Examination Survey (Centers for Disease Control and Prevention (CDC) 1999-2018) containing lead, blood pressure, BMI, smoking status, alcohol use, and demographic variables from NHANES 1999-2018.
+
+If you ever need to see the column descriptions, you can use:
+
+```{r}
 ?NHANESsample
+```
 
-# first we want to see if there are any missing values
-sum(complete.cases(NHANESsample)) # see if there are any complete rows
+First, we want to see if there are any missing values.
+
+```{r}
+sum(complete.cases(NHANESsample)) # see if there are any complete rows 
 apply(NHANESsample, 2, function(x) sum(is.na(x)))/nrow(NHANESsample) # see which columns have the most missing values
-nhanes_df <- na.omit(subset(NHANESsample,
+```
+
+```{r}
+# now based on the above output of which rows have missing values:
+nhanes_df <- na.omit(subset(NHANESsample, 
                             select = -c(SBP2, SBP3, SBP4, DBP2, DBP3, DBP4))) # here we are asking to create a subset of the df where it will only keep the columns besides the ones selected that have full data 
 
 # we can now look at some of the columns more in depth
 table(nhanes_df$SMOKE)
-summary(nhanes_df$YEAR)
+```
 
-# if we want to look at the most recent observations from the data, we would again use the subset() function
+```{r}
+# if we want to look at the most recent observations from the data, we would again use the `subset()` function
 nhanes_df <- subset(nhanes_df, nhanes_df$YEAR == 2017)
+```
 
-# now we want to create a new column for if a person has ever smoked (combining the QuitSmoke and StillSmoke variables)
+```{r}
+# now we want to create a new column for if a person has ever smoked (combining the 'QuitSmoke' and 'StillSmoke' variables)
 nhanes_df$EVER_SMOKE <- ifelse(nhanes_df$SMOKE %in% c("QuitSmoke",
                                                       "StillSmoke"),
                                "Yes", "No")
 table(nhanes_df$EVER_SMOKE)
-# if we wanted to just see the output and not store it in a column, we could use the pipe operator `|>`
+```
+
+```{r}
+# if we want to just see the output and not store it in a column, we could use the pipe operator '|>'
 ifelse(nhanes_df$SMOKE %in% c("QuitSmoke", "StillSmoke"),
        "Yes", "No") |>
   table()
+```
 
+```{r}
 # now we want to look at the lead column
 hist(log(nhanes_df$LEAD))
+```
 
+```{r}
 # we can add to this visual by customizing the plot
 hist(log(nhanes_df$LEAD), breaks=30, col="blue",
      main="Histogram of Log Blood Lead Level",
      xlab="Log Blood Lead Level")
+```
 
-# for categorical columns we can use count of each variable
+```{r}
+# for categorical columns, we can use count of each variable
 smoke_counts <- table(nhanes_df$SMOKE)
 barplot(height=smoke_counts, names=names(smoke_counts),
         col="violetred", xlab="Smoking Status", ylab="Frequency")
+```
 
+```{r}
 # you can even use multiple colors for each bar
-barplot(height = smoke_counts, names = names(smoke_counts),
-        col = c("orange","violetred", "blue"),
+barplot(height=smoke_counts, names=names(smoke_counts),
+        col=c("orange", "violetred", "blue"),
         xlab="Smoking Status", ylab="Frequency")
+```
 
-# PRACTICE QUESTION
+#### Practice Question
+
+```{r}
 lead_quantile_counts <- table(nhanes_df$LEAD_QUANTILE) / sum(table(nhanes_df$LEAD_QUANTILE))
 barplot(height=lead_quantile_counts, names=names(lead_quantile_counts),
         col="red",xlab="Lead Quantile", ylab="Percentage")
+```
 
-# ----- 4.2 Bivariate Distributions -----
+## Bivariate Distributions
 
-# now if we want to look at the distribution of the categorical columns of smoking status by sex
+Now, if we want to look at the distributions of the categorical columns of smoking status by sex:
+
+```{r}
 table(nhanes_df$SMOKE, nhanes_df$SEX)
-# and if we want to look at the numeric breakdown of lead by sex
+```
+
+```{r}
+# and if we want to look at the numeric breadown of lead by sex
 summary(nhanes_df$LEAD[nhanes_df$SEX=="Female"])
 summary(nhanes_df$LEAD[nhanes_df$SEX=="Male"])
+```
 
-# we can also visually view a categorical column and continuous column by using boxplots with the plot() function
-# the first argument for the function is the x-axis and the second is the y-axis
+We can also visually view a categorical column and continuous column by using **boxplots** with the `plot()` function.
+
+The first argument for the function is the x-axis and the second is the y-axis.
+
+```{r}
 plot(nhanes_df$SEX, log(nhanes_df$LEAD), ylab="Log Blood Lead Level",
      xlab="Sex")
+```
 
+```{r}
 # we can also combine categorical values in a more advanced boxplot
-boxplot(log(LEAD) ~ SEX + EVER_SMOKE, data = nhanes_df,
+boxplot(log(LEAD) ~ SEX + EVER_SMOKE, data=nhanes_df,
         col=c("orange", "blue", "orange", "blue"),
-        xlab="Sex: Ever Smoked", ylab="Log BLood Lead Level")
+        xlab="Sex: Ever Smoked", ylab="Log Blood Lead Level")
+```
 
-# to see the distribution of two continuous columns, its best to use scatterplots
+To see the distribution of two continuous columns, its best to use **scatterplots**
+
+```{r}
 plot(nhanes_df$SBP1, nhanes_df$DBP1, col="blue",
-     xlab="Systolic Blood Pressure",
-     ylab="Diastolic Blood Pressure")
-# since these two look highly correlated from the scatterplot, we can calculate the Pearson and Spearman correlation using the cor() function
-# the default is Pearson but you can specify which correlation to use
-cor(nhanes_df$SBP1, nhanes_df$DBP1)
-cor(nhanes_df$SBP1, nhanes_df$DBP1, method="spearman")
-
-# we can further customize the scatterplots by using another variable as the color gradient instead of specifying a color
-plot(nhanes_df$SBP1, nhanes_df$DBP1, col=as.factor(nhanes_df$HYP),
      xlab="Systolic Blood Pressure",
      ylab="Diastolic Blood Pressure")
 abline(v=120, col="blue") # these lines are to show the cutoff for the hypertension variable
 abline(h=80, col="blue") # aka 120/80 is the cutoff for blood pressure
+```
 
+```{r}
 # we can also combine plots to display next to one another
-par(mfrow=c(1, 2))
+par(mfrow=c(1,2))
+
 # boxplot
 boxplot(log(LEAD) ~ HYP, data=nhanes_df, xlab="Hypertension",
         ylab="Log Blood Lead Level")
-# Scatterplot
+
+# scatterplot
 plot(nhanes_df$SBP1, nhanes_df$DBP1, col=as.factor(nhanes_df$HYP),
      xlab="Systolic Blood Pressure",
      ylab="Diastolic Blood Pressure")
 abline(v=120,col="blue")
 abline(h=80,col="blue")
-# this is done with the par() function which stands for parameters and using the arguments mfrow = c(nrow, ncol)
+```
+
+```{r}
+# this is done with the par() function which stands for parameters and using the arguments mfrow = c(nrow,ncol)
 # we do have to reset the par() for the rest of the displays
 par(mfrow=c(1,1))
+```
 
-# PRACTICE QUESTION
+#### Practice Question
+
+```{r}
 table(nhanes_df$EDUCATION)
 # need to plot 3 boxplots next to each other
 par(mfrow=c(1,3))
@@ -713,112 +1047,161 @@ boxplot(INCOME ~ BMI_CAT, data=more_than_hs,
         main="More than High School",
         xlab="BMI Category",
         ylab="Income")
+```
 
-
+```{r}
 # then reset the par() again
 par(mfrow=c(1,1))
+```
 
-# ----- 4.3 Autogenerating Plots -----
-# the ggpairs() function plots univariate and bivariate relationships at the same time
+## Autogenerating Plots
+
+The `ggpairs()` function plots univariate and bivariate relationships at the same time.
+
+```{r}
 ggpairs(nhanes_df, columns=c("SEX", "AGE", "LEAD", "SBP1", "DBP1"))
-# another function is the ggcorr() which takes in all the dataframe but only the numeric columns and displays the relationships between them (aka a correlation graph) and the positional argument option is `label=TRUE`
+```
+
+Another function is the `ggcorr()` function which takes in all the dataframe but only the numeric columns and displays the relationships between them (aka a correlation graph) and the positional argument option is `label=TRUE`
+
+```{r}
 nhanes_df[, c("AGE", "LEAD", "SBP1", "DBP1")] |>
   ggcorr(label=TRUE)
+```
 
-# ----- 4.4 Tables -----
-# another way to view information is through a table
-# the gt package and gtsummary package are used for this
+## Tables
+
+Another way to view information is through a table.
+
+The **gt** package and **gtsummary** package are used for this.
+
+```{r}
 gt(head(nhanes_df[,c("ID", "AGE", "SEX", "RACE")]))
+```
 
-# the tbl_summary() function is from the gtsummary package and is used to summarize all the columns in the data # it uses the argument `include` to specify which columns to include
-# the output can be piped into the `as_gt()` function
-tbl_summary(nhanes_df,
-            include=c("SEX", "RACE", "AGE", "EDUCATION", "SMOKE",
-                      "BMI_CAT", "LEAD", "SBP1", "DBP1", "HYP")) |> 
-  as_gt()
+The `tbl_summary()` function is from the **gtsummary** package and is used to summarize all the columns in the data. It uses the argument `include` to specify which columns to include.
 
-# if we want to change the type of data reported in the summary table, we would do so with the `statistic` argument
-tbl_summary(nhanes_df,
-            include=c("SEX", "RACE", "AGE", "EDUCATION", "SMOKE",
-                      "BMI_CAT", "LEAD", "SBP1", "DBP1", "HYP"),
-            by="HYP",
-            statistic=list(all_continuous() ~ "{mean} ({sd})")) |> 
-  as_gt()
+The output can be piped into the `as_gt()` function.
 
-# ----- 5. Data Transformations and Summaries -----
-# here will be using the dplyr package which is used for more extensive data exploration and transformation
+```{r}
+tbl_summary(nhanes_df, include=c("SEX", "RACE", "AGE", "EDUCATION", "SMOKE", "BMI_CAT", "LEAD", "SBP1", "DBP1", "HYP")) |> as_gt()
+```
+
+```{r}
+# if we want to change the type of data reported in the summary table, we would do so with the statistic argument
+
+tbl_summary(nhanes_df, include=c("SEX", "RACE", "AGE", "EDUCATION", "SMOKE", "BMI_CAT", "LEAD", "SBP1", "DBP1", "HYP"), by="HYP", statistic=list(all_continuous() ~ "{mean} ({sd})")) |> as_gt()
+```
+
+# Data Transformations and Summaries
+
+Here will be using the **dplyr** package which is used for more extensive data exploration and transformation.
+
+```{r}
 library(HDSinRdata)
 library(tidyverse)
 data(NHANESsample)
 
 class(NHANESsample)
+```
 
-# a tibble has all the properties of data frames but its a more modern version of a data frame
-# the function as_tibble()
-nhanes_df <- as_tibble(NHANESsample)
-print(head(nhanes_df))
-nhanes_df <- as.data.frame(nhanes_df)
-print(head(nhanes_df))
+A **tibble** has all the properties of data frames but its a more modern version of a data frame
 
-# ----- 5.2 Subsetting Data -----
+the function: `as_tibble()`
+
+```{r}
+nhanes_df <- as_tibble(NHANESsample) 
+print(head(nhanes_df)) 
+nhanes_df <- as.data.frame(nhanes_df) 
+print(head(nhanes_df))
+```
+
+## Subsetting Data
+
+```{r}
 # we can only see the head of certain columns that we select
 select(nhanes_df, c(RACE, LEAD)) %>% head()
-# we can remove columns with -c() 
+
+# we can remove columns with -c()
 nhanes_df <- nhanes_df %>% select(-c(ID, LEAD_QUANTILE))
 names(nhanes_df)
+```
 
+```{r}
 # if you want to filter the data to only observations after 2008
 nhanes_df_recent <- nhanes_df %>% filter(YEAR >= 2008)
+```
 
+```{r}
 # Example 1: multiple filter calls
 nhanes_df_males1 <- nhanes_df %>%
   filter(YEAR <= 2012) %>%
   filter(YEAR >= 2008) %>%
   filter(SEX == "Male")
+```
 
+```{r}
 # Example 2: combine with & operator
 nhanes_df_males2 <- nhanes_df %>%
   filter((YEAR <= 2012) & (YEAR >= 2008) & (SEX == "Male"))
+```
 
+```{r}
 # Example 3: combine into one filter call with commas
 nhanes_df_males3 <- nhanes_df %>%
   filter(between(YEAR, 2008, 2012), SEX == "Male")
+```
 
+```{r}
 # the slice() function to select a slice of rows by their index
 slice(nhanes_df, c(1, nrow(nhanes_df)))
+# slice_sample() is a function takes in an argument `n` which specifies the number of random rows to sample from the data
+```
 
-# slice_sample() is a function takes in an argument `n` which specifies the number of random rows to sample from the data 
-
-
+```{r}
 # slice_max() and slice_min() are functions to specify a column through the argument `order_by` and return the `n` rows with either the highest or lowest values in that column
 # three male observations with highest blood lead level in 2007
 nhanes_df %>%
   filter(YEAR == 2007, SEX == "Male") %>%
   select(c(RACE, EDUCATION, SMOKE, LEAD, SBP1, DBP1)) %>%
   slice_max(order_by=LEAD, n=3)
+```
 
+```{r}
 # three male observations with lowest blood lead level in 2007
 nhanes_df %>%
   filter(YEAR == 2007, SEX == "Male") %>%
   select(c(RACE, EDUCATION, SMOKE, LEAD, SBP1, DBP1)) %>%
   slice_min(order_by=LEAD, n=3)
+```
 
-# ----- 5.3 Updating Rows and Columns -----
-# these next functions are to update the rows and columns of the data itself 
-# the function `rename()` is to change the names of columns
-nhanes_df <- nhanes_df %>% rename(PIR = INCOME, SMOKE_STATUS = SMOKE) # PIR is for poverty income ratio
+## Updating Rows and Columns
+
+These functions are to update the rows and columns of the data itself.
+
+The function `rename()` is to change the names of the columns.
+
+```{r}
+nhanes_df <- nhanes_df %>% rename(PIR=INCOME, SMOKE_STATUS=SMOKE) # PIR is for poverty income ratio
 names(nhanes_df)
+```
 
+```{r}
 ifelse(nhanes_df$SMOKE_STATUS == "NeverSmoke", "No", "Yes") %>%
   table()
+```
 
+```{r}
 # the function `case_when()` is an extension of `ifelse()` but allows to specify more than two cases
 case_when(nhanes_df$SMOKE_STATUS == "NeverSmoke" ~ "Never Smoked",
           nhanes_df$SMOKE_STATUS == "QuitSmoke" ~ "Quit Smoking",
           nhanes_df$SMOKE_STATUS == "StillSmoke" ~ "Current Smoker") %>%
   table()
+```
 
-# the function `mutate()` takes a data frame and a set of columns with associated names to add to the data or update
+The function `mutate()` takes a data frame and a set of columns with associated names to add to the data or update
+
+```{r}
 # the below we both create the new column and update the current column at the same time
 nhanes_df <- nhanes_df %>% 
   mutate(EVER_SMOKE = ifelse(SMOKE_STATUS == "NeverSmoke", 
@@ -827,7 +1210,9 @@ nhanes_df <- nhanes_df %>%
            case_when(SMOKE_STATUS == "NeverSmoke" ~ "Never Smoked",
                      SMOKE_STATUS == "QuitSmoke" ~ "Quit Smoking",
                      SMOKE_STATUS == "StillSmoke" ~ "Current Smoker")) 
+```
 
+```{r}
 # the function `arrange()` takes in a data frame and a vector of columns used to sort the data
 nhanes_df %>% 
   select(c(YEAR, SEX, SMOKE_STATUS, SBP1, DBP1, LEAD)) %>%
@@ -835,31 +1220,45 @@ nhanes_df %>%
   arrange(desc(SBP1), desc(DBP1)) %>%
   head(8)
 # the above is sorted by SBP1 and then by DBP1
+```
+
+```{r}
 # the below is sorting just by SBP1
 nhanes_df %>% 
   select(c(YEAR, SEX, SMOKE_STATUS, SBP1, DBP1, LEAD)) %>%
   filter(SEX == "Male", SMOKE_STATUS == "Current Smoker") %>%
   arrange(desc(SBP1)) %>%
   head(8)
+```
 
-# PRACTICE QUESTION
+#### Practice Question
+
+```{r}
 nhanes_df %>%
   mutate(DBP_CHANGE = DBP4 - DBP1) %>%
   select(c(DBP1, DBP4, DBP_CHANGE)) %>%
   arrange(DBP_CHANGE) %>%
   head(4)
+```
 
-# ----- 5.4 Summarizing and Grouping -----
-# the `count()` function takes a data frame and one or more columns and counts the number of rows for each combination of unique values in these columns
+## Summarizing and Grouping
+
+The `count()` function takes a data frame and one or more columns and counts the number of rows for each combination of unique values in these columns.
+
+```{r}
 count(nhanes_df)
 count(nhanes_df, RACE, YEAR)
+```
 
+```{r}
 # if we want to find the total number of observations as well as the mean and median systolic blood pressure for Non-Hispanic Blacks
 nhanes_df %>%
   filter(RACE == "Non-Hispanic Black") %>%
   summarize(TOT = n(), MEAN_SBP = mean(SBP1, na.rm=TRUE),
             MEAN_DBP = mean(DBP1, na.rm=TRUE))
+```
 
+```{r}
 # the `group_by()` function takes a data frame and one or more columns with which to group the data
 nhanes_df %>%
   group_by(RACE) %>%
@@ -869,7 +1268,9 @@ nhanes_df %>%
   group_by(RACE) %>%
   summarize(TOT = n(), MEAN_SBP = mean(SBP1, na.rm=TRUE),
             MEAN_DBP=mean(DBP1, na.rm=TRUE))
+```
 
+```{r}
 # we can also then ungroup the data using the ungroup() function which restores the data to a single data frame
 nhanes_df %>%
   select(SEX, RACE, SBP1, DBP1) %>%
@@ -877,10 +1278,15 @@ nhanes_df %>%
   ungroup() %>%
   arrange(desc(SBP1)) %>%
   slice(1)
+```
 
-# ----- 6. CASE STUDY: Cleaning Tuberculosis Screening Data -----
-# the data we will be using is the tb_diagnosis_raw in the HDSinRdata package
-# this data represents 1634 patients in rural South Africa who tested for TB
+# CASE STUDY: Cleaning Tuberculosis Screening Data
+
+The data we will be using is the `tb_diagnosis_raw` in the **HDSinRdata** package.
+
+This data represents 1634 patients in rural South Africa who tested for TB.
+
+```{r}
 library(HDSinRdata)
 library(tidyverse)
 library(gt)
@@ -888,10 +1294,14 @@ library(gtsummary)
 
 # Read in data 
 data("tb_diagnosis_raw")
+```
 
+```{r}
 # Inspect variable descriptions
 ?tb_diagnosis_raw
+```
 
+```{r}
 # the first thing we want to do is drop columns related to the participation in the survery and about seeking care
 # there are also variables containing long or vague names so we will rename most of the variables
 # Select variables and rename
@@ -912,16 +1322,22 @@ tb_df <- tb_diagnosis_raw %>%
 
 tbl_summary(tb_df) %>%
   as_gt()
+```
 
-# sometimes we also want to standard the variables used in each column
-# for this example, there are some columns using 0/1 and others using 1/2 for boolean values
+Sometimes we also want to standard the variables used in each column.
+
+For this example, there are some columns using 0/1 and others using 1/2 for boolean values.
+
+```{r}
 # re-code binary variables to 0/1 instead of 1/2
 tb_df$tb <- case_when(tb_df$tb == 1 ~ "TB Positive",
                       tb_df$tb == 2 ~ "TB Negative")
 tb_df$male <- case_when(tb_df$sex == 1 ~ 1,
                         tb_df$sex == 2 ~ 0)
 tb_df <- tb_df %>% select(-c(sex))
+```
 
+```{r}
 # Re-code diabetes to check if missing
 tb_df$diabetes <- case_when(tb_df$other_conditions_fac___3 == 1 ~ 1,
                             tb_df$other_conditions_fac___1 == 1 ~ 0,
@@ -933,7 +1349,9 @@ tb_df <- tb_df %>% select(-c(other_conditions_fac___1,
                              other_conditions_fac___88,
                              other_conditions_fac___99))
 table(tb_df$diabetes)
+```
 
+```{r}
 # Re-code variables with missing or refused values
 tb_df$hiv_pos <- case_when((tb_df$hiv_pos == 1) ~ 1,
                            tb_df$hiv_pos %in% c(2, 77) ~ 0,
@@ -950,14 +1368,18 @@ tb_df$past_tb <- case_when(tb_df$past_tb == 1 ~ 1,
 tb_df$education[tb_df$education == 99] <- NA
 hist(tb_df$education, xlab = "Years of Education",
      main = "Histograph of Education Years")
+```
 
+```{r}
 # Categorize education to HS and above
 tb_df$hs_less <- case_when(tb_df$education <= 12 ~ 1,
                            tb_df$education > 12 ~ 0,
                            TRUE ~ NA)
 # now we don't need the education column anymore so we will remove it
 tb_df <- tb_df %>% select(-c(education))
+```
 
+```{r}
 # we now want to see how long someone has entered symptoms so we can look at the different units of time there are
 tb_df %>%
   group_by(length_symp_unit_fac) %>%
@@ -965,11 +1387,15 @@ tb_df %>%
             missing_wks = sum(is.na(length_symp_wk_fac))/n(),
             missing_mnt = sum(is.na(length_symp_mnt_fac))/n(),
             missing_yr = sum(is.na(length_symp_yr_fac))/n())
+```
 
+```{r}
 # we can also check to see if all the integers are positive or not
 min(tb_df$length_symp_days_fac, na.rm = TRUE)
 is.integer(tb_df$length_symp_days_fac)
+```
 
+```{r}
 # we now want to create a new variable for whether or not a person has experienced symptoms for more than two weeks
 # Categorize number of weeks experiencing symptoms
 tb_df <- tb_df %>%
@@ -984,7 +1410,9 @@ tb_df <- tb_df %>%
   select(-c(length_symp_wk_fac, length_symp_days_fac,
             length_symp_mnt_fac, length_symp_yr_fac,
             length_symp_unit_fac))
+```
 
+```{r}
 # we next want to create a new summary column that represents the total number of classic TB symptoms rather than keeping track of individual symptoms
 # Count total number of symptoms
 tb_df$num_symptoms <- tb_df$fever + tb_df$weight_loss + tb_df$cough +
@@ -992,16 +1420,22 @@ tb_df$num_symptoms <- tb_df$fever + tb_df$weight_loss + tb_df$cough +
 tb_df$num_symptoms[tb_df$symptoms_missing == 1] <- NA
 tb_df <- tb_df %>% select(-c(night_sweats, weight_loss, cough, fever,
                              symptoms_missing))
+```
 
+```{r}
 # Exclude observations with no TB symptoms
 tb_df <- tb_df %>%
   filter(num_symptoms != 0)
 
 table(tb_df$num_symptoms)
+```
 
+```{r}
 # Convert all variables to factors
 tb_df[] <- lapply(tb_df, function(x){return(as.factor(x))})
+```
 
+```{r}
 # we are now going to create a final summary table that includes all the summary statistics
 tbl_summary(tb_df, by = "tb",
             label = list(
@@ -1019,10 +1453,11 @@ tbl_summary(tb_df, by = "tb",
   add_overall() %>%
   as_gt() %>%
   cols_width(everything() ~ "55pt")
+```
 
+# Merging and Reshaping Data
 
-# ----- 7. Merging and Reshaping Data -----
-
+```{r}
 library(tidyverse)
 library(HDSinRdata)
 
@@ -1033,7 +1468,9 @@ data(mobility) # data set contains daily mobility estimates by state in 2020
 head(covidcases)
 head(mobility)
 head(lockdowndates)
+```
 
+```{r}
 # the function `as.Date()` tells R to treat these columns as dates instead of characters
 mobility$date <- as.Date(mobility$date, formula="%Y-%M-%D")
 lockdowndates$Lockdown_Start <- as.Date(lockdowndates$Lockdown_Start,
@@ -1046,24 +1483,38 @@ class(lockdowndates$Lockdown_End)
 
 month(mobility$date[1])
 week(mobility$date[1])
+```
 
+```{r}
 # this is a test to show what the as.Date() and adding time calculations looks like
 as.Date("2019-12-29") + weeks(1)
+```
 
+```{r}
 covidcases$date <- as.Date("2019-12-29") + weeks(covidcases$week - 1) # this is now adding one week to this specific date
 head(covidcases)
+```
 
-# ----- 7.1 Tidy Data -----
-# data is considered a tidy if:
-# - each variable is associated with a single column
-# - each observation is associated with a single row
-# - each value has its own cell
+## Tidy Data
+
+Data is considered tidy if:
+
+-   each variable is associated with a single column
+
+-   each observation is associated with a single row
+
+-   each value has its own cell
+
+```{r}
 mat_mort1 <- data.frame(country=c("Turkey", "United States",
                                   "Sweden", "Japan"),
                         y2002 = c(64, 9.9, 4.17, 7.8),
                         y2007 = c(21.9, 12.7, 1.86, 3.6),
                         y2012 = c(15.2, 16, 5.4, 4.8))
 head(mat_mort1)
+```
+
+```{r}
 # the above isn't a tidy because the variable for maternity mortality rate is associated with multiple columns
 # to make it a tidy, we can create separate columns for country, year, and maternity mortality rate
 mat_mort2 <- data.frame(
@@ -1071,10 +1522,15 @@ mat_mort2 <- data.frame(
   year = c(rep(2002, 4), rep(2007, 4), rep(2012, 4)),
   mat_mort_rate = c(64.0, 9.9, 4.17, 7.8, 21.9, 12.7, 1.86, 3.6, 15.2, 16, 5.4, 4.8))
 head(mat_mort2)
+```
 
-# ----- 7.2 Reshaping Data -----
-# another function is `pivot_longer()` to change the data from what is called **wide form** to what is called **long form**
-# an example of this is if we want to take the lockdown data:
+## Reshaping Data
+
+Another function is `pivot_longer()` to change the data from what is called **wide form** to what is called **long form**.
+
+An example of this is if we want to take the lockdown data:
+
+```{r}
 lockdown_long <- lockdowndates %>%
   pivot_longer(cols = c("Lockdown_Start", "Lockdown_End"),
                names_to = "Lockdown_Event", values_to = "Date") %>%
@@ -1083,12 +1539,17 @@ lockdown_long <- lockdowndates %>%
                                  "Start", "End")) %>%
   na.omit()
 head(lockdown_long)
+```
+
+```{r}
 # we can then take this data and transform it back to wider by using the `pivot_wider()` function
 lockdown_wide <- pivot_wider(lockdown_long,
                              names_from = Lockdown_Event,
                              values_from = Date)
 head(lockdown_wide)
+```
 
+```{r}
 # now suppose that we want to create a data frame where the columns correspond to the number of cases for each state in New England
 ne_cases <- covidcases %>%
   filter(state %in% c("Maine", "Vermont", "New Hampshire",
@@ -1100,46 +1561,67 @@ ne_cases <- covidcases %>%
   ungroup()
 head(ne_cases)
 # the above will give a warning message stating that the data is still grouped by state
+```
 
+```{r}
 # we now want to convert this data to wider format with a column for each state
 pivot_wider(ne_cases, names_from = state, values_from = total_cases)
+```
 
+## Merging Data with Joins
 
-# ----- 7.3 Merging Data with Joins -----
+```{r}
 # merging two data frames is called joining
 table1 <- data.frame(age = c(14, 26, 32),
                      name = c("Alice", "Bob", "Alice"))
 table2 <- data.frame(name = c("Carol", "Bob"),
                      statins = c(TRUE, FALSE))
 full_join(table1, table2, by = "name")
+```
 
-# Types of Joins:
-# - left_join(table1, table2, by): Joins each row of table1 with all matches in table2.
-# - right_join(table1, table2, by): Joins each row of table2 with all matches in table1 (the opposite of a left join)
-# - inner_join(table1, table2, by): Looks for all matches between rows in table1 and table2. Rows that do not find a match are dropped.
-# - full_join(table1, table2, by): Keeps all rows from both tables and joins those that match. Rows that do not find a match have NA values filled in.
-# - semi_join(table1, table2, by): Keeps all rows in table1 that have a match in table2 but does not join to any information from table2.
-# - anti_join(table1, table2, by): Keeps all rows in table1 that do not have a match in table2 but does not join to any information from table2. The opposite of a semi-join.
+**Types of Joins:**
 
+-   `left_join(table1, table2, by)`: Joins each row of table1 with all matches in table2.
+
+-   `right_join(table1, table2, by)`: Joins each row of table2 with all matches in table1 (the opposite of a left join)
+
+-   `inner_join(table1, table2, by)`: Looks for all matches between rows in table1 and table2. Rows that do not find a match are dropped.
+
+-   `full_join(table1, table2, by)`: Keeps all rows from both tables and joins those that match. Rows that do not find a match have NA values filled in.
+
+-   `semi_join(table1, table2, by)`: Keeps all rows in table1 that have a match in table2 but does not join to any information from table2.
+
+-   `anti_join(table1, table2, by)`: Keeps all rows in table1 that do not have a match in table2 but does not join to any information from table2. The opposite of a semi-join.
+
+```{r}
 covidcases_full <- left_join(covidcases, lockdowndates,
                              by = c("state" = "State")) # sometimes we need to specify the joining column if its slightly worded differently
 head(covidcases_full)
+```
 
+```{r}
 # the `between()` function creates a new column
 covidcases_full <- covidcases_full %>%
   mutate(lockdown = between(date, Lockdown_Start, Lockdown_End)) %>% # the new column 'lockdown' we created based on the two date columns
   select(-c(Lockdown_Start, Lockdown_End)) # now we don't need them, we drop these columns
+```
 
+```{r}
 covidcases_full %>%
   filter(state == "Alabama", county == "Jefferson",
          date <= as.Date("2020-05-10"))
+```
 
+```{r}
 covidcases_full <- inner_join(covidcases_full, mobility,
                               by = c("state", "date")) %>%
   select(-c(samples, m50_index))
 head(covidcases_full)
+```
 
-# PRACTICE QUESTION
+#### Practice Question
+
+```{r}
 df_A <- data.frame(patient_id = c(12, 9, 12, 8, 14, 8), 
                    visit_num = c(1, 1, 2, 1, 1, 2), 
                    temp = c(97.5, 96, 98, 99, 102, 98.6), 
@@ -1153,8 +1635,11 @@ df_B
 df_AB <- inner_join(df_A, df_B,
                     by = c("patient_id", "visit_num"))
 head(df_AB)
+```
 
-# ----- 8. Visualization with ggplot2 -----
+# Visualization with ggplot2
+
+```{r}
 library(tidyverse)
 library(HDSinRdata)
 library(patchwork)
@@ -1164,67 +1649,103 @@ data(pain)
 set.seed(5)
 pain_df_sub <- subset(pain,
                       select = -c(PAIN_INTENSITY_AVERAGE.FOLLOW_UP))
+```
 
+```{r}
 pain_df <- pain[complete.cases(pain_df_sub), ]
 pain_df <- pain_df[sample(1:nrow(pain_df), 5000, replace = FALSE),]
+```
 
-# ----- 8.1 Intro to ggplot -----
-# the function `ggplot()` is to create a graph but using just the ggplot() will bring up an empty gray box that you build up with the code you put in it
+## Intro to ggplot
+
+The function `ggplot()` is to create a graph but using just the `ggplot()` function will bring up an empty gray box that you build up with the code you put in it
+
+```{r}
 ggplot()
+```
 
-# the function `aes()` is to create aesthetics for the graph that you are making
-# geom_point() is for scatterplots
+The function `aes()` is to create aesthetics for the graph that you are making
+
+`geom_point()` is for **scatterplots**
+
+```{r}
 ggplot(pain_df) + geom_point(aes(x=PROMIS_ANXIETY,
                                  y=PROMIS_DEPRESSION))
+```
+
+```{r}
 # Alternative 1:
 ggplot(pain_df, aes(x = PROMIS_ANXIETY, y = PROMIS_DEPRESSION)) +
   geom_point()
+```
+
+```{r}
 # Alternative 2:
 ggplot() +
   geom_point(data = pain_df, aes(x = PROMIS_ANXIETY,
                                  y = PROMIS_DEPRESSION))
+```
 
+```{r}
 # now the `labs()` function adds layers to the graph
 ggplot(pain_df) +
   geom_point(aes(x = PROMIS_ANXIETY, y = PROMIS_DEPRESSION),
              color = "blue", size = 2, shape = 5) +
   labs(x = "PROMIS Anxiety Score", y = "PROMIS Depression Score",
        title = "Depression vs Anxiety Scores")
+```
 
-# other plotting options include `geom_histogram()` which has the options: `binwidth`, `y`, `alpha`, `color`, `fill`, `linetype`, `size`, and `weight`
-# by default: `y` in a histogram is the count for each bin
-# `theme_minimal()` function is used to change the background colors
-# `theme_bw()` function is the classic dark on light theme
+Other plotting options include `geom_histogram()` which has the options: `binwidth`, `y`, `alpha`, `color`, `fill`, `linetype`, `size`, and `weight`
 
+-   by default: `y` in a histogram is the count for each bin
+
+-   `theme_minimal()` function is used to change the background colors
+
+-   `theme_bw()` function is the classic dark on light theme
+
+```{r}
 ggplot(pain_df) +
   geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE), color = "violetred",
                  fill = "lightblue", alpha = 0.5, bins = 11) +
   labs(x = "Patient Reported Pain Intensity", y = "Count") +
   theme_minimal()
+```
 
-# PRACTICE QUESTION
+#### Practice Question
+
+```{r}
 ggplot(pain_df, aes(x = GH_MENTAL_SCORE, y = PROMIS_SLEEP_DISTURB_V1_0)) +
   geom_smooth(color="navy", se=TRUE, fill = "lightblue")
+```
 
-# ----- 8.2 Adjusting the Axes and Aesthetics -----
-# the function `scale_x_continuous()` allows to specify the `limits`, `breaks`, and `labels`
+## Adjusting the Axes and Aesthetics
 
+The function `scale_x_continuous()` allows to specify the `limits`, `breaks`, and `labels`
+
+```{r}
 ggplot(pain_df) +
   geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE), color = "violetred",
                  fill = "lightblue", alpha = 0.5, bins = 11) +
   labs(x = "Patient Reported Pain Intensity", y = "Count") +
   scale_x_continuous(breaks = 0:10) +
   theme_minimal()
+```
 
+```{r}
 # the `position="jitter"` added the to `geom_point()` function jitters the points making them not exactly line up to the lines making it easier to see trends
 ggplot(pain_df) +
   geom_point(aes(x = PROMIS_PHYSICAL_FUNCTION,
                  y = PROMIS_SLEEP_DISTURB_V1_0,
                  color = PAIN_INTENSITY_AVERAGE), position="jitter")
+```
 
-# the `scale_color_gradient()` function allows us to specify the low and high end colors
-# you can also combo this and use `scale_color_grandient2()` and `scale_color_grandientn()` to specify more color points
-# the function `coord_cartesian()` is used to specify the limits which clips the values rather than removing points outside the limits
+The `scale_color_gradient()` function allows us to specify the low and high end colors.
+
+You can also combo this and use `scale_color_grandient2()` and `scale_color_grandientn()` to specify more color points.
+
+The function `coord_cartesian()` is used to specify the limits which clips the values rather than removing points outside the limits.
+
+```{r}
 ggplot(pain_df) +
   geom_point(aes(x = PROMIS_PHYSICAL_FUNCTION,
                  y = PROMIS_SLEEP_DISTURB_V1_0,
@@ -1241,7 +1762,9 @@ ggplot(pain_df) +
   labs(x = "PROMIS Physical Function T-Score",
        y = "PROMIS Sleep Distrubance T-Score") +
   theme_minimal()
+```
 
+```{r}
 # now we want to create boxplots of the race categories
 pain_df$PAT_RACE_CAT <- ifelse(pain_df$PAT_RACE %in% c("BLACK", "WHITE"),
                                pain_df$PAT_RACE, "OTHER")
@@ -1251,8 +1774,11 @@ ggplot(pain_df) +
   geom_boxplot(aes(y = PAT_RACE_CAT, x = PAIN_INTENSITY_AVERAGE,
                    fill = PAT_RACE_CAT), alpha = 0.5) +
   theme_minimal()
+```
 
-# the function `scale_y_discrete()` is a scale function that corresponds to a discrete y-asix
+The function `scale_y_discrete()` is a scale function that corresponds to a discrete y-axis
+
+```{r}
 # we can also specify color using the color `palette` option
 ggplot(pain_df)+
   geom_boxplot(aes(y = PAT_RACE_CAT, x = PAIN_INTENSITY_AVERAGE,
@@ -1263,12 +1789,16 @@ ggplot(pain_df)+
   scale_fill_brewer(palette = "Dark2", guide = "none") +
   labs(x = "Reported Pain Intensity", y = "Reported Race") +
   theme_minimal()
+```
 
+```{r}
 # the RColorBrewer package contained other palette options
 # you can use any of the palettes using `brewer.pal()`
 library(RColorBrewer)
 display.brewer.all()
+```
 
+```{r}
 # the `scale_fill_manual()` function is used to specify the colors we want to use for the two categories using the `values` argument
 ggplot(pain_df) +
   geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE, fill = "Baseline")) +
@@ -1279,56 +1809,30 @@ ggplot(pain_df) +
                     name = "Measurement") +
   labs(x = "Reported Pain Intensity", y = "Count") +
   theme_minimal()
+```
 
-# ----- 8.3 Adding Groups -----
-# there are other ways of adding multiple layers on one visual
-pain_df$HAS_FOLLOW_UP <- 
-  !is.na(pain_df$PAIN_INTENSITY_AVERAGE.FOLLOW_UP)
+Another way to add visual is to add a **facet wrap** to your ggplot object.
+
+Facets divide a plot into subplots based on one or more discrete variable values.
+
+Grouping the rows/columns we arrange uses the function `facet_grid()`
+
+or you can wrap the plots into a rectangular format using `facet_wrap()`
+
+```{r}
 ggplot(pain_df) +
-  geom_density(aes(x = PROMIS_PHYSICAL_FUNCTION,
-                   group = HAS_FOLLOW_UP,
-                   color = HAS_FOLLOW_UP)) +
-  scale_x_continuous(breaks = c(0:10)) +
-  scale_color_discrete(name = "Follow-Up", labels = c("No", "Yes")) +
-  labs(x = "PROMIS Physical Function T-Score",
-       y = "Estimated Density") +
-  theme_minimal()
-
-
-# to do another distribution, sometimes its helpful to look at the data to find the proportions
-pain_df_grp <- pain_df %>%
-  group_by(HAS_FOLLOW_UP, PAIN_INTENSITY_AVERAGE) %>%
-  summarize(tot = n()) %>%
-  mutate(prop = tot/sum(tot)) %>%
-  ungroup()
-head(pain_df_grp)
-
-# the function `geom_col()` creates barplots
-# to not have stack bars be default, you would use the argument `position=dodge` and thatll put the bars side-by-side
-ggplot(pain_df_grp) +
-  geom_col(aes(x = PAIN_INTENSITY_AVERAGE, y = prop,
-               fill = HAS_FOLLOW_UP)) +
+  geom_histogram(aes(x=PAIN_INTENSITY_AVERAGE, fill="Baseline")) +
+  geom_histogram(aes(x=PAIN_INTENSITY_AVERAGE.FOLLOW_UP,
+                     fill="Follow-Up")) +
   scale_x_continuous(breaks=c(0:10)) +
-  scale_fill_discrete(name = "Seen at Follow Up",
-                      labels = c("No", "Yes")) +
-  labs(x = "Reported Pain Intensity", y = "Proportion") +
+  scale_fill_manual(values=c("violetred", "pink"),
+                    name="Measurement") +
+  labs(x="Reported Pain Intensity", y="Count") +
+  facet_grid(row=vars(PAT_RACE_CAT)) +
   theme_minimal()
+```
 
-# another way to add visual is to add a facet wrap to your ggplot object
-# facets divide a plot into subplots based on one or more discrete variable values
-# grouping the rows/columns we arrange uses the function `facet_grid()`
-# or you can wrap the plots into a rectangular format using `facet_wrap()`
-ggplot(pain_df) +
-  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE, fill = "Baseline")) +
-  geom_histogram(aes(x = PAIN_INTENSITY_AVERAGE.FOLLOW_UP, 
-                     fill = "Follow-Up")) +
-  scale_x_continuous(breaks = c(0:10)) +
-  scale_fill_manual(values = c("violetred", "pink"),
-                    name = "Measurement") +
-  labs(x = "Reported Pain Intensity", y = "Count") +
-  facet_grid(row = vars(PAT_RACE_CAT)) +
-  theme_minimal()
-
+```{r}
 # now we want to create another plot but first need to find the number of participants who selected each body region as well as the average pain intensity for those patients
 # we also classify each body part region into larger groups 
 pain_body_map <- data.frame(part = names(pain_df)[2:75])
@@ -1361,7 +1865,9 @@ pain_body_map <- pain_body_map %>%
                 "X224", "X225") ~ "Hips"))
 
 head(pain_body_map)
+```
 
+```{r}
 # now we are plotting the average pain value for each body part as well as the proportion of patients who categorize it as painful
 ggplot(pain_body_map) +
   geom_label(aes(x = perc_patients, y = avg_pain, label = part, 
@@ -1374,13 +1880,21 @@ ggplot(pain_body_map) +
   theme_minimal()+
   theme(legend.position="bottom", 
         panel.grid.major = element_line(color = "lightpink"))
+```
 
-# after making all these plots, it is useful to save them
-# the main function to do this is `ggsave()`
-# the **patchwork** package is to incorporate multiple plots together
-# the function `plot_layout()` function allows us to specify the grid used to arrange our figures
-# another function `guide_area()` creates a placeholder for the legends
-# and the argument `guide = "collect"` in the `plot_layout()` function specify that all guides should be put together
+After making all these plots, it is useful to save them:
+
+-   the main function to do this is `ggsave()`
+
+-   the **patchwork** package is to incorporate multiple plots together
+
+-   the function `plot_layout()` function allows us to specify the grid used to arrange our figures
+
+-   another function `guide_area()` creates a placeholder for the legends
+
+-   and the argument `guide = "collect"` in the `plot_layout()` function specify that all guides should be put together
+
+```{r}
 p1 <- ggplot(pain_body_map) +
   geom_label(aes(x = perc_patients, y = avg_pain, label = part, 
                  color = region)) + 
@@ -1393,7 +1907,9 @@ p1 <- ggplot(pain_body_map) +
   theme_minimal()+
   theme(legend.position = "bottom", 
         panel.grid.major = element_line(color = "lightpink"))
+```
 
+```{r}
 p2 <- ggplot(pain_body_map) +
   geom_histogram(aes(x = perc_patients), color = "violetred", 
                  fill = "lightpink") + 
@@ -1403,20 +1919,108 @@ p2 <- ggplot(pain_body_map) +
 
 p1 + p2 + guide_area() + plot_layout(ncol=1, guides = "collect",
                                      axes = "collect")
-
 # ggsave("images/visualization_ggplot/myplot.png", height=10) 
+```
 
+# CASE STUDY: Exploring Early COVID-19 Data 
 
+This case study focuses on COVID-19 cases and deaths during 2020 using the `covidcases` and `mobility` datasets from the "**HDSinRdata**" package. A new package that is used in this case study is **usmap** package (Di Lorenzo 2024), which allows us to easily create spatial plots of the United States.
 
-# ----- 9. CASE STUDY: Exploring Early COVID-19 Data -----
+```{r}
+install.packages("usmap")
 
+library(HDSinRdata)
+library(tidyverse)
+library(patchwork)
+library(gt)
+library(gtsummary)
+library(usmap)
+```
 
+```{r}
+?mobility
+```
 
+## Pre-processing
 
+We start by cleaning and merging our data.
 
+The `covidcases` data contains weekly confirmed COVID-19 cases and deaths at the state and county level in 2020. As the data description notes, some of these values may be negative due to data discrepancies in the cumulative counts data. The `mobility` data contains daily mobility statistics by state.
 
+```{r}
+# read in data 
+data(covidcases)
+data(mobility)
+```
 
+First, we want to look at the columns in our data. We convert the date columns in the mobility data to be recognized as a date using the `as.Date()` function. The `covidcases` data has the week number of 2020. We create a similar column for the mobility data.
 
+```{r}
+# convert to date format and find week
+mobility$date <- as.Date(mobility$date, formula="%Y-%M-%D")
+mobility$week <- week(mobility$date)
+```
 
+Now, we can summarize the mobility for a state across each week.
 
+```{r}
+# Find average mobility for week 
+mobility_week <- mobility %>%
+  group_by(state, week) %>%
+  summarize(m50=mean(m50, na.rm=TRUE), .groups="drop")
+head(mobility_week)
+```
 
+For both datasets, we want to check whether each state was observed across all dates and how the state's name is represented.
+
+For the mobility data, our data is at the state level, so we can use the `table()` function.
+
+```{r}
+# find number of dates recorded for each state
+table(mobility_week$state)
+```
+
+For the `covidcases` data, the data is at the county level. We need to summarize the data instead. In this case, some states were observed for fewer weeks than others.
+
+```{r}
+# find state names and number of weeks recorded for each state
+unique(covidcases$state)
+```
+
+```{r}
+num_wks <- covidcases %>%
+  group_by(state) %>%
+  summarize(num_weeks=n_distinct(week), .groups="drop")
+summary(num_wks)
+```
+
+"D.C." is written differently for each data source so we need to update this to merge correctly.
+
+We will update the name in the mobility data.
+
+```{r}
+mobility_week$state[mobility_week$state=="Washington, D.C."] <- "District of Columbia"
+```
+
+Now that we've checked the formatting, we can merge the data together.
+
+For this case, we are going to add the mobility data to the case data and use a `left_join()`
+
+```{r}
+# Join cases and mobility data 
+covid <- left_join(covidcases, mobility_week, by=c("state", "week"))
+```
+
+Next, we want to get some simple info about the continuous variables in the data.
+
+```{r}
+summary(covid[, c("weekly_cases", "weekly_deaths", "m50")])
+```
+
+We can see two key points from this:
+
+-   the negative values the data description warned us about
+
+-   there is no missing data
+
+-   
