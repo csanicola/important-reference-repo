@@ -71,7 +71,9 @@ getwd() # "/Users/carolinesanicola" on Mac
         # "D:/GitHub/important-reference-repo/R" on Windows
 
 # to set the current working directory, you can use `setwd()`
-setwd("D:/GitHub/important-reference-repo/R") # for Mac: '/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R'
+setwd("/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R") 
+# for Mac: '/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R'
+# for Windows: 'D:/GitHub/important-reference-repo/R'
 
 # check new working directory
 getwd()
@@ -1922,7 +1924,7 @@ p1 + p2 + guide_area() + plot_layout(ncol=1, guides = "collect",
 # ggsave("images/visualization_ggplot/myplot.png", height=10) 
 ```
 
-# CASE STUDY: Exploring Early COVID-19 Data 
+# CASE STUDY: Exploring Early COVID-19 Data
 
 This case study focuses on COVID-19 cases and deaths during 2020 using the `covidcases` and `mobility` datasets from the "**HDSinRdata**" package. A new package that is used in this case study is **usmap** package (Di Lorenzo 2024), which allows us to easily create spatial plots of the United States.
 
@@ -2023,4 +2025,39 @@ We can see two key points from this:
 
 -   there is no missing data
 
--   
+```{r}
+summary(covid[, c("weekly_cases", "weekly_deaths", "m50")])
+```
+
+The negatives are clear data discrepancies.
+
+In real life, you can either code these as 0 or NA; for this case study, we will re-code the negatives as NA.
+
+```{r}
+# Set negative counts to NA
+covid$weekly_cases <- replace(covid$weekly_cases,
+                              which(covid$weekly_cases < 0),
+                              NA)
+
+covid$weekly_deaths <- replace(covid$weekly_deaths,
+                               which(covid$weekly_deaths < 0),
+                               NA)
+```
+
+For the last step, we will use state abbreviations and region for for each state using the `state.name` and `state.region` vectors.
+
+-   we also specifically code D.C. to be in the same region as Maryland and Virginia
+
+```{r}
+# add region and abbreviation and remove county
+region_key <- data.frame(state = c(state.name,
+                                   "District of Columbia"),
+                         state_abb = c(state.abb, "DC"),
+                         region = c(as.character(state.region),
+                                    "South"))
+
+covid <- covid %>%
+  left_join(region_key, by = c("state"))
+
+head(covid)
+```
