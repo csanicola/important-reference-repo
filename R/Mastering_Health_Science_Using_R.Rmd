@@ -94,9 +94,9 @@ The most important thing to do is download **packages** and one of the most impo
 To see what packages are already installed use `installed.packages()`
 
 ```{r}
-installed.packages()
+# installed.packages()
 # the most important package to download is tidyverse
-install.packages("tidyverse")
+# install.packages("tidyverse")
 library(tidyverse)
 ```
 
@@ -1929,7 +1929,7 @@ p1 + p2 + guide_area() + plot_layout(ncol=1, guides = "collect",
 This case study focuses on COVID-19 cases and deaths during 2020 using the `covidcases` and `mobility` datasets from the "**HDSinRdata**" package. A new package that is used in this case study is **usmap** package (Di Lorenzo 2024), which allows us to easily create spatial plots of the United States.
 
 ```{r}
-install.packages("usmap")
+# install.packages("usmap")
 
 library(HDSinRdata)
 library(tidyverse)
@@ -2049,15 +2049,245 @@ For the last step, we will use state abbreviations and region for for each state
 -   we also specifically code D.C. to be in the same region as Maryland and Virginia
 
 ```{r}
-# add region and abbreviation and remove county
-region_key <- data.frame(state = c(state.name,
-                                   "District of Columbia"),
+# Add region and abbreviation and remove county
+region_key <- data.frame(state = c(state.name, 
+                                   "District of Columbia"), 
                          state_abb = c(state.abb, "DC"),
-                         region = c(as.character(state.region),
+                         region = c(as.character(state.region), 
                                     "South"))
 
 covid <- covid %>%
-  left_join(region_key, by = c("state"))
+  left_join(region_key, by = c("state")) 
 
 head(covid)
+```
+
+## Mobility and Cases Over Time
+
+Once we finish data merging and cleaning, we can now explore mobility and cases by region.
+
+```{r}
+covid %>%
+  select(c("region", "m50", "weekly_cases", "weekly_deaths")) %>%
+  tbl_summary(by = "region", missing = "no") %>%
+  as_gt() %>%
+  cols_width(everything() ~ "55pt")
+```
+
+We can now also plot mobility over time for both country and by region.
+
+```{r}
+# Average mobility in the US over time - overall 
+pmob1 <- covid %>%
+  select(c(region, state, week, m50)) %>%
+  distinct() %>%
+  group_by(week) %>%
+  summarize(avg_m50 = mean(m50, na.rm=TRUE), .groups="drop") %>%
+  ggplot() + 
+  geom_line(aes(x = week, y = avg_m50)) +
+  labs(x = "Week in 2020", y = "Average Mobility", 
+       title = "Average Mobility in the US") + 
+  theme_bw()
+
+# Average mobility in the US over time - by region
+pmob2 <- covid %>%
+  select(c(region, state, week, m50)) %>%
+  distinct() %>%
+  group_by(region, week) %>%
+  summarize(avg_m50 = mean(m50, na.rm=TRUE), .groups="drop") %>%
+  ggplot() + 
+  geom_line(aes(x = week, y = avg_m50, color = region)) +
+  labs(x = "Week in 2020", y = "Average Mobility", 
+       title = "Average Mobility by Region in the US",
+       color = "Region") + 
+  theme_bw() +
+  theme(legend.position = "bottom") 
+
+pmob1+pmob2
+```
+
+From the visuals, we can see similar patterns in how mobility fluctuated, but certain regions had overall higher mobility than others.
+
+-   A limitation is that we do not have population counts which would let us standardize the numbers
+
+    -   however, a secondary y-axis is using the `sec_axis()` function within `scale_y_continuous()` allows us to plot deaths and cases together
+
+        -   in this case, the secondary axis is scaled by 1/10th of the primary axis
+
+```{r}
+# Change in number cases over time, per region
+covid %>% 
+  filter(!is.na(region)) %>% 
+  group_by(region, week) %>% 
+  summarize(weekly_cases=sum(weekly_cases, na.rm=TRUE),
+            weekly_deaths=sum(weekly_deaths, na.rm=TRUE),
+            .groups="drop") %>% 
+ggplot() +
+  geom_line(aes(x=week, y=weekly_cases, color=region, linetype="Cases")) +
+  geom_line(aes(x=week, y=weekly_deaths*10, color=region, linetype="Deaths")) +
+  scale_y_continuous(name="Average Weekly Cases",
+                     sec.axis=sec_axis(~./10,
+                                       name="Average Weekly Deaths")) +
+  scale_linetype(name="Measure") +
+  labs(x="Week in 2020", color="Region",
+       title="Weekly Cases Over Time by Region") +
+  theme_bw()
+```
+
+If we want to look at just California:
+
+```{r}
+covid_ca <- covid %>% filter(state == "California")
+ggplot(covid_ca) +
+  geom_point(aes(x=weekly_cases, y=m50), na.rm=TRUE) +
+  labs(x="Weekly Cases", y="Average Mobility")
+```
+
+So from our plots so far, it looks like we should be focusing on correlation between these two columns by state.
+
+-   we will do this with the `plot_usmap()` from the **usmap** package
+
+```{r}
+# calculate and plot correlation between cases and mobility, y state
+covid_cor <- covid %>% 
+  group_by(state) %>% 
+  summarize(correlation=cor(weekly_cases, m50,
+                            use="complete.obs"))
+
+plot_usmap(regions="states", data=covid_cor,
+           values="correlation") +
+  scale_fill_gradient2(low="darkblue", high="darkred",
+                       mid="white", name="Correlation") +
+  labs(title="Correlation Between Cases and Mobility") +
+  theme(legend.position="right")
+```
+
+From the visual, we can see that although there are different relationships throughout the US, none of the correlations are particularly strong.
+
+The last thing we can look at is how the total cases and deaths are related to each other.
+
+```{r}
+# Relationship between cases and death summarized
+covid %>% 
+  group_by(region, state_abb) %>% 
+  summarize(total_cases=sum(weekly_cases, na.rm=TRUE),
+            total_deaths=sum(weekly_deaths, na.rm=TRUE),
+            .groups="drop") %>% 
+ggplot() +
+  geom_label(aes(x=total_cases,y=total_deaths, color=region,
+                 label=state_abb), size=1.5) +
+  labs(x="Total Cases", y="Total Deaths", color="Region") + 
+  theme_bw()
+```
+
+From this visual, we can see that the Northeast suffered more deaths per case overall.
+
+-   this may be related to the lower mobility and negative correlation between mobility and cases observed earlier
+
+# Probability Distributions in R
+
+-   we are going to generate random samples in R from known probability distributions and empirical distributions
+
+-   base R provides a set of 4 functions for all common probability distributions
+
+```{r}
+library(tidyverse)
+library(HDSinRdata)
+
+data(NHANESsample)
+```
+
+-   using the built-in R random number generator will randomize the results each time but using the `set.seed()` function, it takes a numeric seed value that we can then be able to reproduce the same results
+
+```{r}
+sample(1:10, 1)
+```
+
+```{r}
+set.seed(5)
+sample(1:10, 1)
+```
+
+## Probability Distribution Functions
+
+All of the common discrete (e.g., Bernoulli, binomial) and continuous (e.g., normal, uniform, exponential, Poisson) probability distributions have corresponding functions in R.
+
+The four available functions are:
+
+-   `r[dist]()`: random sample function for the given distribution (e.g., `rnorm()`, `runif()`)
+
+-   `d[dist]()`: density function for the distribution (e.g., `dnorm()`, `dunif()`)
+
+-   `p[dist]()`: cumulative distribution function for the distribution (e.g., `pnorm()`, `punif()`)
+
+-   `q[dist]()`: quantile function for the distribution (e.g., `qnorm()`, `qunif()`)
+
+### Random Samples
+
+-   for the `rnorm(n, mean, sd)` function:
+
+    -   `n` = the number of observations
+
+    -   `mean` = the mean with default value 0
+
+    -   `sd` = the standard deviation with default value 1
+
+```{r}
+x <- rnorm(n=100, mean=5, sd=1)
+# to look at this random distribution we can plot it with a histogram
+hist(x)
+```
+
+Instead of a single value for mean or sd, we can input a vector.
+
+```{r}
+# this example: we generate 100 random numbers with the default standard deviation of 1 where half the samples have a mean of 0 and the other half have a mean of 5
+x <- rnorm(n=100, mean=rep(c(0,5), 50))
+hist(x)
+```
+
+For binomial distribution, the difference is that we need to specify a probability `p` and number of trials `size` (rather than `mean` and `sd` in the normal case) to specify the distribution.
+
+```{r}
+# here we generate 100 random numbers following a binomial distribution with 10 trials and a probability 0.5
+x <- rbinom(n=100, p=0.5, size=10)
+hist(x)
+```
+
+We can also specify a different size or probability of success for each sample.
+
+We repeat our sample but this time let the probability of success be 0.25 for half of the sample and 0.75 for the other half.
+
+```{r}
+x <- rbinom(n=100, p=rep(c(0.25, 0.75), 50), size=10)
+hist(x)
+```
+
+### Density Function
+
+```{r}
+# we can compare some of the values from the dnorm() function to the official formula for the probability density and see that they are equal
+dnorm(0) == 1/sqrt(2*pi)
+dnorm(1) == exp(-1/2)/sqrt(2*pi)
+dnorm(2) == exp(-1/2*2^2)/sqrt(2*pi)
+```
+
+If we wanted to find the density function for several values, we can input a vector to this density function.
+
+```{r}
+# below, we find the values of the density function for a normal distribution with mean 1 and standard deviation 2 for values c(-1, 0, 1, 2, 3)
+dnorm(c(-1, 0, 1, 2, 3), mean=1, sd=2)
+```
+
+For the binomial distribution, `dbinom()` returns the probability of a certain number of successes and corresponds to the probability density function.
+
+```{r}
+# we can find the probability of getting exactly 3 heads from 10 coin flips, each with a probability of 0.5 for heads
+dbinom(3, size=10, p=0.5)
+```
+
+While `dnorm()` allows us to specify any continuous values for `x`, `dbinom()` gives us a warning if `x` contains non-integer values, since the support of a binomial variable only includes integers
+
+```{r}
+dbinom(2.4, size=10, p=0.5)
 ```
