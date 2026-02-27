@@ -2291,3 +2291,109 @@ While `dnorm()` allows us to specify any continuous values for `x`, `dbinom()` g
 ```{r}
 dbinom(2.4, size=10, p=0.5)
 ```
+
+There is also the ability to specify the vector for a distribution parameters to find the distribution function for different distributions.
+
+```{r}
+# if we want to find the probability function for X=4 for the distribution with p=0.25 and p=0.5
+dbinom(4, size=10, p=c(0.25, 0.5))
+```
+
+### Cumulative Distribution
+
+For the normal distribution, the cumulative distribution is give by `pnorm()`, which takes in a value `x`, a `mean`, and a `sd` and returns the probability that a random variable following a *N (mean, sd)* distribution is less than `x`.
+
+-   For ex: `x` = to the mean which returns a 50% probability because the normal distribution is symmetric with mean equal to the median
+
+    -   These are verified with two different values of the mean
+
+```{r}
+pnorm(0)
+pnorm(5, mean=5, sd=1)
+```
+
+The parameters for the distribution can be changed by passing a vector for `size` and/or `p` to the cumulative distribution function.
+
+```{r}
+# this will find the probability that x ≤ 3 and the probability that x ≤ 4 with 12 trials and a probability 0.25 and with 10 trials and and a probability 0.5
+pbinom(c(3, 3, 4, 4), size=c(12, 10, 12, 10),
+       p=c(0.25, 0.5, 0.25, 0.5))
+```
+
+### Quantile Distribution
+
+The quantile distribution function is the inverse of the cumulative distribution function.
+
+The parameters are: `x`, a `mean`, and a `sd`
+
+And returns the value for which the cumulative distribution function is equal to `x`
+
+ex: when `x` = 0.5, the `qnorm()` function returns the median of the distribution, which is equal to the mean for the normal distribution
+
+```{r}
+qnorm(0.5)
+qnorm(0.5, mean=5, sd=1)
+```
+
+For the discrete binomial distribution, the `qbinom()` function returns the largest integer value for which the probability of being less than or equal to that value is at most the inputted value x
+
+```{r}
+qbinom(c(0.2, 0.3), size=10, p=0.5)
+```
+
+### Reference List for Probability Distributions 
+
+There are more probability distributions available in R. (Each is `r[dist]()` with `n` is the number of observations.
+
+-   **Beta**: `rbeta(n, shape1, shape2, ncp = 0)` with shape parameters `shape1` and `shape2` (and optional non-centrality parameter `ncp`).
+
+-   **Binomial**: `rbinom(n, size, prob)` with probability of success `prob` and number of trials `size`.
+
+-   **Cauchy**: `rcauchy(n, location = 0, scale = 1)` with location parameter `location` and scale parameter `scale`.
+
+-   **Chi-Square**: `rchisq(n, df, ncp = 0)` with `df` degrees of freedom and optional non-centrality parameter `ncp`.
+
+-   **Exponential**: `rexp(n, rate = 1)` with rate `rate` (i.e., mean = 1/rate).
+
+-   **F**: `rf(n, df1, df2, ncp)` with `df1` and `df2` degrees of freedom (and optional non-centrality parameter `ncp`).
+
+-   **Gamma**: `rgamma(n, shape, rate = 1, scale = 1/rate)` with parameters `shape` and `scale` (or alternatively specified by `rate`).
+
+-   **Geometric**: `rgeom(n, prob)` with probability parameter `prob`.
+
+-   **Hypergeometric**: `rhyper(nn, m, n, k)` with `m` white balls, `n` black balls, and `k` balls chosen.
+
+-   **Logistic**: `rlogis(n, location = 0, scale = 1)` with parameters `location` and `scale`.
+
+-   **Log Normal**: `rlnorm(n, meanlog = 0, sdlog = 1)` with mean `meanlog` and standard deviation `sdlog` on the log scale.
+
+-   **Negative Binomial**: `rnbinom(n, size, prob, mu)` with parameters `size` and `prob`.
+
+-   **Normal**: `rnorm(n, mean = 0, sd = 1)` with mean equal to `mean` and standard deviation equal to `sd`.
+
+-   **Poisson**: `rpois(n, lambda)` with parameter `lambda`.
+
+-   **Student t**: `rt(n, df, ncp)` with `df` degrees of freedom (and optional non-centrality parameter `ncp`).
+
+-   **Uniform**: `runif(n, min = 0, max = 1)` with minimum value `min` and maximum value `max`.
+
+-   **Weibull**: `rweibull(n, shape, scale = 1)` with parameters `shape` and `scale`.
+
+-   **Wilcoxon Rank Sum**: `rwilcox(nn, m, n)` with `nn` number of observations and sample sizes `m` and `n`.
+
+-   **Wilcoxon Signed Rank**: `rsignrank(nn, n)` with `nn` number of observations and sample size `n`.
+
+#### Practice Question
+
+Set the random seed to be `123`, and then generate 5 random numbers following a uniform distribution with min 1 and max 5. Then, find the 0.15 quantile for this same distribution (it should be equal to 1.6).
+
+```{r}
+set.seed(123)
+# uniform distribution = runif(n, min=0, max=1)
+x <- runif(5, min=1, max=5)
+print(x)
+# quantile distribution = qunif(x, min=x, max=x)
+qunif(0.15, min=1, max=5)
+```
+
+## Empirical Distributions and Sampling Data
