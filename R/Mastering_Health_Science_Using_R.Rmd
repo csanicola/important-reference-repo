@@ -71,7 +71,7 @@ getwd() # "/Users/carolinesanicola" on Mac
         # "D:/GitHub/important-reference-repo/R" on Windows
 
 # to set the current working directory, you can use `setwd()`
-setwd("/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R") 
+setwd("D:/GitHub/important-reference-repo/R") 
 # for Mac: '/Users/carolinesanicola/Documents/GitHub/important-reference-repo/R'
 # for Windows: 'D:/GitHub/important-reference-repo/R'
 
@@ -2341,7 +2341,7 @@ For the discrete binomial distribution, the `qbinom()` function returns the larg
 qbinom(c(0.2, 0.3), size=10, p=0.5)
 ```
 
-### Reference List for Probability Distributions 
+### Reference List for Probability Distributions
 
 There are more probability distributions available in R. (Each is `r[dist]()` with `n` is the number of observations.
 
@@ -2397,3 +2397,88 @@ qunif(0.15, min=1, max=5)
 ```
 
 ## Empirical Distributions and Sampling Data
+
+-   the `sample(x, size, replace=FALSE, prob=NULL)` function takes in:
+
+    -   the values we want to sample from `x`
+
+    -   the number of observations we want to sample `size`
+
+    -   whether we want to sample with replacement `replace`
+
+    -   if we don't want to sample where each value has an equal probability of being chosen, we can set a probability vector `prob`
+
+        -   this must have the same length as `x`
+
+```{r}
+# here we sample 500 rows without replacement from `NHANESsample` data
+nhanes_sample_ids <- sample(1:nrow(NHANESsample), 500, replace=FALSE)
+nhanes_sample <- NHANESsample[nhanes_sample_ids, ]
+dim(nhanes_sample)
+```
+
+```{r}
+# now we are going to do sampling with replacement
+# the new dataset is sampled from the empirical distribution of the data which is called a bootstrap sample
+nhanes_sample_ids <- sample(1:nrow(NHANESsample), nrow(NHANESsample),
+                            replace=TRUE)
+nhanes_sample <- NHANESsample[nhanes_sample_ids, ]
+dim(nhanes_sample)
+```
+
+The `slice_sample()` function from **tidyverse** is another way to sample from a data frame.
+
+-   you can specify the number of observations to sample with `n`
+
+-   or the proportion of observations to sample `prop`
+
+-   we can sample with or without replacement by setting the value of the argument `replace` with default value FALSE
+
+```{r}
+nhanes_sample <- NHANESsample %>%
+  slice_sample(prop = 0.2, replace=FALSE)
+dim(nhanes_sample)
+```
+
+#### Practice Question
+
+Set the random seed to `5` and then sample 50 observations with replacement from the set of integers from 1 to 100. Take the mean of those observations; it should be 56.7.
+
+```{r}
+set.seed(5)
+x <- 1:100
+practice_sample <- sample(x, 50, replace=TRUE)
+mean(practice_sample)
+```
+
+\_\_\_
+
+Empirical cumulative distribution -\> use a given vector to infer a distribution
+
+-   use the function `ecdf()` for empirical cumulative distribution (which actually returns a function)
+
+    -   this returned function can be used to find the sample cumulative distribution for different values similar to the `p[dist]()` function
+
+```{r}
+# here we draw a random sample from a normal distribution `vec` and find the empirical distribution using the `ecdf()` function
+# we are looking to find the sample probability that x ≤ 0
+vec <- rnorm(100)
+ecdf_vec <- ecdf(vec)
+ecdf_vec(0)
+```
+
+We can now plot the empirical distribution against the actual cdf using the `pnorm()` function
+
+-   to do so, we need to create a sequence of possible `x` values to pass to both `pnorm()` and `ecdf_vec()`
+
+```{r}
+df <- data.frame(x=seq(-3, 3, 0.05))
+df$ecdf <- ecdf_vec(df$x)
+df$distn = pnorm(df$x)
+
+ggplot(df) +
+  geom_line(aes(x=x, y=ecdf), color="black") +
+  geom_line(aes(x=x, y=distn), color="red")
+```
+
+In practice, the empirical cumulative distribution might involve data from a given dataset that you want to use to represent the population's distribution.
