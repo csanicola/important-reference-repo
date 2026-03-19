@@ -2613,7 +2613,7 @@ wilcox_res
 wilcox_res$p.value
 ```
 
-## Correlation and Covariance 
+## Correlation and Covariance
 
 -   now lets look at two-sample tests
 
