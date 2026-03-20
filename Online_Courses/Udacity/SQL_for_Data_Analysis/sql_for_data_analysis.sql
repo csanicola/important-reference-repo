@@ -795,7 +795,167 @@ SELECT r.name,
 	GROUP BY r.name, w.channel
 	ORDER BY num_events DESC;
 
+-- DISTINCT 
+SELECT account_id,
+		channel,
+		COUNT(id) AS events
+	FROM web_events
+	GROUP BY account_id, channel
+	ORDER BY account_id, events DESC;
+-- this produces the same number of rows as above (you just now lose the count number column)
+SELECT DISTINCT account_id,
+				channel
+		FROM web_events
+		ORDER BY account_id;
 
+-- Question
+-- Use DISTINCT to test if there are any accounts associated with more than one region.
+SELECT a.name account,
+		r.name region
+	FROM accounts a
+	JOIN sales_reps s
+		ON s.id = a.sales_rep_id
+	JOIN region r
+		ON r.id = s.region_id
+	ORDER BY account;
+-- now compare the number of rows to the below full list to see if the amount is bigger in the DISTINCT query then we know there are more than one region
+SELECT DISTINCT id, name
+	FROM accounts;
+
+-- Have any sales reps worked on more than one account?
+SELECT  s.id,
+		s.name sales_rep,
+		COUNT(*) num_accounts
+	FROM accounts a
+	JOIN sales_reps s
+		ON s.id = a.sales_rep_id
+	GROUP BY s.id, sales_rep
+	ORDER BY num_accounts;
+-- we now compare the above to the below distinct to see if there are a different number of rows but from the above we can see that every rep has more than one account
+SELECT DISTINCT id, name
+	FROM sales_reps;
+
+
+-- HAVING
+/*
+-- Instead of running the below, the WHERE will throw an error, you need to use HAVING instead
+SELECT account_id, 
+		SUM(total_amt_usd) AS sum_total_amt_usd
+	FROM orders
+	WHERE SUM(total_amt_usd) >= 250000
+	GROUP BY 1
+	ORDER BY 2 DESC;
+*/
+
+SELECT account_id,
+		SUM(total_amt_usd) AS sum_total_amt_usd
+	FROM orders
+	GROUP BY 1
+	HAVING SUM(total_amt_usd) >= 250000;
+
+
+-- Questions
+-- How many of the sales reps have more than 5 accounts that they manage?
+SELECT s.name sales_rep,
+		COUNT(a.id) num_accounts
+	FROM accounts a
+	JOIN sales_reps s
+		ON s.id = a.sales_rep_id
+	GROUP BY sales_rep
+	HAVING COUNT(a.id) > 5
+	ORDER BY num_accounts DESC;
+
+-- How many accounts have more than 20 orders?
+SELECT a.name account,
+		COUNT(o.id) num_orders
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY account
+	HAVING COUNT(o.id) > 20
+	ORDER BY num_orders;
+
+-- Which account has the most orders?
+SELECT a.name account,
+		COUNT(o.id) num_orders
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY account
+	ORDER BY num_orders DESC
+	LIMIT 1;
+
+-- Which accounts spent more than 30,000 usd total across all orders?
+SELECT a.name accounts,
+		SUM(o.total_amt_usd) total_spent
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY accounts
+	HAVING SUM(o.total_amt_usd) > 30000
+	ORDER BY total_spent;
+
+-- Which accounts spent less than 1,000 usd total across all orders?
+SELECT a.name accounts,
+		SUM(o.total_amt_usd) total_spent
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY accounts
+	HAVING SUM(o.total_amt_usd) > 1000
+	ORDER BY total_spent;
+
+-- Which account has spent the most with us?
+SELECT a.name account,
+		SUM(o.total_amt_usd) total_spent
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY account
+	ORDER BY total_spent DESC
+	LIMIT 1;
+
+-- Which account has spent the least with us?
+SELECT a.name account,
+		SUM(o.total_amt_usd) total_spent
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY account
+	ORDER BY total_spent
+	LIMIT 1;
+
+-- Which accounts used facebook as a channel to contact customers more than 6 times?
+SELECT a.name account,
+		w.channel,
+		COUNT(w.channel) time_contacted
+	FROM accounts a
+	JOIN web_events w
+		ON a.id = w.account_id
+	GROUP BY account, w.channel
+	HAVING w.channel = 'facebook' AND
+		COUNT(w.channel) > 6
+	ORDER BY time_contacted;
+
+-- Which account used facebook most as a channel?
+SELECT a.name account,
+		w.channel,
+		COUNT(w.channel) time_contacted
+	FROM accounts a
+	JOIN web_events w
+		ON a.id = w.account_id
+	GROUP BY account, w.channel
+	HAVING w.channel = 'facebook'
+	ORDER BY time_contacted DESC
+	LIMIT 1;
+
+-- Which channel was most frequently used by most accounts?
+SELECT channel,
+		COUNT(*) used
+	FROM web_events
+	GROUP BY channel
+	ORDER BY used DESC
+	LIMIT 1;
 
 
 
