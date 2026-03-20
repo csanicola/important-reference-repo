@@ -957,6 +957,92 @@ SELECT channel,
 	ORDER BY used DESC
 	LIMIT 1;
 
+-- DISTINCT 
+SELECT account_id,
+		channel,
+		COUNT(id) AS events
+	FROM web_events
+	GROUP BY account_id, channel
+	ORDER BY account_id, events DESC;
+-- this produces the same number of rows as above (you just now lose the count number column)
+SELECT DISTINCT account_id,
+				channel
+		FROM web_events
+		ORDER BY account_id;
+
+-- Question
+-- Use DISTINCT to test if there are any accounts associated with more than one region.
+SELECT a.name account,
+		r.name region
+	FROM accounts a
+	JOIN sales_reps s
+		ON s.id = a.sales_rep_id
+	JOIN region r
+		ON r.id = s.region_id
+	ORDER BY account;
+-- now compare the number of rows to the below full list to see if the amount is bigger in the DISTINCT query then we know there are more than one region
+SELECT DISTINCT id, name
+	FROM accounts;
+
+-- Have any sales reps worked on more than one account?
+SELECT  s.id,
+		s.name sales_rep,
+		COUNT(*) num_accounts
+	FROM accounts a
+	JOIN sales_reps s
+		ON s.id = a.sales_rep_id
+	GROUP BY s.id, sales_rep
+	ORDER BY num_accounts;
+
+-- DATES
+-- for looking at "what day of the week are the most sales?" you would do the following:
+SELECT DATE_PART('dow', occurred_at) AS day_of_week,
+		SUM(total) as total_qty
+	FROM orders
+	GROUP BY day_of_week
+	ORDER BY total_qty DESC;
+
+
+-- Questions
+-- Find the sales in terms of total dollars for all orders in each year, ordered from greatest to least. Do you notice any trends in the yearly sales totals?
+SELECT DATE_PART('year', occurred_at) AS order_year,
+		SUM(total_amt_usd) AS total_sales
+	FROM orders
+	GROUP BY order_year
+	ORDER BY total_sales DESC;
+
+-- Which month did Parch & Posey have the greatest sales in terms of total dollars? Are all months evenly represented by the dataset?
+SELECT DATE_PART('month', occurred_at) AS order_month,
+		SUM(total_amt_usd) AS total_sales
+	FROM orders
+	GROUP BY order_month
+	ORDER BY order_month;
+
+-- Which year did Parch & Posey have the greatest sales in terms of total number of orders? Are all years evenly represented by the dataset?
+SELECT DATE_PART('year', occurred_at) AS order_year,
+		COUNT(*) AS total_sales
+	FROM orders
+	GROUP BY order_year
+	ORDER BY order_year;
+
+-- Which month did Parch & Posey have the greatest sales in terms of total number of orders? Are all months evenly represented by the dataset?
+SELECT DATE_PART('month', occurred_at) AS order_month,
+		COUNT(*) AS total_sales
+	FROM orders
+	GROUP BY order_month
+	ORDER BY order_month;
+
+-- In which month of which year did Walmart spend the most on gloss paper in terms of dollars?
+SELECT DATE_TRUNC('month', o.occurred_at) ord_date, SUM(o.gloss_amt_usd) tot_spent
+FROM orders o 
+JOIN accounts a
+ON a.id = o.account_id
+WHERE a.name = 'Walmart'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+
+
 
 
 
