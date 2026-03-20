@@ -1234,6 +1234,22 @@ SELECT s.name, COUNT(*), SUM(o.total_amt_usd) total_spent,
 	GROUP BY s.name
 	ORDER BY 3 DESC;
 
+-- Subqueries (can be thought of as nested queries)
+-- wrapped in parentheses
+-- lets say we want to find on average which channel sends the most traffic per day to Patch and Posey
+SELECT channel,
+		AVG(event_count) AS avg_event_count
+	FROM
+		(SELECT DATE_TRUNC('day', occurred_at) AS day,
+				channel,
+				COUNT(*) AS event_count
+			FROM web_events
+			GROUP BY 1, 2) sub
+	GROUP BY 1
+	ORDER BY 2 DESC;
+
+
+-- Questions
 
 
 
