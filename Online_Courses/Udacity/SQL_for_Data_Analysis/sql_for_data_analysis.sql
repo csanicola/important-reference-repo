@@ -1899,7 +1899,7 @@ WITH t1 AS (SELECT primary_poc,
 					LEFT(primary_poc, STRPOS(primary_poc, ' ') -1) AS first_name,
 					RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) AS last_name
 				FROM accounts)
-SELECT CONCAT(first_name, '.', last_name, '@', name, '.com') AS email_addresss
+SELECT CONCAT(first_name, '.', last_name, '@', name, '.com') AS email_address
 	FROM t1;
 
 /*
@@ -1907,49 +1907,210 @@ You may have noticed that in the previous solution some of the company names inc
 which will certainly not work in an email address. See if you can create an email address that will work by removing all of the spaces in the account name, 
 but otherwise your solution should be just as in question 1. Some helpful documentation is here(opens in a new tab).
 */
+WITH t1 AS (SELECT primary_poc, 
+					name,
+					LEFT(primary_poc, STRPOS(primary_poc, ' ') -1) AS first_name,
+					RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) AS last_name
+				FROM accounts)
+SELECT CONCAT(first_name, '.', last_name, '@', REPLACE(name,' ',''), '.com') AS email_address
+	FROM t1;
 
 
 /*
 We would also like to create an initial password, which they will change after their first log in. 
-The first password will be the first letter of the primary_poc's first name (lowercase), 
-then the last letter of their first name (lowercase), the first letter of their last name (lowercase), 
-the last letter of their last name (lowercase), the number of letters in their first name, 
-the number of letters in their last name, and then the name of the company they are working with, all capitalized with no spaces.
+The first password will be the: 
+1. first letter of the primary_poc's first name (lowercase), 
+2. then the last letter of their first name (lowercase), 
+3. the first letter of their last name (lowercase), 
+4. the last letter of their last name (lowercase), 
+5. the number of letters in their first name, 
+6. the number of letters in their last name, 
+7. and then the name of the company they are working with, all capitalized with no spaces.
+*/
+WITH t1 AS (SELECT primary_poc,
+					name,
+					LEFT(primary_poc, STRPOS(primary_poc, ' ') -1) AS first_name,
+					RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) AS last_name
+				FROM accounts)
+SELECT first_name,
+		last_name,
+		CONCAT(first_name, '.', last_name, '@', REPLACE(name,' ',''), '.com') 
+			AS email_address,
+		LEFT(LOWER(first_name),1) || -- 1. first letter of the first name in lowercase
+		RIGHT(LOWER(first_name),1) || -- 2. last letter of the first name in lowercase
+		LEFT(LOWER(last_name),1) || -- 3. first letter of the last name in lowercase
+		RIGHT(LOWER(last_name),1) || -- 4. last letter of the last name in lowercase 
+		CHAR_LENGTH(first_name) || -- 5. number of letters in first name
+		CHAR_LENGTH(last_name) || -- 6. number of letters in last name
+		REPLACE(UPPER(name),' ','')
+			AS first_password
+		FROM t1;
+
+-- alternative way to write it:
+WITH t1 AS (SELECT LEFT(primary_poc, STRPOS(primary_poc, ' ') -1 ) first_name,  
+					RIGHT(primary_poc, LENGTH(primary_poc) - STRPOS(primary_poc, ' ')) last_name, 
+					name
+   				FROM accounts)
+SELECT first_name, 
+		last_name, 
+		CONCAT(first_name, '.', last_name, '@', name, '.com') AS email_address, 
+		LEFT(LOWER(first_name), 1) || 
+			RIGHT(LOWER(first_name), 1) || 
+			LEFT(LOWER(last_name), 1) || 
+			RIGHT(LOWER(last_name), 1) || 
+			LENGTH(first_name) || 
+			LENGTH(last_name) || 
+			REPLACE(UPPER(name), ' ', '') AS password
+FROM t1;
+
+
+-- CAST
+/* EXAMPLE
+SELECT *,
+		DATE_PART('month', TO_DATE(month, 'month')) AS clean_month,
+		year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' || day AS concatenated_date,
+		CAST(year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' || day AS date) AS formatted_date,
+		(year || '-' || DATE_PART('month', TO_DATE(month, 'month')) || '-' || day)::date AS formatted_date_alt
+	FROM ad_clicks
 */
 
+-- Quiz
+-- 1. Write a query to look at the top 10 rows to understand the columns and the raw data in the dataset called `sf_crime_data`
+SELECT *
+	FROM sf_crime_data
+	LIMIT 10;
+
+-- 2. Remembering back to the lesson on dates, use the below to make sure you remember the format that dates should use in SQL
+-- DATE FORMAT: 'yyyy-mm-dd'
+
+-- 3. Look at the `date` column in the sf_crime_data table. Notice the date is not in the correct format
+SELECT date
+	FROM sf_crime_data;
+
+-- 4. Write a query to change the date into the correct SQL date format. You will need to use at least SUBSTR and CONCAT to perform this operation.
+SELECT date AS original_date,
+		(
+		SUBSTR(date, 7, 4) || -- year
+		'-' ||
+		LEFT(date, 2) || -- month
+		'-' ||
+		SUBSTR(date, 4, 2) -- day
+		) AS new_date
+	FROM sf_crime_data;
+
+-- 5. Once you have created a column in the correct format, use either `CAST` or `::` to convert this to a date.
+SELECT date AS original_date,
+		(
+		SUBSTR(date, 7, 4) || -- year
+		'-' ||
+		LEFT(date, 2) || -- month
+		'-' ||
+		SUBSTR(date, 4, 2) -- day
+		)::DATE AS new_date
+	FROM sf_crime_data;
 
 
+-- COALESCE
+/* EXAMPLE
+SELECT COUNT(primary_poc) AS regular_count,
+		COUNT(COALESCE(primary_poc, 'no POC')) AS modified_count
+	FROM accounts
+*/
 
+-- 1. Run the query entered below in the SQL workspace to notice the row with missing data 
+SELECT *
+	FROM accounts a
+	LEFT JOIN orders o
+		ON a.id = o.account_id
+	WHERE o.total IS NULL;
 
+-- 2. Use COALESCE to fill in the `accounts.id` column with the `account.id` for the NULL value for the table in `1`
+SELECT COALESCE(o.id, a.id) filled_id, 
+		a.name, 
+		a.website, 
+		a.lat, 
+		a.long, 
+		a.primary_poc, 
+		a.sales_rep_id, 
+		o.*
+	FROM accounts a
+	LEFT JOIN orders o
+		ON a.id = o.account_id
+	WHERE o.total IS NULL;
 
+-- 3. Use COALESCE to fill in the `orders.accounts_id` column with the `account.id` for the NULL value for the table in `1`
+SELECT COALESCE(o.id, a.id) filled_id, 
+		a.name, 
+		a.website, 
+		a.lat, 
+		a.long, 
+		a.primary_poc, 
+		a.sales_rep_id, 
+		COALESCE(o.account_id, a.id) account_id, 
+		o.occurred_at, 
+		o.standard_qty, 
+		o.gloss_qty, 
+		o.poster_qty, 
+		o.total, 
+		o.standard_amt_usd, 
+		o.gloss_amt_usd, 
+		o.poster_amt_usd, 
+		o.total_amt_usd
+	FROM accounts a
+	LEFT JOIN orders o
+		ON a.id = o.account_id
+	WHERE o.total IS NULL;
 
+-- 4. Use COALESCE to fill in each of the qty and usd columns with `0` for the table in `1`
+SELECT COALESCE(o.id, a.id) filled_id,
+		a.name,
+		a.website,
+		a.lat,
+		a.long,
+		a.primary_poc,
+		a.sales_rep_id,
+		COALESCE(o.account_id, a.id) account_id,
+		o.occurred_at,
+		COALESCE(o.standard_qty, 0) standard_qty,
+		COALESCE(o.gloss_qty, 0) gloss_qty,
+		COALESCE(o.poster_qty, 0) poster_qty,
+		COALESCE(o.total, 0) total,
+		COALESCE(o.standard_amt_usd, 0) standard_amt_usd,
+		COALESCE(o.gloss_amt_usd, 0) gloss_amt_usd,
+		COALESCE(o.poster_amt_usd, 0) poster_amt_usd,
+		COALESCE(o.total_amt_usd, 0) total_amt_usd
+	FROM accounts a
+	LEFT JOIN orders o
+		ON a.id = o.account_id
+	WHERE o.total IS NULL;
 
+-- 5. Run the query in `1` with the WHERE removed and COUNT the number of `id`s
+SELECT COUNT(*)
+	FROM accounts a
+	LEFT JOIN orders o
+		ON a.id = o.account_id;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+-- 6. Run the query in `5`, but with the COALESCE function used in questions `2` through `4`
+SELECT COALESCE(o.id, a.id) filled_id, 
+		a.name, 
+		a.website, 
+		a.lat, 
+		a.long, 
+		a.primary_poc, 
+		a.sales_rep_id, 
+		COALESCE(o.account_id, a.id) account_id, 
+		o.occurred_at, 
+		COALESCE(o.standard_qty, 0) standard_qty, 
+		COALESCE(o.gloss_qty,0) gloss_qty, 
+		COALESCE(o.poster_qty,0) poster_qty, 
+		COALESCE(o.total,0) total, 
+		COALESCE(o.standard_amt_usd,0) standard_amt_usd, 
+		COALESCE(o.gloss_amt_usd,0) gloss_amt_usd, 
+		COALESCE(o.poster_amt_usd,0) poster_amt_usd, 
+		COALESCE(o.total_amt_usd,0) total_amt_usd
+	FROM accounts a
+	LEFT JOIN orders o
+		ON a.id = o.account_id;
 
 
 

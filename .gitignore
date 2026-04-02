@@ -3,6 +3,9 @@
 .history/
 .vscode/
 kaggle.json
+# don't want to upload data files
+*.csv
+*.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
