@@ -1,0 +1,456 @@
+---
+title: "2026.04.17_Practice_Project"
+output: html_document
+---
+
+Below you will find a complete, self-contained training module. We'll start by generating a realistic healthcare dataset with a statistically justified sample size directly in R. Then we'll work through eight increasingly complex, real-world healthcare questions. For each, I'll provide the clinical/statistical terminology, what to look for, and the R code to execute the analysis.
+
+# Part 1: Generating a Realistic Healthcare Dataset with Sufficient Sample Size
+
+Before analyzing data, we need data. In healthcare data science, sample size is not arbitrary - it is dictated by the **power** needed to detect a clinically meaningful effect.
+
+## Background Terminology:
+
+-   **Power (1 - β)**: probability of correctly rejecting the null hypothesis when a true effect exists. Standard is 80% or 90%. (also referred to as *Statistical Power*)
+-   **Alpha (α, Type I Error)**: probability of finding a false positive. Standard is 0.05.
+-   **Effect Size**: The smallest difference between groups that is clinically relevant (e.g., a 10% reduction in readmission rate, or a 5mmHg drop in blood pressure).
+
+## Method for this Dataset:
+
+We will simulate a study of 5,000 patients with Type 2 Diabetes. We want 80% power to detect a **10% absolute reduction in 1-year hospital readmission** (from 30% baseline to 20% in a new intervention) at a α=0.05. A standard sample size calculation for two proportions yields approximately **N=290 per group** for a total of 580. However, we will generate **N=5,000** to: 1. Allow for adjustment for multiple cofounders (multivariable models) 2. Provide enough events for **Survival Analysis** (Task 5) and **Machine Learning** (Task 7). 3. Simulate a realistic hospital registry size
+
+```{r}
+# Load necessary libraries (install if missing)
+packages <- c("tidyverse", "survival", "survminer", "lme4", "randomForest",
+              "pROC", "MatchIt", "tableone")
+install.packages(setdiff(packages, rownames(installed.packages())))
+library(tidyverse)
+
+set.seed(2026) # For reproducibility
+n <- 5000
+
+# Simulate baseline characteristics
+df_health <- tibble(
+  patient_id = 1:n, # creating the patient ideas in aescending order from 1 to 5000
+  
+  # Demographics
+  age = rnorm(n, mean = 65, sd = 12) |> round(),
+  sex = sample(c("Male", "Female"), n, replace = TRUE, prob = c(0.48, 0.52)),
+  
+  # Comorbidities (correlated with age)
+  bmi = rnorm(n, mean = 30, sd = 6) |> round(1),
+  hypertension = rbinom(n, 1, prob = plogis(-2 + 0.03 * age + 0.1 * bmi)),
+  ckd = rbinom(n, 1, prob = plogis(-4 + 0.04 * age + 0.1 * hypertension)),
+  
+  # Lab value at baseline
+  hba1c = rnorm(n, mean = 7.8, sd = 1.5) |> round(1),
+  
+  # Treatment assignment (new drug vs standard care)
+  treatment = rbinom(n, 1, prob = 0.5)
+)
+
+# Simulate outcomes based on a realistic medical logic model 
+# Outcome 1: Continuous outcome - 6-month HbA1c change (reduction is good)
+df_health <- df_health |>
+  mutate(
+    # Treatment effect: reduces HbA1c by -0.8 on average, adjust for baseline
+    hba1c_6m = hba1c - 0.8 * treatment + rnorm(n, mean = 0, sd = 0.8),
+    hba1c_6m = round(hba1c_6m, 1),
+    
+    # Outcome 2: Binary outcome - 1-year readmission
+    # Baseline risk ~30%, treatment reduces odds
+    readmit_prob = plogis(-1.2 + 0.03 * age + 0.2 * hypertension +
+                            0.3 * ckd - 0.6 * treatment + 0.1 * (hba1c - 7.8)),
+    readmission = rbinom(n, 1, prob = readmit_prob),
+    
+    # Outcome 3: Time-to-Event (Days to readmission or censoring at 365 days)
+    # For those readmitted, time is drawn from an exponential distribution
+    # For those not readmitted, time is censored at 365
+    time_to_readmit = ifelse(readmission == 1,
+                             round(rexp(sum(readmission), rate = 1/180)),
+                             365),
+    # Ensure times are within 1-365
+    time_to_readmit = pmin(pmax(time_to_readmit, 1), 365)
+  )
+
+# Add a hospital site variable for hierarchical modeling (Task 6)
+df_health <- df_health |>
+  mutate(hospital_site = sample(c("Site A", "Site B", "Site C", "Site D", "Site E"),
+                                n, replace = TRUE, prob = c(0.3, 0.25, 0.2, 0.15, 0.1)))
+
+# Check structure
+glimpse(df_health)
+```
+
+# Part 2: Progressive Data Science Questions & Analyses in R
+
+For each task, provided are: **Real-Life Question**, **Background Terminology**, **What to Look For**, and **R Implementation**.
+
+## Task 1: Descriptive Statistics & Cohort Profiling (Beginner)
+
+**Real-Life Question**:
+
+*"What are the baseline characteristics of our diabetic patient population? How do they differ between the new drug and standard care groups? Are there any imbalances that might confound our results?"*
+
+### Background Terminology:
+
+-   **Cohort**: A group of subjects sharing a common characteristic (here, Type 2 Diabetes)
+
+-   **Standardized Mean Difference (SMD)**: A measure of balance between groups.
+
+    -   A value \< 0.1 generally indicates good balance
+
+-   **Table 1**: The standard first table in any clinical study summarizing baseline demographics and clinical variables by exposure/treatment group.
+
+### What to Look For:
+
+-   Missing data (none in this synthetic set, but crucial in real life)
+
+-   Outliers in age or lab values
+
+-   **Imbalance**: Check if the `treatment` groups differ significantly in `age`, `bmi`, or `hba1c`.
+
+    -   Since we randomized treatment in the simulation, SMD should be small
+
+```{r}
+library(tableone)
+
+# Define variables to summarize 
+myVars <- c("age", "sex", "bmi", "hypertension", "ckd", "hba1c")
+catVars <- c("sex", "hypertension", "ckd")
+
+# Create Table 1 stratified by treatment 
+table1 <- CreateTableOne(vars = myVars, strata = "treatment", data = df_health,
+                         factorVars = catVars, addOverall = TRUE)
+print(table1, smd = TRUE) # SMD shows standardized mean difference 
+```
+
+From the above table, we see there are only two variables with p values under 0.5 but most are above.
+
+```{r}
+# Visual exploration
+ggplot(df_health, aes(x = age, fill = as.factor(treatment))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Age Distribution by Treatment Arm", fill = "Treatment")
+```
+
+## Task 2: Hypothesis Testing & Confidence Intervals (Intermediate)
+
+### Real-Life Question:
+
+*"Does the new drug significantly reduce HbA1c after 6 months compared to standard care? What is the magnitude and precision of this effect?"*
+
+### Background Terminology:
+
+-   **t-test**: Compares means of two independent groups
+
+-   **Confidence Interval (CI)**: A range of values likely to contain the true population parameter. A 95% CI for a difference that does not cross 0 implies statistical significance.
+
+-   **P-value**: probability of observing the data if the null hypothesis (no difference) is true.
+
+### What to Look For: 
+
+-   The point estimate of the difference in HbA1c reduction
+
+-   The 95% CI
+
+-   Whether the p-value is \< 0.05
+
+```{r}
+# Calculate change in HbA1c
+df_health <- df_health |>
+  mutate(hba1c_change = hba1c_6m - hba1c)
+
+# Perform t-test
+t_test_result <- t.test(hba1c_change ~ treatment, data = df_health, var.equal = FALSE)
+print(t_test_result)
+```
+
+```{r}
+# Visualize the difference 
+ggplot(df_health, aes(x = as.factor(treatment), y = hba1c_change, fill = as.factor(treatment))) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", shape = 20, size = 4, color = "red") +
+  labs(x = "Treatment (0 = Standard, 1 = New Drug)", y = "Change in HbA1c (%)",
+       title = "Effect of Treatment on HbA1c Change")
+```
+
+From the visual we can clearly see there is a difference in change of HbA1c and confirms the above t-test findings with the p-value being \< 0.000
+
+## Task 3: Linear Regression with Multiple Predictors & Diagnostics (Intermediate)
+
+### Real-Life Question:
+
+*"What is the adjusted effect of the new drug on HbA1c change, accounting for baseline HbA1c, age, and comorbidities? Is the treatment effect still present after controlling for these confounders?"*
+
+### Background Terminology:
+
+-   **Confounding**: A variable associated with both the exposure (treatment) and outcome that distorts the true relationship
+
+-   **Adjustment**: Including confounders in a regression model to isolate the independent effect of the exposure
+
+-   **Multicollinearity**: High correlation between predictors (check Variance Inflation Factor - VIF)
+
+-   **Heteroscedasticity**: Non-constant variance of residuals (check Residuals vs Fitted plot)
+
+### What to Look For: 
+
+-   The coefficient for `treatment` in the adjusted model. It should be robust (similar to the crude difference).
+
+-   Adjusted R-squared value.
+
+-   Diagnostic plots to ensure model assumptions are met.
+
+```{r}
+# Fit the multivariable linear model
+model_lm <- lm(hba1c_change ~ treatment + age + sex + bmi + hypertension + ckd + hba1c,
+               data = df_health)
+summary(model_lm)
+```
+
+```{r}
+# Check model diagnostics
+par(mfrow = c(2, 2))
+plot(model_lm)
+par(mfrow = c(1, 1))
+```
+
+```{r}
+# Check Variance Inflation Factor (VIF)
+if (!require(car)) install.packages("car")
+library(car)
+vif(model_lm) # Values > 5 or 10 indicate problematic multicollinearity
+```
+
+## Task 4: Logistic Regression & Model Performance (Advanced)
+
+### Real-Life Question:
+
+*"What is the odds ration for 1-year hospital readmission associated with receiving the new drug? Can we build a simple predictive model using baseline factors to identify high-risk patients at admission?"*
+
+### Background Terminology:
+
+-   **Odds Ratio (OR)**: The ratio of the odds of an event in the treatment group to the odds in the control group. OR \< 1 indicates a protective effect.
+
+-   **ROC Curve & AUC (Area Under the Curve)**: Measures the model's ability to discriminate between patients who will and will not be readmitted. AUC ranges from 0.5 (no better than chance) to 1.0 (perfect prediction).
+
+-   **Calibration**: How well predicted probabilities match observed frequencies.
+
+### What to Look For:
+
+-   The adjusted OR for `treatment`.
+
+-   The AUC of the model (aim for \>0.70 in healthcare).
+
+-   Which variables are strongest predictors (e.g., CKD, Hypertension)
+
+```{r}
+# Fit logistic regression model
+model_glm <- glm(readmission ~ treatment + age + sex + bmi + hypertension + ckd + hba1c,
+                 data = df_health, family = binomial)
+summary(model_glm)
+```
+
+```{r}
+# Calculate Odds Ratios and Confidence Intervals
+exp(cbind(OR = coef(model_glm), confint(model_glm)))
+```
+
+```{r}
+# ROC Curve Analysis
+if (!require(pROC)) install.packages("pROC")
+library(pROC)
+
+predicted_probs <- predict(model_glm, type = "response")
+roc_obj <- roc(df_health$readmission, predicted_probs)
+plot(roc_obj, main = paste("AUC:", round(auc(roc_obj), 3)))
+```
+
+We were shooting for above 0.7 for the AUC but it's coming back as 0.645 which is not the ideal outcome we were looking for but still better than 0.5
+
+## Task 5: Survival Analysis (Advanced)
+
+### Real-Life Question: 
+
+*"Does the new drug delay the time to first readmission? How does the risk of readmission change over the course of the year?"*
+
+### Background Terminology:
+
+-   **Kaplan-Meier Curve**: estimates the survival function (probability of *not* being readmitted) over time.
+
+-   **Log-Rank Test**: Compares survival distributions between groups
+
+-   **Cox Proportional Hazards Model**: Estimates the **Hazard Ratio (HR)**. HR is the instantaneous risk of the event at time t, given survival to t. Like OR, HR \< 1 indicates a protective effect.
+
+-   **Censoring**: Patients who do not experience the event by end of study (365 days) are "censored"
+
+### What to Look For:
+
+-   separation of Kaplan-Meier curves
+
+-   The **Hazard Ratio** for `treatment`. It should be less than 1.
+
+-   Testing the **Proportional Hazards Assumption** (Schoenfeld residuals test)
+
+```{r}
+library(survival)
+library(survminer)
+
+# Create survival object
+surv_obj <- Surv(time = df_health$time_to_readmit, event = df_health$readmission)
+
+# Kaplan-Meier Curve
+km_fit <- survfit(surv_obj ~ treatment, data = df_health)
+ggsurvplot(km_fit, data = df_health, pval = TRUE, risk.table = TRUE, 
+           xlab = "Days", ylab = "Readmission-Free Probability",
+           title = "Time to Readmission by Treatment Group")
+```
+
+```{r}
+# Cox Regression (Adjusted)
+cox_model <- coxph(surv_obj ~ treatment + age + sex + bmi + hypertension + ckd + hba1c,
+                   data = df_health)
+summary(cox_model)
+```
+
+```{r}
+# Test Proportional Hazards Assumption
+cox.zph(cox_model) # p-value > 0.05 indicates assumption holds
+```
+
+## Task 6: Mixed-Effects Models for Clustered Data (Advanced)
+
+### Real-Life Question:
+
+*"Patients are treated at different hospital sites. Does the hospital site influence the HbA1c outcome, and does that affect our estimate of the treatment effect?"*
+
+### Background Terminology:
+
+-   **Fixed Effects**: Variables of primary interest (e.g., `treatment`)
+
+-   **Random Effects**: grouping variables that cause correlation within clusters (e.g., `hospital_site`)
+
+    -   we assume site-specific intercepts vary around a population mean
+
+-   **Intraclass Correlation Coefficient (ICC)**: proportion of variance explained by the grouping structure
+
+### What to Look For:
+
+-   Does the treatment effect estimate change after accounting for site clustering?
+
+-   Variance of the random intercept (is there significant variation between hospitals?)
+
+```{r}
+library(lme4)
+
+# Fit a linear mixed model with random intercept for hospital site 
+model_lmer <- lmer(hba1c_change ~ treatment + age + bmi + hypertension + ckd + hba1c + (1 | hospital_site),
+                   data = df_health)
+summary(model_lmer)
+```
+
+```{r}
+# Compare to standard linear model to see if SE changes
+confint(model_lmer) # More conservative (wider) intervals for site-level inference
+```
+
+## Task 7: Machine Learning for Prediction (Advanced/Expert)
+
+### Real-Life Question:
+
+*"Can we build a better predictive model for readmission using a machine learning algorithm like Random Forest? Which factors are most important for prediction?"*
+
+### Background Terminology:
+
+-   **Overfitting**: model learns noise instead of signal.
+
+    -   Avoided via cross-validation
+
+-   **Random Forest**: An ensemble of decision trees. Handles non-linear relationships and interactions automatically.
+
+-   **Variable Importance**: Measures how prediction accuracy decreases if a variable is permutated (Mean Decrease in Accuracy).
+
+### What to Look For:
+
+-   **Cross-Validated AUC**: Compare it to the logistic regression AUC.
+
+    -   If Random Forest is slightly higher, the relationships are non-linear.
+
+-   **Top 5 Important Variables**: Usually age, CKD, and baseline HbA1c
+
+```{r}
+library(randomForest)
+
+# Prepare data (ensure outcome is factor for classification)
+df_rf <- df_health |>
+  select(readmission, treatment, age, sex, bmi, hypertension, ckd, hba1c) |>
+  mutate(readmission = as.factor(readmission),
+         sex = as.factor(sex),
+         hypertension = as.factor(hypertension),
+         ckd = as.factor(ckd))
+
+# Train Random Forest 
+set.seed(123)
+rf_model <- randomForest(readmission ~ ., data = df_rf, importance = TRUE,
+                         ntree = 500)
+print(rf_model)
+```
+
+```{r}
+# variable Importance Plot
+varImpPlot(rf_model)
+```
+
+```{r}
+# Evaluate AUC on training set (for learning: real ML requires train/test split)
+rf_pred <- predict(rf_model, type = "prob")[,2]
+roc_rf <- roc(df_rf$readmission, rf_pred)
+plot(roc_rf, main = paste("Random Forest AUC:", round(auc(roc_rf), 3)))
+```
+
+## Task 8: Causal Inference with Propensity Score Matching (Expert)
+
+### Real-Life Question:
+
+"Our treatment was randomized in this simulation, but what if it was an observational study? How do we control for confounding by indication (sicker patients being more likely to receive the drug) to estimate a causal effect?"
+
+### Background Terminology:
+
+-   **Causal Inference**: distinguishing correlation from causation
+
+-   **Propensity Score (PS)**: the probability of receiving the treatment given baseline covariates
+
+-   **Matching**: pairing each treated patient with a control patient with similar propensity score to create a pseudo-randomized cohort
+
+-   **Average Treatment Effect on the Treated (ATT)**
+
+### What to Look For:
+
+-   **Balance after matching**: Check SMD after matching; all should be \<0.1
+
+-   **Effect Estimate after matching**: Compare the treatment coefficient in the matched dataset to the crude difference
+
+```{r}
+library(MatchIt)
+
+# Estimate Propensity Score
+ps_model <- matchit(treatment ~ age + sex + bmi + hypertension + ckd + hba1c,
+                    data = df_health, method = "nearest", ratio = 1)
+
+# Check balance improvement 
+summary(ps_model)
+```
+
+```{r}
+plot(summary(ps_model))
+```
+
+```{r}
+# Extract matched data 
+matched_data <- match.data(ps_model)
+
+# Re-run analysis on matched cohort (e.g., Logistic Regression)
+model_matched <- glm(readmission ~ treatment, data = matched_data, family = binomial)
+summary(model_matched)
+# Compare OR to crude model: crude OR likely overestimates benefit if we had confounding by indication.
+```
